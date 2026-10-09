@@ -116,12 +116,13 @@
     setTitle('DNEM ADA Lens');
     store.allVisits().then(function (visits) {
       visits.sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
-      var html = '<div class="brand"><div class="logo-tile"><img src="dnem_logo.png" alt="Disability Network Eastern Michigan"></div>' +
-        '<p>Walk a site and record parking, routes, entrances, rooms, outdoor areas and polling places. Works with no signal.</p></div>' +
-        '<h2>Site visits</h2>' +
-        '<p class="help">Everything is saved on this phone, even with no signal. Tap "Send visit" when you are done, choose Drive, and save it to the shared DNEM field-visits folder.</p>';
+      var html = '<button type="button" class="btn block big" id="newVisit">+ New site visit</button>' +
+        '<div class="brand"><div class="logo-tile"><img src="dnem_logo.png" alt="Disability Network Eastern Michigan"></div>' +
+        '<p>Check a site for accessibility. Works with no signal.</p></div>' +
+        '<h2>Your visits</h2>' +
+        '<p class="help">Your visits are saved on this phone. When you finish a visit, tap "Send visit".</p>';
       if (!db) html += '<p class="card status-manual">This browser is not allowing storage, so visits will be lost if you close the app. Send each visit before closing.</p>';
-      if (!visits.length) html += '<p class="empty">No visits yet.</p>';
+      if (!visits.length) html += '<p class="empty">No visits yet. Tap "New site visit" to start.</p>';
       visits.forEach(function (v) {
         var n = (v.findings || []).length;
         html += '<button type="button" class="card link" data-open="' + esc(v.id) + '"><strong>' + esc(v.siteName || 'Untitled site') + '</strong>' +
@@ -129,7 +130,6 @@
           (v.exportedAt && v.exportedAt >= v.updated ? '<span class="badge">Sent</span>' : (n ? '<span class="badge">Not sent yet</span>' : '')) + '</button>';
       });
       html += '<p class="help" style="text-align:center">App version ' + APP_VERSION + '</p>';
-      html += '<div class="sticky-actions"><button type="button" class="btn" id="newVisit">+ New site visit</button></div>';
       main.innerHTML = html;
       main.querySelectorAll('[data-open]').forEach(function (b) { b.onclick = function () { go('#visit/' + b.dataset.open); }; });
       document.getElementById('newVisit').onclick = function () { go('#new'); };
