@@ -4,7 +4,10 @@
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 9 Trails and polling';
+  var APP_VERSION = 'Oct 9 Direct to Drive';
+  // DNEM's Google Drive upload service (Apps Script web app, see src/drive/Code.gs).
+  // When empty, "Send visit" uses the phone's share sheet instead.
+  var UPLOAD_URL = '';
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
@@ -533,15 +536,62 @@
         v.exportedAt = new Date().toISOString();
         return store.putVisit(v, true).then(function () { toast(msg); route(); });
       };
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: name })
-          .then(function () { return markSent('Sent. Check it arrived in the shared folder.'); })
-          .catch(function (err) {
-            if (err && err.name === 'AbortError') toast('Not sent');
-            else { download(file); markSent('Downloaded. Upload the ZIP to the Google Drive folder.'); }
-          });
-      } else { download(file); markSent('Downloaded. Upload the ZIP to the Google Drive folder.'); }
+      if (UPLOAD_URL) return uploadVisit(file).then(function (r) {
+        if (r === 'ok') return markSent('Sent to the DNEM Google Drive.');
+        if (r === 'cancel') return toast('Not sent');
+        if (confirm('Could not reach the DNEM Google Drive. The visit is still saved on this phone.\n\nTap OK to save or share the visit file another way, or Cancel to try again later with a better signal.')) shareFile(file, markSent);
+      });
+      shareFile(file, markSent);
     }).catch(function (err) { toast('Could not pack visit: ' + err.message); });
+  }
+  function shareFile(file, markSent) {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: file.name })
+        .then(function () { return markSent('Sent. Check it arrived in the shared folder.'); })
+        .catch(function (err) {
+          if (err && err.name === 'AbortError') toast('Not sent');
+          else { download(file); markSent('Downloaded. Upload the ZIP to the Google Drive folder.'); }
+        });
+    } else { download(file); markSent('Downloaded. Upload the ZIP to the Google Drive folder.'); }
+  }
+
+  // Upload to DNEM's Drive in 6 MB pieces (a multiple of 3 bytes, so the base64 pieces join cleanly).
+  // Resolves 'ok', 'cancel' (no team code) or 'failed'.
+  var PART = 6 * 1024 * 1024 - (6 * 1024 * 1024) % 3;
+  function teamCode(askAgain) {
+    var c = askAgain ? null : pref('teamCode');
+    if (!c) {
+      c = prompt((askAgain ? 'That team code was not accepted. ' : '') + 'Enter the DNEM team code (ask Amy). You only need to do this once.');
+      c = c && c.replace(/\D/g, '');
+      if (c) pref('teamCode', c);
+    }
+    return c;
+  }
+  function toBase64(bytes) {
+    var s = '';
+    for (var i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function uploadVisit(file, askAgain) {
+    var code = teamCode(askAgain);
+    if (!code) return Promise.resolve('cancel');
+    return file.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf), parts = Math.max(1, Math.ceil(bytes.length / PART));
+      var upload = uid() + '-' + Date.now().toString(36);
+      function send(i) {
+        toast(parts > 1 ? 'Sending part ' + (i + 1) + ' of ' + parts + '...' : 'Sending...');
+        var body = JSON.stringify({ code: code, name: file.name, upload: upload, part: i, parts: parts, data: toBase64(bytes.subarray(i * PART, (i + 1) * PART)) });
+        return fetch(UPLOAD_URL, { method: 'POST', body: body, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (j && j.ok) return i + 1 < parts ? send(i + 1) : 'ok';
+            if (j && j.error === 'code') { pref('teamCode', ''); return 'badcode'; }
+            return 'failed';
+          });
+      }
+      return send(0);
+    }).then(function (r) { return r === 'badcode' ? uploadVisit(file, true) : r; })
+      .catch(function () { return 'failed'; });
   }
   function download(file) {
     var a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;

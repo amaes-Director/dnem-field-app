@@ -18,7 +18,7 @@ Two tools that share one rules table.
    - In **Rooms**, tap **Add a room**, pick the room type, and add a number and a name if useful (for example Meeting / conference room 2, "Board of Directors room"). The room then shows its usual items. Use **Something else** for anything not listed.
    - When the rooms are finished, tap **Next: Outdoor and recreation areas**. Add each playground, pool or spa, park or picnic area, sports field or bleachers, fishing pier or boat dock, golf or mini golf course, outdoor fitness area, trail or wetland boardwalk, campground, beach, festival or event area, or bus stop the same way. Skip it if the site has none. **Send visit** is at the bottom of this screen and on the visit overview.
 4. Everything saves on the phone, including with no signal.
-5. When you finish, tap **Send visit**. The phone's share sheet opens. Choose **Drive** (the Google Drive app must be installed and signed in), then pick the shared DNEM field-visits folder and tap Upload.
+5. When you finish, tap **Send visit**. Once DNEM's upload service is set up (see `Google Drive setup.md`), the visit goes straight into the DNEM Google Drive folder. The first time, the phone asks for the team code. Until then, the phone's share sheet opens: choose **Drive**, pick the shared DNEM field-visits folder and tap Upload.
 
 ## Amy, at the desk
 1. Double-click `DNEM ADA Lens Report Builder.html`. It opens in your browser and nothing is uploaded anywhere.
