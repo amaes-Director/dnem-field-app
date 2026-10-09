@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var R = window.DNEM_RULES, E = window.DNEM_ENGINE;
+  var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
   var backBtn = document.getElementById('back');
@@ -144,7 +144,12 @@
       '<fieldset><legend>Building status</legend><p class="help">Decides whether the 2021 Michigan new-building sizes apply (for example a 67 in turning circle). Leave "Not known" if unsure; the report will flag those items.</p><div class="choices">' + st + '</div></fieldset>' +
       '<div class="field"><label for="vnotes">Visit notes</label><textarea id="vnotes">' + esc(v.notes) + '</textarea></div>' +
       '<p id="vfErr" class="status-fail" role="alert"></p>' +
+      (isNew ? '' : '<h3>Remove</h3><p><button class="btn danger" type="button" id="delV">Delete this visit from the phone</button></p>') +
       '<div class="sticky-actions"><button class="btn" type="submit">' + (isNew ? 'Start visit' : 'Save') + '</button></div></form>';
+    if (!isNew) document.getElementById('delV').onclick = function () {
+      var sent = v.exportedAt && v.exportedAt >= v.updated;
+      if (confirm((sent ? '' : 'This visit has NOT been sent. ') + 'Delete "' + v.siteName + '" and its photos from this phone?')) store.deleteVisit(v.id).then(function () { toast('Visit deleted'); go('#'); });
+    };
     document.getElementById('vf').onsubmit = function (e) {
       e.preventDefault();
       var g = function (id) { return document.getElementById(id).value.trim(); };
@@ -161,33 +166,162 @@
     focusMain();
   }
 
+  // ---------------------------------------------------------------- the walk
+  // Visit overview: one big button to carry on, then the stops in walk order.
+  function areaFindings(v, areaId) { return (v.findings || []).filter(function (f) { return (f.areaId || '') === areaId; }); }
+  function areaStatus(v, areaId) {
+    var fs = areaFindings(v, areaId);
+    if (!fs.length) return '';
+    var st = fs.map(function (f) { return E.evaluateFinding(f, v, R).status; });
+    var fail = st.filter(function (s) { return s === 'fail'; }).length, man = st.filter(function (s) { return s === 'manual'; }).length;
+    return fs.length + ' recorded' + (fail ? ' · <span class="status-fail">' + fail + ' do not comply</span>' : '') + (man ? ' · <span class="status-manual">' + man + ' need input</span>' : '');
+  }
+  // Where "Continue" goes: the first stop with nothing recorded and not marked done, else Rooms.
+  function nextHash(v, afterId) {
+    var areas = W.areas(v), done = v.doneAreas || [];
+    if (afterId === undefined) {
+      for (var i = 0; i < areas.length; i++) if (done.indexOf(areas[i].id) < 0 && !areaFindings(v, areas[i].id).length) return areas[i].kind === 'room' ? '#area/' + v.id + '/' + areas[i].id : '#area/' + v.id + '/' + areas[i].id;
+      return '#rooms/' + v.id;
+    }
+    var idx = areas.map(function (a) { return a.id; }).indexOf(afterId);
+    var nxt = areas[idx + 1];
+    if (!nxt || (areas[idx].id === 'entrance')) return '#rooms/' + v.id;
+    return '#area/' + v.id + '/' + nxt.id;
+  }
+  function nextLabel(v, hash) {
+    if (hash.indexOf('#rooms/') === 0) return 'Rooms';
+    var id = hash.split('/')[2], a = W.areas(v).filter(function (x) { return x.id === id; })[0];
+    return a ? a.label : 'Next';
+  }
+  function markDone(v, areaId) {
+    v.doneAreas = v.doneAreas || [];
+    if (v.doneAreas.indexOf(areaId) < 0) v.doneAreas.push(areaId);
+    return store.putVisit(v);
+  }
+
   function viewVisit(id) {
     store.getVisit(id).then(function (v) {
       if (!v) return go('#');
       setTitle(v.siteName || 'Site visit', '#');
-      var fs = v.findings || [];
-      var bs = R.buildingStatus.filter(function (s) { return s.id === v.buildingStatus; })[0];
-      var html = '<h2>' + esc(v.siteName) + '</h2><p class="help">' + esc(v.date) + ' · ' + esc(v.consultant) + (v.address ? ' · ' + esc(v.address) : '') + '<br>Building: ' + esc(bs ? bs.label : 'Not known') + '</p>' +
-        '<div class="row" style="margin:12px 0"><button class="btn secondary" type="button" id="editV">Edit details</button><button class="btn" type="button" id="sendV">Send visit</button></div>' +
-        '<h3>Findings (' + fs.length + ')</h3>';
-      if (!fs.length) html += '<p class="empty">No findings yet. Tap "Add finding" to start.</p>';
-      fs.forEach(function (f, i) {
-        var ev = E.evaluateFinding(f, v, R);
-        var cls = { fail: 'status-fail', manual: 'status-manual', pass: 'status-pass', na: '' }[ev.status];
-        html += '<button type="button" class="card link" data-f="' + esc(f.id) + '"><strong>' + (i + 1) + '. ' + esc(elementLabel(f.elementType)) + '</strong>' +
-          '<span class="meta">' + esc(f.location || 'No location') + ' · ' + (f.photos || []).length + ' photo(s)</span><br>' +
-          '<span class="' + cls + '">' + esc(E.STATUS_LABEL[ev.status]) + '</span></button>';
+      var nh = nextHash(v);
+      var html = '<button class="btn block big" type="button" id="cont">' + (v.findings && v.findings.length ? 'Continue: ' : 'Start: ') + esc(nextLabel(v, nh)) + '</button>' +
+        '<h2>' + esc(v.siteName) + '</h2><p class="help">' + esc(v.date) + ' · ' + esc(v.consultant) + '</p><ol class="walk">';
+      W.stops.forEach(function (s, i) {
+        var done = (v.doneAreas || []).indexOf(s.id) >= 0 || areaFindings(v, s.id).length;
+        html += '<li><button type="button" class="card link" data-go="#area/' + v.id + '/' + s.id + '"><strong>' + (i + 1) + '. ' + esc(s.label) + (done ? ' <span aria-label="started">✓</span>' : '') + '</strong><span class="meta">' + (areaStatus(v, s.id) || 'Not started') + '</span></button></li>';
       });
-      html += '<h3>Remove</h3><button class="btn danger" type="button" id="delV">Delete this visit from the phone</button>' +
-        '<div class="sticky-actions"><button class="btn" type="button" id="addF">+ Add finding</button></div>';
+      var rooms = v.rooms || [];
+      html += '<li><button type="button" class="card link" data-go="#rooms/' + v.id + '"><strong>4. Rooms</strong><span class="meta">' + rooms.length + ' room' + (rooms.length === 1 ? '' : 's') + ' added</span></button></li></ol>';
+      var loose = areaFindings(v, '');
+      if (loose.length) html += '<button type="button" class="card link" data-go="#area/' + v.id + '/_none"><strong>Other findings</strong><span class="meta">' + areaStatus(v, '') + '</span></button>';
+      html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>' +
+        '<p><a href="#visit/' + v.id + '/edit" class="textlink">Visit details or delete visit</a></p>';
       main.innerHTML = html;
-      main.querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { go('#finding/' + v.id + '/' + b.dataset.f); }; });
-      document.getElementById('addF').onclick = function () { go('#finding/' + v.id + '/new'); };
-      document.getElementById('editV').onclick = function () { go('#visit/' + v.id + '/edit'); };
+      main.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
+      document.getElementById('cont').onclick = function () { go(nh); };
       document.getElementById('sendV').onclick = function () { sendVisit(v); };
-      document.getElementById('delV').onclick = function () {
-        var sent = v.exportedAt && v.exportedAt >= v.updated;
-        if (confirm((sent ? '' : 'This visit has NOT been sent. ') + 'Delete "' + v.siteName + '" and its photos from this phone?')) store.deleteVisit(v.id).then(function () { toast('Visit deleted'); go('#'); });
+      focusMain();
+    });
+  }
+
+  // One stop or room: big Next button, then the element checklist.
+  function viewArea(visitId, areaId) {
+    store.getVisit(visitId).then(function (v) {
+      if (!v) return go('#');
+      var area = areaId === '_none' ? { id: '', label: 'Other findings', elements: [], kind: 'none' } : W.areas(v).filter(function (a) { return a.id === areaId; })[0];
+      if (!area) return go('#visit/' + v.id);
+      var back = area.kind === 'room' ? '#rooms/' + v.id : '#visit/' + v.id;
+      setTitle(area.label, back);
+      var nh = area.kind === 'none' ? '#visit/' + v.id : nextHash(v, area.id);
+      var fs = areaFindings(v, area.id);
+      var html = '<button class="btn block big" type="button" id="next">Done here. Next: ' + esc(nextLabel(v, nh)) + '</button>' +
+        '<h2>' + esc(area.label) + '</h2>';
+      if (area.kind !== 'none') html += '<p class="help">Tap each item you can see here. Skip anything that is not here.</p>';
+      html += '<ul class="checklist">';
+      area.elements.forEach(function (eid) {
+        var n = fs.filter(function (f) { return f.elementType === eid; }).length;
+        html += '<li><button type="button" class="card link" data-go="#finding/' + v.id + '/' + (area.id || '_none') + '/new/' + eid + '"><strong>' + esc(elementLabel(eid)) + (n ? ' <span aria-label="recorded">✓</span>' : '') + '</strong><span class="meta">' + (n ? n + ' recorded. Tap to add another.' : 'Tap to record') + '</span></button></li>';
+      });
+      if (area.kind !== 'none') html += '<li><button type="button" class="card link" data-go="#finding/' + v.id + '/' + area.id + '/new/_pick"><strong>Something else</strong><span class="meta">Any other element, or a photo and note</span></button></li>';
+      html += '</ul>';
+      if (fs.length) {
+        html += '<h3>Recorded here</h3><ul class="checklist">';
+        fs.forEach(function (f) {
+          var ev = E.evaluateFinding(f, v, R), cls = { fail: 'status-fail', manual: 'status-manual', pass: 'status-pass', na: '' }[ev.status];
+          html += '<li><button type="button" class="card link" data-go="#finding/' + v.id + '/' + (area.id || '_none') + '/' + f.id + '"><strong>' + esc(elementLabel(f.elementType)) + '</strong><span class="meta">' + esc(f.location) + ' · ' + (f.photos || []).length + ' photo(s)</span><br><span class="' + cls + '">' + esc(E.STATUS_LABEL[ev.status]) + '</span></button></li>';
+        });
+        html += '</ul>';
+      }
+      if (area.kind === 'room') html += '<p><a href="#room/' + v.id + '/' + area.id + '" class="textlink">Rename or remove this room</a></p>';
+      main.innerHTML = html;
+      main.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
+      document.getElementById('next').onclick = function () { (area.id ? markDone(v, area.id) : Promise.resolve()).then(function () { go(nh); }); };
+      focusMain();
+    });
+  }
+
+  // Rooms list: add a room at the top, then the rooms in the order added.
+  function viewRooms(visitId) {
+    store.getVisit(visitId).then(function (v) {
+      if (!v) return go('#');
+      setTitle('Rooms', '#visit/' + v.id);
+      var rooms = v.rooms || [];
+      var html = '<button class="btn block big" type="button" id="addRoom">+ Add a room</button><h2>Rooms</h2>';
+      if (!rooms.length) html += '<p class="empty">No rooms yet. Add each room as you walk into it.</p>';
+      html += '<ul class="checklist">';
+      rooms.forEach(function (r) {
+        html += '<li><button type="button" class="card link" data-go="#area/' + v.id + '/' + r.id + '"><strong>' + esc(W.roomLabel(r)) + ((v.doneAreas || []).indexOf(r.id) >= 0 ? ' <span aria-label="done">✓</span>' : '') + '</strong><span class="meta">' + (areaStatus(v, r.id) || 'Nothing recorded yet') + '</span></button></li>';
+      });
+      html += '</ul>';
+      if (rooms.length) html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>';
+      main.innerHTML = html;
+      main.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
+      document.getElementById('addRoom').onclick = function () { go('#room/' + v.id + '/new'); };
+      if (rooms.length) document.getElementById('sendV').onclick = function () { sendVisit(v); };
+      focusMain();
+    });
+  }
+
+  // Add or rename a room: type, number, and the name the reviewer uses.
+  function roomForm(visitId, roomId) {
+    store.getVisit(visitId).then(function (v) {
+      if (!v) return go('#');
+      v.rooms = v.rooms || [];
+      var isNew = roomId === 'new';
+      var r = isNew ? { id: uid(), type: '', number: '', name: '' } : v.rooms.filter(function (x) { return x.id === roomId; })[0];
+      if (!r) return go('#rooms/' + v.id);
+      setTitle(isNew ? 'Add a room' : 'Rename room', isNew ? '#rooms/' + v.id : '#area/' + v.id + '/' + r.id);
+      var types = W.roomTypes.map(function (t) {
+        return '<label class="choice" style="width:100%"><input type="radio" name="rtype" value="' + t.id + '"' + (r.type === t.id ? ' checked' : '') + '> ' + esc(t.label) + '</label>';
+      }).join('');
+      main.innerHTML = '<form id="rf" novalidate>' +
+        '<button class="btn block big" type="submit">' + (isNew ? 'Add room' : 'Save') + '</button>' +
+        '<fieldset><legend>Room type (required)</legend><div class="choices">' + types + '</div></fieldset>' +
+        '<div class="field"><label for="rnum">Number (optional)</label><input type="text" id="rnum" placeholder="e.g. 2 or 104" value="' + esc(r.number) + '"></div>' +
+        '<div class="field"><label for="rname">Name (optional)</label><input type="text" id="rname" placeholder="e.g. Board of Directors meeting room" value="' + esc(r.name) + '"></div>' +
+        '<p class="help" id="rprev"></p><p id="rfErr" class="status-fail" role="alert"></p>' +
+        (isNew ? '' : '<p><button class="btn danger" type="button" id="delR">Remove this room</button></p>') + '</form>';
+      function preview() {
+        var t = main.querySelector('input[name=rtype]:checked');
+        document.getElementById('rprev').textContent = t ? 'Shown as: ' + W.roomLabel({ type: t.value, number: document.getElementById('rnum').value.trim(), name: document.getElementById('rname').value.trim() }) : '';
+      }
+      main.querySelectorAll('input').forEach(function (i) { i.addEventListener('input', preview); i.addEventListener('change', preview); });
+      preview();
+      document.getElementById('rf').onsubmit = function (e) {
+        e.preventDefault();
+        var t = main.querySelector('input[name=rtype]:checked');
+        if (!t) { document.getElementById('rfErr').textContent = 'Choose the room type.'; main.querySelector('input[name=rtype]').focus(); return; }
+        r.type = t.value; r.number = document.getElementById('rnum').value.trim(); r.name = document.getElementById('rname').value.trim();
+        if (isNew) v.rooms.push(r);
+        store.putVisit(v).then(function () { go('#area/' + v.id + '/' + r.id); });
+      };
+      if (!isNew) document.getElementById('delR').onclick = function () {
+        var n = areaFindings(v, r.id).length;
+        if (!confirm('Remove ' + W.roomLabel(r) + (n ? ' and its ' + n + ' finding(s)' : '') + '?')) return;
+        var gone = areaFindings(v, r.id);
+        v.findings = (v.findings || []).filter(function (f) { return f.areaId !== r.id; });
+        v.rooms = v.rooms.filter(function (x) { return x.id !== r.id; });
+        Promise.all([].concat.apply([], gone.map(function (f) { return f.photos; })).map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Room removed'); go('#rooms/' + v.id); });
       };
       focusMain();
     });
@@ -240,16 +374,21 @@
     return values;
   }
 
-  function viewFinding(visitId, findingId) {
+  function viewFinding(visitId, areaKey, findingId, presetElement) {
     store.getVisit(visitId).then(function (v) {
       if (!v) return go('#');
       v.findings = v.findings || [];
       var isNew = findingId === 'new';
       var orig = isNew ? null : v.findings.filter(function (f) { return f.id === findingId; })[0];
-      if (!isNew && !orig) return go('#visit/' + v.id);
-      var f = orig ? JSON.parse(JSON.stringify(orig)) : { id: uid(), elementType: pref('lastElement') || '', location: '', values: {}, photos: [], notes: '', flagManual: false, flagReason: '', consultant: v.consultant, created: new Date().toISOString() };
+      var areaId = areaKey === '_none' ? '' : areaKey;
+      var area = W.areas(v).filter(function (a) { return a.id === areaId; })[0];
+      var backTo = '#area/' + v.id + '/' + (areaId || '_none');
+      if (!isNew && !orig) return go(backTo);
+      var preset = presetElement && presetElement !== '_pick' ? presetElement : '';
+      var f = orig ? JSON.parse(JSON.stringify(orig)) : { id: uid(), areaId: areaId, elementType: preset, location: area ? area.label : '', values: {}, photos: [], notes: '', flagManual: false, flagReason: '', consultant: v.consultant, created: new Date().toISOString() };
       var addedPhotos = [], removedPhotos = [];
-      setTitle(isNew ? 'New finding' : 'Edit finding', '#visit/' + v.id);
+      var lockedType = !!(f.elementType && (preset || !isNew));
+      setTitle(lockedType ? elementLabel(f.elementType) : 'Something else', backTo);
 
       var groups = {};
       R.elements.forEach(function (el) { (groups[el.group] = groups[el.group] || []).push(el); });
@@ -258,8 +397,9 @@
       }).join('');
 
       main.innerHTML = '<form id="ff" novalidate>' +
-        '<div class="field"><label for="etype">Element (required)</label><select id="etype">' + sel + '</select></div>' +
-        '<div class="field"><label for="loc">Location (required)</label><input type="text" id="loc" placeholder="e.g. 2nd floor women\'s restroom, east entrance" value="' + esc(f.location) + '"></div>' +
+        (lockedType ? '<h2>' + esc(elementLabel(f.elementType)) + '</h2><input type="hidden" id="etype" value="' + esc(f.elementType) + '">'
+          : '<div class="field"><label for="etype">Element (required)</label><select id="etype">' + sel + '</select></div>') +
+        '<div class="field"><label for="loc">Where is it? (required)</label><input type="text" id="loc" placeholder="e.g. north lot, space 3" value="' + esc(f.location) + '"></div>' +
         '<h3>Photos</h3><div class="row"><label class="btn secondary file-btn">Take photo<input type="file" accept="image/*" capture="environment" id="cam"></label>' +
         '<label class="btn secondary file-btn">Choose photos<input type="file" accept="image/*" multiple id="gal"></label></div>' +
         '<div class="photos" id="photos" aria-live="polite"></div>' +
@@ -309,26 +449,26 @@
       }
       document.getElementById('cam').onchange = function (e) { addFiles(e.target.files); e.target.value = ''; };
       document.getElementById('gal').onchange = function (e) { addFiles(e.target.files); e.target.value = ''; };
-      document.getElementById('etype').onchange = function () { pref('lastElement', this.value); renderFields(); };
+      if (!lockedType) document.getElementById('etype').onchange = renderFields;
       document.getElementById('cancelF').onclick = function () {
-        Promise.all(addedPhotos.map(store.deletePhoto)).then(function () { go('#visit/' + v.id); });
+        Promise.all(addedPhotos.map(store.deletePhoto)).then(function () { go(backTo); });
       };
       if (!isNew) document.getElementById('delF').onclick = function () {
         if (!confirm('Delete this finding and its photos?')) return;
         v.findings = v.findings.filter(function (x) { return x.id !== f.id; });
-        Promise.all(f.photos.concat(removedPhotos).map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Finding deleted'); go('#visit/' + v.id); });
+        Promise.all(f.photos.concat(removedPhotos).map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Finding deleted'); go(backTo); });
       };
       document.getElementById('ff').onsubmit = function (e) {
         e.preventDefault();
         var el = E.findElement(R, document.getElementById('etype').value);
         var loc = document.getElementById('loc').value.trim();
-        if (!el || !loc) { document.getElementById('ffErr').textContent = 'Choose the element and enter its location.'; document.getElementById(!el ? 'etype' : 'loc').focus(); return; }
+        if (!el || !loc) { document.getElementById('ffErr').textContent = !el ? 'Choose the element.' : 'Enter where this is.'; document.getElementById(!el ? 'etype' : 'loc').focus(); return; }
         f.elementType = el.id; f.location = loc; f.values = readFields(el);
         f.notes = document.getElementById('fnotes').value.trim();
         f.flagManual = document.getElementById('flag').checked; f.flagReason = document.getElementById('flagr').value.trim();
         f.updated = new Date().toISOString();
         if (isNew) v.findings.push(f); else v.findings = v.findings.map(function (x) { return x.id === f.id ? f : x; });
-        Promise.all(removedPhotos.map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Finding saved'); go('#visit/' + v.id); });
+        Promise.all(removedPhotos.map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Finding saved'); go(backTo); });
       };
       renderFields(); renderPhotos(); focusMain();
     });
@@ -340,8 +480,8 @@
     if (!(v.findings || []).length) { toast('Add at least one finding first'); return; }
     toast('Packing visit...');
     var zip = new JSZip(), photoDir = zip.folder('photos');
-    var out = { format: 'dnem-field-visit', formatVersion: 1, rulesVersion: R.version, exportedAt: new Date().toISOString(), app: 'DNEM Field Capture', visit: {}, findings: [] };
-    ['id', 'siteName', 'address', 'client', 'consultant', 'date', 'buildingStatus', 'notes', 'created', 'updated'].forEach(function (k) { out.visit[k] = v[k]; });
+    var out = { format: 'dnem-field-visit', formatVersion: 2, rulesVersion: R.version, exportedAt: new Date().toISOString(), app: 'DNEM Field Capture', visit: {}, findings: [] };
+    ['id', 'siteName', 'address', 'client', 'consultant', 'date', 'buildingStatus', 'notes', 'created', 'updated', 'rooms', 'doneAreas'].forEach(function (k) { out.visit[k] = v[k]; });
     var jobs = [];
     v.findings.forEach(function (f, i) {
       var copy = JSON.parse(JSON.stringify(f)); copy.photos = [];
@@ -382,11 +522,14 @@
   function route() {
     var h = location.hash.replace(/^#/, '').split('/');
     if (h[0] === 'new') {
-      visitForm({ id: uid(), siteName: '', address: '', client: '', consultant: pref('consultant') || '', date: today(), buildingStatus: 'unknown', notes: '', findings: [], created: new Date().toISOString() }, true);
+      visitForm({ id: uid(), siteName: '', address: '', client: '', consultant: pref('consultant') || '', date: today(), buildingStatus: 'unknown', notes: '', rooms: [], doneAreas: [], findings: [], created: new Date().toISOString() }, true);
     } else if (h[0] === 'visit' && h[2] === 'edit') {
       store.getVisit(h[1]).then(function (v) { if (v) visitForm(v, false); else go('#'); });
     } else if (h[0] === 'visit') viewVisit(h[1]);
-    else if (h[0] === 'finding') viewFinding(h[1], h[2]);
+    else if (h[0] === 'area') viewArea(h[1], h[2]);
+    else if (h[0] === 'rooms') viewRooms(h[1]);
+    else if (h[0] === 'room') roomForm(h[1], h[2]);
+    else if (h[0] === 'finding') viewFinding(h[1], h[2], h[3], h[4]);
     else viewHome();
   }
   window.addEventListener('hashchange', route);

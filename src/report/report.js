@@ -9,7 +9,7 @@
   var ORDER = { fail: 0, manual: 1, pass: 2, na: 3 };
 
   function buildReport(deps, visits, opts) {
-    var d = deps.docx, R = deps.rules, E = deps.engine;
+    var d = deps.docx, R = deps.rules, E = deps.engine, W = deps.walk;
     opts = opts || {};
     var P = d.Paragraph, T = d.TextRun;
 
@@ -22,8 +22,24 @@
         items.push({ visit: v, visitIndex: vi, finding: f, ev: ev, photos: (f.photos || []).map(function (p) { return vz.photos[p.file]; }).filter(Boolean) });
       });
     });
-    items.sort(function (a, b) { return ORDER[a.ev.status] - ORDER[b.ev.status] || a.visitIndex - b.visitIndex; });
-    items.forEach(function (it, i) { it.no = i + 1; });
+    // ---- walk order: Parking, Route, Entrance, then each visit's rooms, then anything unassigned
+    var multiSite = uniq(visits.map(function (z) { return z.data.visit.siteName; })).length > 1;
+    var groups = W.stops.map(function (st) { return { key: 'stop:' + st.id, label: st.label, kind: 'stop', items: [] }; });
+    visits.forEach(function (vz, vi) {
+      (vz.data.visit.rooms || []).forEach(function (r) {
+        groups.push({ key: vi + ':' + r.id, label: W.roomLabel(r) + (multiSite ? ' (' + vz.data.visit.siteName + ')' : ''), kind: 'room', items: [] });
+      });
+    });
+    var other = { key: 'other', label: 'Other findings', kind: 'other', items: [] };
+    groups.push(other);
+    var gIndex = {}; groups.forEach(function (g, i) { gIndex[g.key] = i; });
+    items.forEach(function (it, i) {
+      var a = it.finding.areaId || '';
+      var key = W.stops.some(function (st) { return st.id === a; }) ? 'stop:' + a : (gIndex[it.visitIndex + ':' + a] !== undefined ? it.visitIndex + ':' + a : 'other');
+      it.group = groups[gIndex[key]]; it.seq = i;
+    });
+    items.sort(function (a, b) { return gIndex[a.group.key] - gIndex[b.group.key] || a.visitIndex - b.visitIndex || a.seq - b.seq; });
+    items.forEach(function (it, i) { it.no = i + 1; it.group.items.push(it); });
 
     var sites = uniq(visits.map(function (z) { return z.data.visit.siteName; }));
     var consultants = uniq(visits.map(function (z) { return z.data.visit.consultant; }).concat(items.map(function (it) { return it.finding.consultant; })));
@@ -66,12 +82,6 @@
     // ---- counts ---------------------------------------------------------------
     var count = { fail: 0, manual: 0, pass: 0, na: 0 };
     items.forEach(function (it) { count[it.ev.status]++; });
-    var byType = {};
-    items.forEach(function (it) {
-      var k = it.ev.element ? it.ev.element.label : it.finding.elementType;
-      byType[k] = byType[k] || { fail: 0, manual: 0, pass: 0, na: 0, n: 0 };
-      byType[k][it.ev.status]++; byType[k].n++;
-    });
 
     var children = [];
     // ---- title page -------------------------------------------------------------
@@ -94,33 +104,62 @@
     children.push(para(items.length + ' finding(s) were recorded at ' + sites.length + ' site(s). ' +
       count.fail + ' do not comply with at least one requirement, ' + count.manual + ' need manual input before a determination can be made, and ' +
       count.pass + ' comply with every requirement that was measured.'));
-    var sumRows = [headRow(['Element', 'Findings', 'Does not comply', 'Needs manual input', 'Complies'])];
-    Object.keys(byType).sort().forEach(function (k) {
-      var b = byType[k];
-      sumRows.push(new d.TableRow({ cantSplit: true, children: [cell(k), cell(String(b.n)), cell(String(b.fail)), cell(String(b.manual)), cell(String(b.pass + b.na))] }));
+    var sumRows = [headRow(['Area (in walk order)', 'Findings', 'Does not comply', 'Needs manual input', 'Complies'])];
+    groups.forEach(function (g) {
+      if (g.kind === 'other' && !g.items.length) return;
+      var b = { fail: 0, manual: 0, pass: 0, na: 0 };
+      g.items.forEach(function (it) { b[it.ev.status]++; });
+      sumRows.push(new d.TableRow({ cantSplit: true, children: [cell(g.label), cell(String(g.items.length)), cell(String(b.fail)), cell(String(b.manual)), cell(String(b.pass + b.na))] }));
     });
     sumRows.push(new d.TableRow({ cantSplit: true, children: [cell('Total', { bold: true, fill: TINT }), cell(String(items.length), { bold: true, fill: TINT }), cell(String(count.fail), { bold: true, fill: TINT }), cell(String(count.manual), { bold: true, fill: TINT }), cell(String(count.pass + count.na), { bold: true, fill: TINT })] }));
     children.push(table(sumRows));
 
     children.push(h(d.HeadingLevel.HEADING_2, 'How to read this report'));
+    children.push(bullet([txt('Order. ', { bold: true }), txt('Findings follow the order the site was walked: parking, the route to the entrance, the entrance, then each room. Finding numbers follow the same order.')]));
     children.push(bullet([txt('Which code governs. ', { bold: true }), txt('Each measurement is compared with the 2010 ADA Standards and with the Michigan barrier-free requirements (2021 Michigan Building Code, which adopts ICC A117.1-2017). Where both set a limit, the stricter one is used and cited. When the two match, both are cited with "(same requirement)".')]));
     children.push(bullet([txt('Results. ', { bold: true }), txt('"Does not comply" means a recorded measurement or answer falls outside the stricter requirement. "Complies" means every recorded value meets it. "Needs manual input" means the tool could not decide: a value was not recorded, the requirement depends on something not captured (such as the building\'s permit date), or the item needs a consultant\'s judgment.')]));
     children.push(bullet([txt('Citations marked †. ', { bold: true }), txt('These citations have not yet been checked against the printed code text. They are listed in Appendix A for confirmation before the report is issued.')]));
     children.push(bullet([txt('Measurements. ', { bold: true }), txt('Values are shown in inches, percent slope (with the ratio), pounds-force or seconds. Values entered in other units are converted and the original entry is shown in brackets. Dimensions are subject to conventional industry tolerances (ADA 104.1.1).')]));
 
-    // ---- 2. findings --------------------------------------------------------------
-    var sections = [['fail', '2A. Findings That Do Not Comply'], ['manual', '2B. Findings That Need Manual Input'], ['pass', '2C. Findings That Comply'], ['na', '2D. Findings With No Applicable Checks']];
-    sections.forEach(function (sec) {
-      var list = items.filter(function (it) { return it.ev.status === sec[0]; });
-      if (!list.length) return;
-      children.push(h(d.HeadingLevel.HEADING_1, sec[1]));
-      list.forEach(function (it) { findingBlock(it).forEach(function (c) { children.push(c); }); });
+    // ---- 2. problems to fix, then findings in walk order --------------------------------
+    var sec = 2;
+    var fails = [];
+    items.forEach(function (it) {
+      it.ev.results.forEach(function (r) { if (r.status === 'fail') fails.push([String(it.no), it.group.label, it.ev.element ? it.ev.element.label : it.finding.elementType, r.label, r.measured || '', r.required || '']); });
     });
+    children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Problems to Fix'));
+    if (fails.length) {
+      children.push(para(fails.length + ' requirement(s) were not met, listed in the order the site was walked. Details and photos follow under each area.'));
+      children.push(table([headRow(['Finding', 'Area', 'Element', 'Requirement not met', 'Measured', 'Required'], [9, 20, 17, 24, 15, 15])].concat(fails.map(function (r) {
+        return new d.TableRow({ cantSplit: true, children: r.map(function (c) { return cell(c); }) });
+      }))));
+    } else children.push(para('No recorded measurement or answer failed a requirement.'));
 
-    function findingBlock(it) {
+    function groupBody(g, level) {
+      if (!g.items.length) { children.push(small('Nothing was recorded here.')); return; }
+      g.items.forEach(function (it) { findingBlock(it, level).forEach(function (c) { children.push(c); }); });
+    }
+    groups.forEach(function (g) {
+      if (g.kind !== 'stop') return;
+      children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. ' + g.label));
+      groupBody(g, d.HeadingLevel.HEADING_2);
+    });
+    var roomGroups = groups.filter(function (g) { return g.kind === 'room'; });
+    children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Rooms'));
+    if (!roomGroups.length) children.push(small('No rooms were recorded.'));
+    roomGroups.forEach(function (g) {
+      children.push(h(d.HeadingLevel.HEADING_2, g.label));
+      groupBody(g, d.HeadingLevel.HEADING_3);
+    });
+    if (other.items.length) {
+      children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Other Findings'));
+      groupBody(other, d.HeadingLevel.HEADING_2);
+    }
+
+    function findingBlock(it, level) {
       var f = it.finding, out = [];
       var elLabel = it.ev.element ? it.ev.element.label : f.elementType;
-      out.push(h(d.HeadingLevel.HEADING_2, 'Finding ' + it.no + ' - ' + elLabel + ' - ' + (f.location || 'Location not recorded')));
+      out.push(h(level, 'Finding ' + it.no + ' - ' + elLabel + (f.location && f.location !== it.group.label ? ' - ' + f.location : '')));
       out.push(small('Site: ' + it.visit.siteName + '. Recorded by ' + (f.consultant || it.visit.consultant) + ' on ' + (it.visit.date || '') + '. Overall result: ' + E.STATUS_LABEL[it.ev.status] + '.'));
       var shown = it.ev.results.filter(function (r) { return r.status !== 'na'; });
       var naCount = it.ev.results.length - shown.length;
@@ -157,13 +196,13 @@
     var manualRows = [];
     items.forEach(function (it) {
       it.ev.results.forEach(function (r) {
-        if (r.status === 'manual') manualRows.push([String(it.no), it.finding.location || '', r.label, r.reason || '', citeText(r)]);
+        if (r.status === 'manual') manualRows.push([String(it.no), it.group.label, r.label, r.reason || '', citeText(r)]);
       });
     });
-    children.push(h(d.HeadingLevel.HEADING_1, '3. Items Needing Manual Input'));
+    children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Items Needing Manual Input'));
     if (manualRows.length) {
       children.push(para(manualRows.length + ' check(s) could not be decided automatically. Resolve each one before the report is issued, then delete this section or record the outcome.'));
-      children.push(table([headRow(['Finding', 'Location', 'Check', 'Why it needs input', 'Citation'], [9, 20, 25, 26, 20])].concat(manualRows.map(function (r) {
+      children.push(table([headRow(['Finding', 'Area', 'Check', 'Why it needs input', 'Citation'], [9, 20, 25, 26, 20])].concat(manualRows.map(function (r) {
         return new d.TableRow({ cantSplit: true, children: r.map(function (c, i) { return cell(c, { size: i === 4 ? 17 : 19 }); }) });
       }))));
     } else children.push(para('None. Every check had enough information to decide.'));
@@ -202,6 +241,7 @@
         paragraphStyles: [
           { id: 'Title', name: 'Title', basedOn: 'Normal', next: 'Normal', run: { size: 48, bold: true, color: BLUE }, paragraph: { spacing: { after: 120 } } },
           { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 32, bold: true, color: BLUE }, paragraph: { spacing: { before: 360, after: 160 }, keepNext: true } },
+          { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 23, bold: true, color: '04407F' }, paragraph: { spacing: { before: 220, after: 80 }, keepNext: true } },
           { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 26, bold: true, color: '04407F' }, paragraph: { spacing: { before: 280, after: 100 }, keepNext: true } }
         ]
       },

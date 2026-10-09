@@ -68,6 +68,7 @@
 <!--INLINE:jszip-->
 <!--INLINE:rules-->
 <!--INLINE:engine-->
+<!--INLINE:walk-->
 <!--INLINE:report-->
 <script>
 (function () {
@@ -123,7 +124,7 @@
     var sel = loaded.filter(function (v) { return v.selected; });
     msg.textContent = 'Building report...';
     try {
-      var doc = REP.buildReport({ docx: docx, rules: R, engine: E }, sel, { title: document.getElementById('rtitle').value.trim(), preparedBy: document.getElementById('rprep').value.trim() });
+      var doc = REP.buildReport({ docx: docx, rules: R, engine: E, walk: window.DNEM_WALK }, sel, { title: document.getElementById('rtitle').value.trim(), preparedBy: document.getElementById('rprep').value.trim() });
       docx.Packer.toBlob(doc).then(function (blob) {
         var site = sel[0].data.visit.siteName.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
         var dates = sel.map(function (v) { return v.data.visit.date; }).sort();

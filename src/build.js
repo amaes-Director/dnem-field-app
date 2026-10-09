@@ -13,11 +13,12 @@ fs.cpSync(path.join(SRC, 'phone'), phoneOut, { recursive: true });
 fs.writeFileSync(path.join(phoneOut, '.nojekyll'), '');
 fs.copyFileSync(path.join(SRC, 'rules.js'), path.join(phoneOut, 'rules.js'));
 fs.copyFileSync(path.join(SRC, 'engine.js'), path.join(phoneOut, 'engine.js'));
+fs.copyFileSync(path.join(SRC, 'walk.js'), path.join(phoneOut, 'walk.js'));
 
 // report builder (single file)
 const inline = js => '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n</script>';
 let html = read('report/builder.html');
-const parts = { docx: 'report/lib/docx.iife.js', jszip: 'phone/lib/jszip.min.js', rules: 'rules.js', engine: 'engine.js', report: 'report/report.js' };
+const parts = { docx: 'report/lib/docx.iife.js', jszip: 'phone/lib/jszip.min.js', rules: 'rules.js', engine: 'engine.js', walk: 'walk.js', report: 'report/report.js' };
 for (const [k, p] of Object.entries(parts)) html = html.replace('<!--INLINE:' + k + '-->', () => inline(read(p)));
 fs.writeFileSync(path.join(OUT, 'DNEM Field Report Builder.html'), html);
 console.log('Built ' + path.basename(phoneOut) + '/ and DNEM Field Report Builder.html (' + Math.round(html.length / 1024) + ' KB)');
