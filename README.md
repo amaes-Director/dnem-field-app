@@ -11,10 +11,12 @@ Two tools that share one rules table.
 
 ## Consultant, on site
 1. Open https://amaes-director.github.io/dnem-field-app/ on the phone and choose **Add to Home Screen** (iPhone: Share > Add to Home Screen; Android: menu > Install app).
-2. Tap **New site visit**. Enter the site, your name, and the building status if you know it.
+2. Tap **New site visit**. Enter the site and your name. Choose the **type of visit** (building or site, or polling place), and the building status and **federal funds** if you know them.
+   - **Polling place** visits follow the DOJ ADA Checklist for Polling Places: **Parking and drop-off**, **Route to the entrance**, **Voter entrance**, **Route to the voting area**, then **Voting area**. Record any temporary fix (cones, mats, portable ramps, propped doors) with **Temporary fix**.
+   - **Federal funds** decides how trail and park items count: **Yes** means the federal ABA rules are required, **No** means they are best practice, and **Not known** flags them for review.
 3. Follow the big button at the top of each screen. It walks you in order: **Parking**, **Route to the entrance**, **Entrance**, **Rooms**, then **Outdoor and recreation areas**. On each screen, tap each item you can see (for example "Accessible parking space"), take photos, and fill in the measurements. Each field shows its requirement, and anything left blank is marked "Needs manual input". Inches are the default unit; cm, degrees and newtons are converted.
    - In **Rooms**, tap **Add a room**, pick the room type, and add a number and a name if useful (for example Meeting / conference room 2, "Board of Directors room"). The room then shows its usual items. Use **Something else** for anything not listed.
-   - When the rooms are finished, tap **Next: Outdoor and recreation areas**. Add each playground, pool or spa, park or picnic area, sports field or bleachers, fishing pier or boat dock, golf or mini golf course, outdoor fitness area, or bus stop the same way. Skip it if the site has none. **Send visit** is at the bottom of this screen and on the visit overview.
+   - When the rooms are finished, tap **Next: Outdoor and recreation areas**. Add each playground, pool or spa, park or picnic area, sports field or bleachers, fishing pier or boat dock, golf or mini golf course, outdoor fitness area, trail or wetland boardwalk, campground, beach, festival or event area, or bus stop the same way. Skip it if the site has none. **Send visit** is at the bottom of this screen and on the visit overview.
 4. Everything saves on the phone, including with no signal.
 5. When you finish, tap **Send visit**. The phone's share sheet opens. Choose **Drive** (the Google Drive app must be installed and signed in), then pick the shared DNEM field-visits folder and tap Upload.
 
@@ -41,6 +43,12 @@ Site and building: parking and loading zones, curb ramps, routes, ramps, stairs,
 
 Outdoor and recreation (ADA 2010 sections 240-242 and 1003-1009; ICC A117.1-2017 Chapter 11): play areas (component counts, routes, surfacing, ramps, transfer systems, play components), pools, wading pools and spas (number of entries, lifts, sloped entries, transfer walls), bleachers and outdoor assembly seating, fishing piers, boat docks, golf and mini golf, exercise equipment, bus stops and picnic areas.
 
-Not checked automatically: trails, beaches and picnic tables at federal sites (ABA Chapter 10, federal only), amusement rides, shooting facilities, saunas, EV chargers, and equipment safety under Michigan's Playground Equipment Safety Act. Record these with **Something else** and they are flagged "Needs manual input".
+Trails and parks (federal ABA standards, Chapter 10): trails and wetland boardwalks, park paths (outdoor recreation access routes), beach access routes, picnic tables, fire rings and grills, benches, campsites, and overlooks. Required when federal money applies; otherwise reported as best practice.
 
-Every Michigan citation, and the ADA sub-sections for recreation, is marked † in the report until checked. Use `Rules review - Michigan citations to verify.xlsx` to confirm them.
+Polling places (DOJ ADA Checklist for Polling Places, Help America Vote Act, Michigan Election Law): parking and drop-off, routes, voter entrance, voting area, accessible voting station, and temporary fixes.
+
+Festivals and events: tents, booths and vendor spaces (space inside, reach, counters), event paths and cable covers, and portable toilets.
+
+Not checked automatically: amusement rides, shooting facilities, saunas, EV chargers, and equipment safety under Michigan's Playground Equipment Safety Act. Record these with **Something else** and they are flagged "Needs manual input".
+
+Every Michigan citation, the ADA sub-sections for recreation, and every ABA citation is marked † in the report until checked. Use `Rules review - Michigan citations to verify.xlsx` to confirm them.

@@ -3,7 +3,7 @@
  * Each result: { checkId, label, status: pass|fail|manual|na, measured, required, cite, reason, verify, note }
  */
 (function (root) {
-  var STATUS_LABEL = { pass: 'Complies', fail: 'Does not comply', manual: 'Needs manual input', na: 'Not applicable' };
+  var STATUS_LABEL = { pass: 'Complies', fail: 'Does not comply', manual: 'Needs manual input', advice: 'Best practice not met', na: 'Not applicable' };
 
   // ---- units ---------------------------------------------------------------
   // Accepts 32, 32.5, 32,5, "32 1/2", "32-1/2", "1/2"
@@ -80,6 +80,7 @@
   function sides(check, visit) {
     var out = [];
     if (check.ada) out.push({ key: 'ada', s: check.ada });
+    if (check.aba) out.push({ key: 'aba', s: check.aba });
     if (check.mi) {
       var s = check.mi;
       if (s.newBuilding) {
@@ -227,6 +228,23 @@
       var ok = prim >= 1 && prim + other >= need;
       return Object.assign(res, { status: ok ? 'pass' : 'fail' });
     },
+    // ABA trails and park paths: steepest slope allowed depends on how long the steep segment is.
+    // check.segments: [[max slope %, max length ft], ...] from gentlest to steepest.
+    abaSlope: function (check, finding, visit, el) {
+      var sl = rawVal(finding, el, 'running_slope'), ln = rawVal(finding, el, 'steep_length');
+      var sd = sides(check, visit), segs = check.segments;
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd), required: segs.map(function (g) { return slopeRatio(g[0]) + (g[1] === Infinity ? ' any length' : ' for ' + g[1] + ' ft max'); }).join('; ') };
+      if (sl.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', reason: 'Running slope not recorded.' });
+      res.measured = fmt('slope', sl.v) + (ln.missing ? '' : ' for ' + ln.v + ' ft');
+      if (sl.v <= segs[0][0] + 1e-9) return Object.assign(res, { status: 'pass' });
+      for (var i = 1; i < segs.length; i++) {
+        if (sl.v <= segs[i][0] + 1e-9) {
+          if (ln.missing) return Object.assign(res, { status: 'manual', reason: 'Length of the steep segment not recorded.' });
+          return Object.assign(res, { status: ln.v <= segs[i][1] ? 'pass' : 'fail' });
+        }
+      }
+      return Object.assign(res, { status: 'fail' });
+    },
     // ADA Table 221.2.1.1 wheelchair spaces in assembly seating
     seatCount: function (check, finding, visit, el) {
       var t = rawVal(finding, el, 'seats'), a = rawVal(finding, el, 'wc_spaces');
@@ -262,6 +280,12 @@
         var f = fieldOf(el, check.field);
         r = f.type === 'bool' ? boolCheck(check, f, finding, visit, el) : numericCheck(check, f, finding, visit, el);
       }
+      // ABA-only checks depend on whether federal money requires the ABA standards at this site
+      if (check.aba && !check.ada && !check.mi && r.status === 'fail') {
+        var ff = (visit && visit.federalFunds) || 'unknown';
+        if (ff === 'no') r = Object.assign(r, { status: 'advice', reason: 'Not met. The ABA standards are best practice here because no federal money applies.' });
+        else if (ff !== 'yes') r = Object.assign(r, { status: 'manual', reason: 'Does not meet the ABA standard. Whether it is required depends on federal funding: confirm, then record it in the visit details.' });
+      }
       // citations still to be checked against the code text (Appendix A)
       r.verifyCites = r.status === 'na' ? [] : sd.filter(function (x) { return x.s.verify; }).map(function (x) { return x.s.cite; });
       return Object.assign(base, r);
@@ -269,6 +293,7 @@
     if (finding.flagManual) results.push({ checkId: 'consultant-flag', label: 'Consultant flagged this finding for review', status: 'manual', measured: '', required: '', cite: '', reason: finding.flagReason || 'See consultant notes.' });
     var status = results.some(function (r) { return r.status === 'fail'; }) ? 'fail'
       : results.some(function (r) { return r.status === 'manual'; }) ? 'manual'
+      : results.some(function (r) { return r.status === 'advice'; }) ? 'advice'
       : results.some(function (r) { return r.status === 'pass'; }) ? 'pass' : 'na';
     return { element: el, results: results, status: status };
   }

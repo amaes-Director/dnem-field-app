@@ -3,6 +3,9 @@
  * One entry per element type. "fields" are what the phone app asks for.
  * "checks" compare those fields against two codes:
  *   ada : 2010 ADA Standards for Accessible Design (DOJ). Section numbers are the 2010 Standards.
+ *   aba : federal Architectural Barriers Act standards, Chapter 10 (trails, park paths, beaches, picnic and
+ *         camping). ABA-only checks are required when visit.federalFunds is 'yes', best practice when 'no',
+ *         and "Needs manual input" when unknown.
  *   mi  : Michigan barrier-free requirements = 2021 Michigan Building Code (effective April 9, 2025),
  *         Chapter 11, which adopts ICC A117.1-2017 (R 408.30427 excludes A117.1 sections 611 and 707).
  *
@@ -22,20 +25,32 @@
 
   // Shorthand: side(cite, limits) builds one code side.
   function ada(sec, lim) { return Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); } // lim.verify = true marks an ADA section to double-check
+  // Federal Architectural Barriers Act standards, outdoor developed areas (Chapter 10). Section numbers to confirm.
+  function aba(sec, lim) { return Object.assign({ cite: 'ABA §' + sec, verify: true }, lim || {}); }
   function mi(sec, lim, opts) {
     return Object.assign({ cite: MI + ' §' + sec, verify: true }, lim || {}, opts || {});
   }
 
   var RULES = {
-    version: '2026-10-09.2',
+    version: '2026-10-09.3',
     codes: {
       ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
+      aba: { short: 'ABA', name: 'Architectural Barriers Act Accessibility Standards, Chapter 10 (outdoor developed areas)' },
       mi: {
         short: 'Michigan',
         name: '2021 Michigan Building Code, Chapter 11 (adopts ICC A117.1-2017), effective April 9, 2025',
         note: 'Michigan Administrative Code R 408.30427 adopts ICC A117.1 except sections 611 and 707.'
       }
     },
+    federalFunds: [
+      { id: 'yes', label: 'Yes: federal agency, or federal money that requires the ABA standards (for example a federal grant to DNR)' },
+      { id: 'no', label: 'No federal money' },
+      { id: 'unknown', label: 'Not known' }
+    ],
+    visitTypes: [
+      { id: 'site', label: 'Building or site' },
+      { id: 'polling', label: 'Polling place (follows the DOJ polling place checklist)' }
+    ],
     buildingStatus: [
       { id: 'new', label: 'Built or altered under the 2021 Michigan Building Code (permit on or after April 9, 2025)' },
       { id: 'existing', label: 'Built or last altered before April 9, 2025' },
@@ -738,7 +753,280 @@
           { id: 'pn-height', label: 'Table height (28 to 34 in), if treated as a dining surface', field: 'height', ada: ada('226.1 and 902.3', { min: 28, max: 34 }), mi: mi('902.3', { min: 28, max: 34 }) },
           { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
           { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
-            note: 'The 2010 ADA Standards have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. Federal outdoor areas follow ABA Chapter 10 instead.' }
+            note: 'The 2010 ADA Standards have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under the federal ABA rules, record "Picnic table (park or picnic area)".' }
+        ]
+      },
+      // ================================================================ Outdoor developed areas (ABA Chapter 10)
+      // ABA-only checks: required when the visit says federal funds apply, best practice when not.
+      {
+        id: 'trail', label: 'Trail, nature path or wetland boardwalk', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required for federal agencies and when federal funds apply; otherwise reported as best practice. Use this for trails and boardwalks; use "Outdoor recreation access route" for paths linking parking, picnic, camping and viewing areas.',
+        fields: [
+          { id: 'surface', type: 'bool', label: 'Tread surface firm and stable?' },
+          { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
+          { id: 'passing', type: 'bool', label: 'Where narrower than 60 in: 60 x 60 in passing spaces at least every 1,000 ft?', allowNA: true },
+          { id: 'obstacle', type: 'len', label: 'Tallest tread obstacle (root, rock, plank edge)', allowNA: true },
+          { id: 'opening', type: 'len', label: 'Widest gap in the tread (boardwalk planks, grates)', allowNA: true },
+          { id: 'running_slope', type: 'slope', label: 'Steepest running slope' },
+          { id: 'steep_length', type: 'count', label: 'Length of that steep segment (feet)' },
+          { id: 'pct_12', type: 'bool', label: 'No more than 30% of the trail is steeper than 1:12?' },
+          { id: 'cross_slope', type: 'slope', label: 'Steepest cross slope' },
+          { id: 'resting', type: 'bool', label: 'Resting intervals (60 in long, nearly level) where needed on steep segments?', allowNA: true },
+          { id: 'headroom', type: 'len', label: 'Lowest overhead clearance (branches, signs)', allowNA: true },
+          { id: 'sign', type: 'bool', label: 'Trailhead sign gives length, surface, width and steepest slopes?' }
+        ],
+        checks: [
+          { id: 'tr-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1017.3', { expect: true }) },
+          { id: 'tr-width', label: 'Clear tread width (36 in min)', field: 'width', aba: aba('1017.4', { min: 36 }), note: 'May narrow to 32 in where there is a physical constraint.' },
+          { id: 'tr-pass', label: 'Passing spaces', field: 'passing', aba: aba('1017.5', { expect: true }) },
+          { id: 'tr-obst', label: 'Tread obstacles (2 in max)', field: 'obstacle', aba: aba('1017.6', { max: 2 }), note: 'Up to 3 in is allowed where running and cross slopes are 1:20 or less.' },
+          { id: 'tr-open', label: 'Openings (1/2 in max)', field: 'opening', aba: aba('1017.7', { max: 0.5 }) },
+          { id: 'tr-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 200], [10, 30], [12.5, 10]], aba: aba('1017.8.1') },
+          { id: 'tr-30', label: 'No more than 30% of the trail steeper than 1:12', field: 'pct_12', aba: aba('1017.8.1', { expect: true }) },
+          { id: 'tr-cross', label: 'Cross slope (1:20 max)', field: 'cross_slope', aba: aba('1017.8.2', { max: 5 }) },
+          { id: 'tr-rest', label: 'Resting intervals', field: 'resting', aba: aba('1017.9', { expect: true }) },
+          { id: 'tr-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1017.10', { min: 80 }) },
+          { id: 'tr-sign', label: 'Trailhead signs', field: 'sign', aba: aba('1017.11', { expect: true }) }
+        ]
+      },
+      {
+        id: 'orar', label: 'Outdoor recreation access route (park path)', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10) for paths that connect parking, picnic, camping, viewing and toilet areas in a park. Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'surface', type: 'bool', label: 'Surface firm and stable?' },
+          { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
+          { id: 'passing', type: 'bool', label: 'Where narrower than 60 in: passing spaces at least every 200 ft?', allowNA: true },
+          { id: 'obstacle', type: 'len', label: 'Tallest tread obstacle', allowNA: true },
+          { id: 'opening', type: 'len', label: 'Widest gap in the surface', allowNA: true },
+          { id: 'running_slope', type: 'slope', label: 'Steepest running slope' },
+          { id: 'steep_length', type: 'count', label: 'Length of that steep segment (feet)' },
+          { id: 'cross_slope', type: 'slope', label: 'Steepest cross slope' },
+          { id: 'resting', type: 'bool', label: 'Resting intervals where needed on steep segments?', allowNA: true },
+          { id: 'headroom', type: 'len', label: 'Lowest overhead clearance', allowNA: true }
+        ],
+        checks: [
+          { id: 'or-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1016.2', { expect: true }) },
+          { id: 'or-width', label: 'Clear tread width (36 in min)', field: 'width', aba: aba('1016.3', { min: 36 }) },
+          { id: 'or-pass', label: 'Passing spaces', field: 'passing', aba: aba('1016.4', { expect: true }) },
+          { id: 'or-obst', label: 'Tread obstacles (1/2 in max)', field: 'obstacle', aba: aba('1016.5', { max: 0.5 }) },
+          { id: 'or-open', label: 'Openings (1/2 in max)', field: 'opening', aba: aba('1016.6', { max: 0.5 }) },
+          { id: 'or-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 50], [10, 30]], aba: aba('1016.7.1') },
+          { id: 'or-cross', label: 'Cross slope (1:33 max)', field: 'cross_slope', aba: aba('1016.7.2', { max: 3.03 }), note: 'Up to 1:20 is allowed on surfaces other than asphalt, concrete and boards where needed for drainage.' },
+          { id: 'or-rest', label: 'Resting intervals', field: 'resting', aba: aba('1016.8', { expect: true }) },
+          { id: 'or-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1016.9', { min: 80 }) }
+        ]
+      },
+      {
+        id: 'beach_route', label: 'Beach access route', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'surface', type: 'bool', label: 'Surface firm and stable (mat, boardwalk or hardened path)?' },
+          { id: 'width', type: 'len', label: 'Narrowest clear width' },
+          { id: 'running_slope', type: 'slope', label: 'Steepest running slope' },
+          { id: 'steep_length', type: 'count', label: 'Length of that steep segment (feet)' },
+          { id: 'cross_slope', type: 'slope', label: 'Steepest cross slope' },
+          { id: 'obstacle', type: 'len', label: 'Tallest obstacle or mat edge', allowNA: true },
+          { id: 'reach_water', type: 'bool', label: 'Route reaches the high tide or normal water level?' }
+        ],
+        checks: [
+          { id: 'br-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1018.3', { expect: true }) },
+          { id: 'br-width', label: 'Clear width (60 in min)', field: 'width', aba: aba('1018.4', { min: 60 }) },
+          { id: 'br-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 50], [10, 30]], aba: aba('1018.7.1') },
+          { id: 'br-cross', label: 'Cross slope (1:50 max)', field: 'cross_slope', aba: aba('1018.7.2', { max: 2 }) },
+          { id: 'br-obst', label: 'Obstacles (1/2 in max)', field: 'obstacle', aba: aba('1018.5', { max: 0.5 }) },
+          { id: 'br-water', label: 'Reaches the water', field: 'reach_water', aba: aba('1018.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'picnic_aba', label: 'Picnic table (park or picnic area)', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice. For tables at a building\'s dining area use "Picnic table, bench or outdoor seating".',
+        fields: [
+          { id: 'tables', type: 'count', label: 'Picnic tables in this area' },
+          { id: 'tables_ok', type: 'count', label: 'Tables with a wheelchair space and on an outdoor recreation access route' },
+          { id: 'height', type: 'len', label: 'Table top height' },
+          { id: 'knee', type: 'len', label: 'Knee clearance height at the wheelchair space' },
+          { id: 'knee_depth', type: 'len', label: 'Knee clearance depth under the table' },
+          { id: 'cgs', type: 'len', label: 'Clear ground space around the usable sides' },
+          { id: 'surface', type: 'bool', label: 'Ground around the table firm and stable, nearly level?' }
+        ],
+        checks: [
+          { id: 'pk-count', label: 'At least 20% of tables accessible', kind: 'ratio', num: 'tables_ok', den: 'tables', minPct: 20, aba: aba('F245.2.1') },
+          { id: 'pk-height', label: 'Table top height (28 to 34 in)', field: 'height', aba: aba('1011.3.1', { min: 28, max: 34 }) },
+          { id: 'pk-knee', label: 'Knee clearance height (27 in min)', field: 'knee', aba: aba('1011.3.2', { min: 27 }) },
+          { id: 'pk-kdepth', label: 'Knee clearance depth (19 in min)', field: 'knee_depth', aba: aba('1011.3.2', { min: 19 }) },
+          { id: 'pk-cgs', label: 'Clear ground space around usable sides (36 in min)', field: 'cgs', aba: aba('1011.3.3', { min: 36 }) },
+          { id: 'pk-surf', label: 'Ground surface', field: 'surface', aba: aba('1011.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'fire_grill', label: 'Fire ring, grill or cooking surface', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'height', type: 'len', label: 'Cooking surface height' },
+          { id: 'cgs', type: 'bool', label: 'Clear, firm and nearly level ground space around it (48 x 48 in at fire rings, 30 x 48 in at grills)?' },
+          { id: 'route', type: 'bool', label: 'On an outdoor recreation access route?' }
+        ],
+        checks: [
+          { id: 'fg-height', label: 'Cooking surface height (15 to 34 in)', field: 'height', aba: aba('1011.5 and 1011.6', { min: 15, max: 34 }) },
+          { id: 'fg-cgs', label: 'Clear ground space', field: 'cgs', aba: aba('1011.5 and 1011.6', { expect: true }) },
+          { id: 'fg-route', label: 'On an access route', field: 'route', aba: aba('F247.1', { expect: true }) }
+        ]
+      },
+      {
+        id: 'bench_aba', label: 'Park bench', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'seat', type: 'len', label: 'Seat height' },
+          { id: 'back', type: 'bool', label: 'Back support provided?' },
+          { id: 'cgs', type: 'bool', label: '36 x 48 in clear ground space beside one end?' }
+        ],
+        checks: [
+          { id: 'bn-seat', label: 'Seat height (17 to 19 in)', field: 'seat', aba: aba('1011.13', { min: 17, max: 19 }) },
+          { id: 'bn-back', label: 'Back support', field: 'back', aba: aba('1011.13', { expect: true }) },
+          { id: 'bn-cgs', label: 'Clear ground space beside the bench', field: 'cgs', aba: aba('1011.13', { expect: true }) }
+        ]
+      },
+      {
+        id: 'campsite', label: 'Campsite or tent pad', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'surface', type: 'bool', label: 'Tent pad surface firm and stable (allows tent stakes)?' },
+          { id: 'slope', type: 'slope', label: 'Steepest slope on the tent pad' },
+          { id: 'cgs', type: 'len', label: 'Clear ground space around the tent pad' },
+          { id: 'route', type: 'bool', label: 'Connected to parking, toilets and water by an outdoor recreation access route?' }
+        ],
+        checks: [
+          { id: 'cs-surf', label: 'Firm and stable tent pad', field: 'surface', aba: aba('1013.2', { expect: true }) },
+          { id: 'cs-slope', label: 'Tent pad slope (1:48 max)', field: 'slope', aba: aba('1013.3', { max: 2.08 }), note: '1:33 is allowed on surfaces other than asphalt, concrete and boards where needed for drainage.' },
+          { id: 'cs-cgs', label: 'Clear ground space around the pad (48 in min)', field: 'cgs', aba: aba('1013.4', { min: 48 }) },
+          { id: 'cs-route', label: 'On an access route', field: 'route', aba: aba('F244', { expect: true }) }
+        ]
+      },
+      {
+        id: 'viewing', label: 'Overlook, viewing area or viewing scope', group: 'Trails and parks (ABA)',
+        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        fields: [
+          { id: 'cgs', type: 'bool', label: '30 x 48 in clear ground space at each distinct viewing spot?' },
+          { id: 'view_height', type: 'len', label: 'Railing or wall height in front of the seated view', allowNA: true },
+          { id: 'scope', type: 'len', label: 'Viewing scope eyepiece height', allowNA: true },
+          { id: 'route', type: 'bool', label: 'On an outdoor recreation access route?' }
+        ],
+        checks: [
+          { id: 'vw-cgs', label: 'Clear ground space at viewing spots', field: 'cgs', aba: aba('1011.14', { expect: true }) },
+          { id: 'vw-view', label: 'Clear view at seated eye level', field: 'view_height', kind: 'manual', aba: aba('1011.14'), note: 'Check that a seated person can see over or through the railing (about 32 in and above).' },
+          { id: 'vw-scope', label: 'Viewing scope eyepiece (43 to 51 in)', field: 'scope', aba: aba('1011.15', { min: 43, max: 51 }) },
+          { id: 'vw-route', label: 'On an access route', field: 'route', aba: aba('F246', { expect: true }) }
+        ]
+      },
+      // ================================================================ Polling places (DOJ ADA Checklist for Polling Places, 2016)
+      {
+        id: 'voting_station', label: 'Accessible voting station or booth', group: 'Polling place',
+        fields: [
+          { id: 'route_width', type: 'len', label: 'Narrowest route to the station (between tables, lines, booths)' },
+          { id: 'cfs', type: 'bool', label: '30 x 48 in clear floor space at the station?' },
+          { id: 'height', type: 'len', label: 'Writing or machine surface height', allowNA: true },
+          { id: 'knee', type: 'len', label: 'Knee clearance height', allowNA: true },
+          { id: 'reach_high', type: 'len', label: 'Highest control or ballot slot' },
+          { id: 'machine', type: 'bool', label: 'Accessible voting machine set up, powered on, with audio and tactile controls?' },
+          { id: 'privacy', type: 'bool', label: 'Positioned so the voter has privacy?' }
+        ],
+        checks: [
+          { id: 'vs-route', label: 'Route to the station (36 in min)', field: 'route_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'vs-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('305.3', { expect: true }), mi: mi('305.3', { expect: true }) },
+          { id: 'vs-height', label: 'Surface height (28 to 34 in)', field: 'height', ada: ada('902.3', { min: 28, max: 34 }), mi: mi('902.3', { min: 28, max: 34 }) },
+          { id: 'vs-knee', label: 'Knee clearance (27 in min)', field: 'knee', ada: ada('306.3', { min: 27 }), mi: mi('306.3', { min: 27 }) },
+          { id: 'vs-reach', label: 'Controls within reach (48 in max)', field: 'reach_high', ada: ada('308.2.1 and 308.3.1', { max: 48 }), mi: mi('308.2.1 and 308.3.1', { max: 48 }) },
+          { id: 'vs-machine', label: 'Accessible voting system available', field: 'machine', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)', expect: true, verify: true }, mi: { cite: 'MCL 168.795a', expect: true, verify: true } },
+          { id: 'vs-priv', label: 'Private and independent voting', field: 'privacy', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)(A); DOJ ADA Checklist for Polling Places', expect: true, verify: true } }
+        ]
+      },
+      {
+        id: 'temp_fix', label: 'Temporary fix (cones, mat, portable ramp, propped door, bell)', group: 'Polling place',
+        scopeNote: 'The DOJ ADA Checklist for Polling Places lists temporary measures that can make a site usable on election day. They must be in place before the polls open and stay in place all day.',
+        fields: [
+          { id: 'kind', type: 'choice', label: 'What is it?', options: [{ id: 'parking', label: 'Cones or signs for temporary accessible parking' }, { id: 'mat', label: 'Mat or plates over grass, gravel or gaps' }, { id: 'ramp', label: 'Portable ramp or threshold ramp' }, { id: 'door', label: 'Door propped open or staffed, or a call bell' }, { id: 'other', label: 'Other' }] },
+          { id: 'in_place', type: 'bool', label: 'In place before the polls open, and staff know to keep it there?' },
+          { id: 'secure', type: 'bool', label: 'Secured, with no loose or curled edges?' },
+          { id: 'edge', type: 'len', label: 'Height of the mat or ramp edge', allowNA: true },
+          { id: 'slope', type: 'slope', label: 'Portable ramp running slope', allowNA: true },
+          { id: 'width', type: 'len', label: 'Clear width of mat or ramp', allowNA: true }
+        ],
+        checks: [
+          { id: 'tf-place', label: 'In place all day', field: 'in_place', ada: { cite: 'DOJ ADA Checklist for Polling Places (2016)', expect: true } },
+          { id: 'tf-secure', label: 'Secured, no tripping edges', field: 'secure', ada: ada('302.1', { expect: true }) },
+          { id: 'tf-edge', label: 'Edge height (1/2 in max, beveled)', field: 'edge', ada: ada('303.3', { max: 0.5 }), mi: mi('303.3', { max: 0.5 }) },
+          { id: 'tf-slope', label: 'Portable ramp slope (1:12 max)', field: 'slope', when: { kind: 'ramp' }, ada: ada('405.2', { max: 8.33 }), mi: mi('405.2', { max: 8.33 }) },
+          { id: 'tf-width', label: 'Clear width (36 in min)', field: 'width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) }
+        ]
+      },
+      // ================================================================ Festivals and temporary events
+      {
+        id: 'event_tent', label: 'Tent, booth or vendor space', group: 'Festivals and events',
+        scopeNote: 'The ADA applies to temporary facilities (ADA 201.3). Michigan building code applies to tents and other temporary structures that need a permit.',
+        fields: [
+          { id: 'level_change', type: 'len', label: 'Change in level at the tent edge or floor', allowNA: true },
+          { id: 'beveled', type: 'bool', label: 'Is that change in level beveled or ramped?' },
+          { id: 'entry_width', type: 'len', label: 'Clear width at the entry' },
+          { id: 'aisle', type: 'len', label: 'Narrowest aisle inside' },
+          { id: 'turning', type: 'bool', label: '60 in turning circle or T-shaped space inside?' },
+          { id: 'floor', type: 'bool', label: 'Floor firm, stable and slip resistant (not loose grass, straw, sand or gravel)?' },
+          { id: 'counter', type: 'len', label: 'Lowest counter or table where people are served', allowNA: true },
+          { id: 'reach_high', type: 'len', label: 'Highest item, sign-up sheet or control people need to reach' },
+          { id: 'reach_low', type: 'len', label: 'Lowest item people need to reach', allowNA: true }
+        ],
+        checks: [
+          { id: 'et-level', label: 'Change in level at the entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
+          { id: 'et-entry', label: 'Entry width (32 in min at openings)', field: 'entry_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
+          { id: 'et-aisle', label: 'Aisle width (36 in min)', field: 'aisle', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'et-turn', label: 'Turning space', field: 'turning', ada: ada('304.3', { expect: true }), mi: mi('304.3', { expect: true }) },
+          { id: 'et-floor', label: 'Floor surface', field: 'floor', ada: ada('302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
+          { id: 'et-counter', label: 'Service counter or table (36 in max)', field: 'counter', ada: ada('904.4.1', { max: 36 }), mi: mi('904.3.1', { max: 36 }) },
+          { id: 'et-high', label: 'High reach (48 in max)', field: 'reach_high', ada: ada('308.2.1 and 308.3.1', { max: 48 }), mi: mi('308.2.1 and 308.3.1', { max: 48 }) },
+          { id: 'et-low', label: 'Low reach (15 in min)', field: 'reach_low', ada: ada('308.2.1 and 308.3.1', { min: 15 }), mi: mi('308.2.1 and 308.3.1', { min: 15 }) }
+        ]
+      },
+      {
+        id: 'event_path', label: 'Event path, ground cover or cable cover', group: 'Festivals and events',
+        fields: [
+          { id: 'surface', type: 'bool', label: 'Path firm, stable and slip resistant (mats, plywood, pavement)?' },
+          { id: 'clear_width', type: 'len', label: 'Narrowest clear width (crowds, vendor displays, cords)' },
+          { id: 'running_slope', type: 'slope', label: 'Steepest running slope' },
+          { id: 'cross_slope', type: 'slope', label: 'Steepest cross slope' },
+          { id: 'level_change', type: 'len', label: 'Tallest cable cover, mat edge or bump', allowNA: true },
+          { id: 'beveled', type: 'bool', label: 'Is it beveled or ramped on both sides?' },
+          { id: 'opening', type: 'len', label: 'Widest gap between mats or plates', allowNA: true }
+        ],
+        checks: [
+          { id: 'ep-surf', label: 'Firm, stable path', field: 'surface', ada: ada('302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
+          { id: 'ep-width', label: 'Clear width (36 in min)', field: 'clear_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'ep-run', label: 'Running slope (1:20 max; steeper needs a ramp)', field: 'running_slope', ada: ada('403.3', { max: 5 }), mi: mi('403.3', { max: 5 }) },
+          { id: 'ep-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope', ada: ada('403.3', { max: 2.08 }), mi: mi('403.3', { max: 2.08 }) },
+          { id: 'ep-level', label: 'Cable covers and edges', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2, 303.3 and 303.4'), mi: mi('303.2, 303.3 and 303.4'),
+            note: 'Cable covers over 1/2 in high must have ramped sides (1:12 max).' },
+          { id: 'ep-open', label: 'Gaps (1/2 in max)', field: 'opening', ada: ada('302.3', { max: 0.5 }), mi: mi('302.3', { max: 0.5 }) }
+        ]
+      },
+      {
+        id: 'portable_toilet', label: 'Portable toilets', group: 'Festivals and events',
+        fields: [
+          { id: 'total', type: 'count', label: 'Portable toilet units in this cluster' },
+          { id: 'accessible', type: 'count', label: 'Accessible units' },
+          { id: 'route', type: 'bool', label: 'Accessible units on a firm, stable route?' },
+          { id: 'level_change', type: 'len', label: 'Step or lip at the accessible unit door', allowNA: true },
+          { id: 'beveled', type: 'bool', label: 'Is that lip beveled or ramped?' },
+          { id: 'door', type: 'len', label: 'Door clear width' },
+          { id: 'turning', type: 'bool', label: '60 in turning space inside?' },
+          { id: 'seat', type: 'len', label: 'Toilet seat height' },
+          { id: 'grab', type: 'bool', label: 'Grab bars on the side and back walls?' }
+        ],
+        checks: [
+          { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2'), mi: { cite: '2021 MBC §1109.2', verify: true } },
+          { id: 'pt-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
+          { id: 'pt-level', label: 'Level entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
+          { id: 'pt-door', label: 'Door clear width (32 in min)', field: 'door', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
+          { id: 'pt-turn', label: 'Turning space inside', field: 'turning', ada: ada('603.2.1', { expect: true }), mi: mi('603.2.1', { expect: true }) },
+          { id: 'pt-seat', label: 'Seat height (17 to 19 in)', field: 'seat', ada: ada('604.4', { min: 17, max: 19 }), mi: mi('604.4', { min: 17, max: 19 }) },
+          { id: 'pt-grab', label: 'Grab bars', field: 'grab', ada: ada('604.5', { expect: true }), mi: mi('604.5', { expect: true }) }
         ]
       },
       {

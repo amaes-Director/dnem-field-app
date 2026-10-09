@@ -43,7 +43,7 @@
   <div class="brand">
     <div class="logo-tile"><img src="__LOGO_DATA_URI__" alt="Disability Network Eastern Michigan"></div>
     <div><h1>DNEM ADA Lens</h1>
-    <p>Turn site visits from the ADA Lens phone app into a Word report citing the 2010 ADA Standards and the Michigan barrier-free code.</p></div>
+    <p>Turn site visits from the ADA Lens phone app into a Word report citing the 2010 ADA Standards, the Michigan barrier-free code and, for trails and parks, the federal ABA standards.</p></div>
   </div>
 </header>
 <main>
@@ -117,11 +117,11 @@
     loaded.sort(function (a, b) { return (a.data.visit.siteName + a.data.visit.date).localeCompare(b.data.visit.siteName + b.data.visit.date); });
     var html = '<table><caption class="help" style="text-align:left">Select the visits to include. Results are a preview of the report.</caption><thead><tr><th scope="col">Include</th><th scope="col">Site</th><th scope="col">Date</th><th scope="col">Consultant</th><th scope="col">Findings</th><th scope="col">Results</th></tr></thead><tbody>';
     loaded.forEach(function (v, i) {
-      var c = { fail: 0, manual: 0, pass: 0, na: 0 };
+      var c = { fail: 0, manual: 0, advice: 0, pass: 0, na: 0 };
       (v.data.findings || []).forEach(function (f) { c[E.evaluateFinding(f, v.data.visit, R).status]++; });
       html += '<tr><td><input type="checkbox" data-i="' + i + '" id="vis' + i + '"' + (v.selected ? ' checked' : '') + ' aria-label="Include ' + esc(v.data.visit.siteName) + ', ' + esc(v.data.visit.date) + '"></td>' +
         '<td>' + esc(v.data.visit.siteName) + '<br><span class="help">' + esc(v.name) + '</span></td><td>' + esc(v.data.visit.date) + '</td><td>' + esc(v.data.visit.consultant) + '</td>' +
-        '<td>' + (v.data.findings || []).length + '</td><td><span class="fail">' + c.fail + ' do not comply</span><br><span class="manual">' + c.manual + ' need manual input</span><br><span class="pass">' + (c.pass + c.na) + ' comply</span></td></tr>';
+        '<td>' + (v.data.findings || []).length + '</td><td><span class="fail">' + c.fail + ' do not comply</span><br><span class="manual">' + c.manual + ' need manual input</span><br>' + (c.advice ? c.advice + ' best practice not met<br>' : '') + '<span class="pass">' + (c.pass + c.na) + ' comply</span></td></tr>';
     });
     box.innerHTML = html + '</tbody></table>';
     box.querySelectorAll('input[data-i]').forEach(function (cb) { cb.onchange = function () { loaded[cb.dataset.i].selected = cb.checked; update(); }; });

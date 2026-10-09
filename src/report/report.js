@@ -6,9 +6,9 @@
   // Same palette and type as the DNEM Access Lens reports (layout.py): Calibri, 14 pt minimum.
   var BLUE = '0758B5', TINT = 'E7EFF9', INK = '17263A', MUTED = '485668', LINE = 'CBD7E5';
   var APP_NAME = 'DNEM ADA Lens';
-  var RESULT_FILL = { fail: 'FBE3E4', manual: 'FFF1CC', pass: 'E3F1E6', na: 'F2F2F2' };
-  var RESULT_TEXT = { fail: 'A4161A', manual: '6B4300', pass: '1E6B2E', na: '4A4A4A' };
-  var ORDER = { fail: 0, manual: 1, pass: 2, na: 3 };
+  var RESULT_FILL = { fail: 'FBE3E4', manual: 'FFF1CC', advice: 'E7EFF9', pass: 'E3F1E6', na: 'F2F2F2' };
+  var RESULT_TEXT = { fail: 'A4161A', manual: '6B4300', advice: '0758B5', pass: '1E6B2E', na: '4A4A4A' };
+  var ORDER = { fail: 0, manual: 1, advice: 2, pass: 3, na: 4 };
 
   function buildReport(deps, visits, opts) {
     var d = deps.docx, R = deps.rules, E = deps.engine, W = deps.walk;
@@ -26,7 +26,10 @@
     });
     // ---- walk order: Parking, Route, Entrance, then each visit's rooms, outdoor areas, then anything unassigned
     var multiSite = uniq(visits.map(function (z) { return z.data.visit.siteName; })).length > 1;
-    var groups = W.stops.map(function (st) { return { key: 'stop:' + st.id, label: st.label, kind: 'stop', items: [] }; });
+    // stops in walk order; a polling place visit has its own stops (parking ... voting area)
+    var stopList = [];
+    visits.forEach(function (z) { W.stopsFor(z.data.visit).forEach(function (st) { if (!stopList.some(function (x) { return x.id === st.id; })) stopList.push(st); }); });
+    var groups = stopList.map(function (st) { return { key: 'stop:' + st.id, label: st.label, kind: 'stop', items: [] }; });
     visits.forEach(function (vz, vi) {
       (vz.data.visit.rooms || []).forEach(function (r) {
         groups.push({ key: vi + ':' + r.id, label: W.roomLabel(r) + (multiSite ? ' (' + vz.data.visit.siteName + ')' : ''), kind: W.isOutdoor(r) ? 'outdoor' : 'room', items: [] });
@@ -40,7 +43,7 @@
     var gIndex = {}; groups.forEach(function (g, i) { gIndex[g.key] = i; });
     items.forEach(function (it, i) {
       var a = it.finding.areaId || '';
-      var key = W.stops.some(function (st) { return st.id === a; }) ? 'stop:' + a : (gIndex[it.visitIndex + ':' + a] !== undefined ? it.visitIndex + ':' + a : 'other');
+      var key = stopList.some(function (st) { return st.id === a; }) ? 'stop:' + a : (gIndex[it.visitIndex + ':' + a] !== undefined ? it.visitIndex + ':' + a : 'other');
       it.group = groups[gIndex[key]]; it.seq = i;
     });
     items.sort(function (a, b) { return gIndex[a.group.key] - gIndex[b.group.key] || a.visitIndex - b.visitIndex || a.seq - b.seq; });
@@ -85,14 +88,20 @@
     function citeText(r) { return (r.cite || '') + (r.verify ? ' †' : ''); }
 
     // ---- counts ---------------------------------------------------------------
-    var count = { fail: 0, manual: 0, pass: 0, na: 0 };
+    var count = { fail: 0, manual: 0, advice: 0, pass: 0, na: 0 };
     items.forEach(function (it) { count[it.ev.status]++; });
+    var anyPolling = visits.some(function (z) { return W.isPolling(z.data.visit); });
+    var allPolling = visits.every(function (z) { return W.isPolling(z.data.visit); });
+    var usesAba = items.some(function (it) { return it.ev.results.some(function (r) { return r.status !== 'na' && /^ABA /.test(r.cite || ''); }); });
+    var DEFAULT_TITLE = 'Facility Accessibility Field Evaluation';
+    var title = opts.title && !(allPolling && opts.title === DEFAULT_TITLE) ? opts.title : (allPolling ? 'Polling Place Accessibility Survey' : DEFAULT_TITLE);
+    var ffLabel = function (id) { var m = (R.federalFunds || []).filter(function (x) { return x.id === (id || 'unknown'); })[0]; return m ? m.label : 'Not known'; };
 
     var children = [];
     // ---- title page -------------------------------------------------------------
     if (opts.logo) children.push(new P({ children: [new d.ImageRun({ type: 'png', data: opts.logo, transformation: { width: 240, height: 90 },
       altText: { name: 'DNEM logo', title: 'Disability Network Eastern Michigan', description: 'Disability Network Eastern Michigan logo' } })], spacing: { after: 160 } }));
-    children.push(new P({ text: opts.title || 'Facility Accessibility Field Evaluation', heading: d.HeadingLevel.TITLE }));
+    children.push(new P({ text: title, heading: d.HeadingLevel.TITLE }));
     children.push(new P({ children: [txt(sites.join('; '), { size: 36, color: MUTED })], spacing: { after: 240 } }));
     children.push(kv([
       ['Site', sites.join('; ')],
@@ -101,7 +110,9 @@
       ['Visit date(s)', dates.join(', ')],
       ['Field consultant(s)', consultants.join(', ')],
       ['Building status', statuses.join('; ')],
-      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name],
+      ['Type of visit', uniq(visits.map(function (z) { return W.isPolling(z.data.visit) ? 'Polling place (DOJ ADA Checklist for Polling Places)' : 'Building or site'; })).join('; ')],
+      ['Federal funds', uniq(visits.map(function (z) { return ffLabel(z.data.visit.federalFunds); })).join('; ')],
+      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name + (usesAba ? '; ' + R.codes.aba.name : '') + (anyPolling ? '; Help America Vote Act and Michigan Election Law (voting systems)' : '')],
       ['Prepared by', opts.preparedBy || 'Disability Network Eastern Michigan (DNEM)'],
       ['Report generated', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' (rules table ' + R.version + ')']
     ]));
@@ -110,19 +121,26 @@
     children.push(h(d.HeadingLevel.HEADING_1, '1. Summary'));
     children.push(para(items.length + ' finding(s) were recorded at ' + sites.length + ' site(s). ' +
       count.fail + ' do not comply with at least one requirement, ' + count.manual + ' need manual input before a determination can be made, and ' +
+      (count.advice ? count.advice + ' meet the legal requirements that apply but not the federal best practice, ' : '') +
       count.pass + ' comply with every requirement that was measured.'));
-    var sumRows = [headRow(['Area (in walk order)', 'Findings', 'Does not comply', 'Needs manual input', 'Complies'])];
+    var adv = count.advice > 0;
+    var sumRows = [headRow(['Area (in walk order)', 'Findings', 'Does not comply', 'Needs manual input'].concat(adv ? ['Best practice not met'] : [], ['Complies']))];
+    function sumCells(label, n, b, o) {
+      return [cell(label, o), cell(String(n), o), cell(String(b.fail), o), cell(String(b.manual), o)].concat(adv ? [cell(String(b.advice), o)] : [], [cell(String(b.pass + b.na), o)]);
+    }
     groups.forEach(function (g) {
       if (g.kind === 'other' && !g.items.length) return;
-      var b = { fail: 0, manual: 0, pass: 0, na: 0 };
+      var b = { fail: 0, manual: 0, advice: 0, pass: 0, na: 0 };
       g.items.forEach(function (it) { b[it.ev.status]++; });
-      sumRows.push(new d.TableRow({ cantSplit: true, children: [cell(g.label), cell(String(g.items.length)), cell(String(b.fail)), cell(String(b.manual)), cell(String(b.pass + b.na))] }));
+      sumRows.push(new d.TableRow({ cantSplit: true, children: sumCells(g.label, g.items.length, b) }));
     });
-    sumRows.push(new d.TableRow({ cantSplit: true, children: [cell('Total', { bold: true, fill: TINT }), cell(String(items.length), { bold: true, fill: TINT }), cell(String(count.fail), { bold: true, fill: TINT }), cell(String(count.manual), { bold: true, fill: TINT }), cell(String(count.pass + count.na), { bold: true, fill: TINT })] }));
+    sumRows.push(new d.TableRow({ cantSplit: true, children: sumCells('Total', items.length, count, { bold: true, fill: TINT }) }));
     children.push(table(sumRows));
 
     children.push(h(d.HeadingLevel.HEADING_2, 'How to read this report'));
-    children.push(bullet([txt('Order. ', { bold: true }), txt('Findings follow the order the site was walked: parking, the route to the entrance, the entrance, each room, then outdoor and recreation areas such as playgrounds and pools. Finding numbers follow the same order.')]));
+    children.push(bullet([txt('Order. ', { bold: true }), txt(allPolling ? 'Findings follow the path a voter takes: parking and drop-off, the route to the entrance, the voter entrance, the route to the voting area, then the voting area. Finding numbers follow the same order.' : 'Findings follow the order the site was walked: parking, the route to the entrance, the entrance, each room, then outdoor and recreation areas such as playgrounds, pools, trails and event areas. Finding numbers follow the same order.')]));
+    if (anyPolling) children.push(bullet([txt('Polling places. ', { bold: true }), txt('Polling places are checked with the U.S. Department of Justice ADA Checklist for Polling Places (2016), which applies the 2010 ADA Standards to the path a voter takes. Temporary fixes such as cones, mats, portable ramps and propped doors count only if they are in place before the polls open and stay all day. The accessible voting system is checked against the Help America Vote Act and Michigan Election Law.')]));
+    if (usesAba) children.push(bullet([txt('Trails, park paths, beaches, picnic and camping areas. ', { bold: true }), txt('The 2010 ADA Standards and the Michigan code have no technical rules for these. They are checked against the federal Architectural Barriers Act (ABA) standards, Chapter 10. These rules are required for federal agencies and where federal funds require them, for example many grant-funded DNR projects. Where the visit records no federal money, an unmet ABA item is shown as "Best practice not met" rather than "Does not comply". Where funding is not known, it is shown as "Needs manual input".')]));
     children.push(bullet([txt('Which code governs. ', { bold: true }), txt('Each measurement is compared with the 2010 ADA Standards and with the Michigan barrier-free requirements (2021 Michigan Building Code, which adopts ICC A117.1-2017). Where both set a limit, the stricter one is used and cited. When the two match, both are cited with "(same requirement)".')]));
     children.push(bullet([txt('Results. ', { bold: true }), txt('"Does not comply" means a recorded measurement or answer falls outside the stricter requirement. "Complies" means every recorded value meets it. "Needs manual input" means the tool could not decide: a value was not recorded, the requirement depends on something not captured (such as the building\'s permit date), or the item needs a consultant\'s judgment.')]));
     children.push(bullet([txt('Citations marked †. ', { bold: true }), txt('These citations have not yet been checked against the printed code text. They are listed in Appendix A for confirmation before the report is issued.')]));
@@ -141,6 +159,17 @@
         return new d.TableRow({ cantSplit: true, children: r.map(function (c) { return cell(c); }) });
       }))));
     } else children.push(para('No recorded measurement or answer failed a requirement.'));
+    var advRows = [];
+    items.forEach(function (it) {
+      it.ev.results.forEach(function (r) { if (r.status === 'advice') advRows.push([String(it.no), it.group.label, it.ev.element ? it.ev.element.label : it.finding.elementType, r.label, r.measured || '', r.required || '']); });
+    });
+    if (advRows.length) {
+      children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Best Practice Recommendations'));
+      children.push(para(advRows.length + ' federal ABA best practice(s) for outdoor areas were not met. They are not legally required at this site because no federal money applies, but meeting them makes the trail, path or area usable by more people.'));
+      children.push(table([headRow(['Finding', 'Area', 'Element', 'Best practice not met', 'Measured', 'Recommended'], [9, 20, 17, 24, 15, 15])].concat(advRows.map(function (r) {
+        return new d.TableRow({ cantSplit: true, children: r.map(function (c) { return cell(c); }) });
+      }))));
+    }
 
     function groupBody(g, level) {
       if (!g.items.length) { children.push(small('Nothing was recorded here.')); return; }
@@ -152,8 +181,8 @@
       groupBody(g, d.HeadingLevel.HEADING_2);
     });
     var roomGroups = groups.filter(function (g) { return g.kind === 'room'; });
-    children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Rooms'));
-    if (!roomGroups.length) children.push(small('No rooms were recorded.'));
+    if (!allPolling) children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Rooms'));
+    if (!allPolling && !roomGroups.length) children.push(small('No rooms were recorded.'));
     roomGroups.forEach(function (g) {
       children.push(h(d.HeadingLevel.HEADING_2, g.label));
       groupBody(g, d.HeadingLevel.HEADING_3);
@@ -233,7 +262,7 @@
       });
     });
     children.push(h(d.HeadingLevel.HEADING_1, 'Appendix A. Citations to Verify (†)'));
-    children.push(para('These citations come from the tool\'s rules table and have not yet been confirmed against the printed ICC A117.1-2017 or 2021 Michigan Building Code text. Michigan section numbers can differ from ADA numbering, especially for parking and signage. ADA 2010 citations appear here only for recreation sections (play areas, pools and similar) whose sub-section numbers should be confirmed. Confirm each one, then initial it.'));
+    children.push(para('These citations come from the tool\'s rules table and have not yet been confirmed against the printed ICC A117.1-2017 or 2021 Michigan Building Code text. Michigan section numbers can differ from ADA numbering, especially for parking and signage. ADA 2010 citations appear here only for recreation sections (play areas, pools and similar) whose sub-section numbers should be confirmed. ABA citations are the federal outdoor developed area sections (Chapter 10). Confirm each one, then initial it.'));
     var vk = Object.keys(verify).sort();
     if (vk.length) children.push(table([headRow(['Citation', 'Uses', 'Confirmed by / date'], [62, 10, 28])].concat(vk.map(function (k) {
       return new d.TableRow({ cantSplit: true, children: [cell(k), cell(String(verify[k])), cell('')] });
@@ -248,7 +277,7 @@
     visits.forEach(function (z) { if (z.data.visit.notes) children.push(para([txt('Visit notes (' + z.data.visit.consultant + ', ' + z.data.visit.date + '): ', { bold: true }), txt(z.data.visit.notes)])); });
 
     return new d.Document({
-      creator: APP_NAME, title: (opts.title || 'Facility Accessibility Field Evaluation') + ' - ' + sites.join('; '),
+      creator: APP_NAME, title: title + ' - ' + sites.join('; '),
       description: 'Accessibility field evaluation citing the 2010 ADA Standards and the Michigan barrier-free code.',
       styles: {
         default: { document: { run: { font: 'Calibri', size: 28, color: INK }, paragraph: { spacing: { after: 120, line: 264, lineRule: d.LineRuleType.AUTO } } } },

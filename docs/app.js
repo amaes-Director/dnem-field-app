@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 9 Outdoor areas';
+  var APP_VERSION = 'Oct 9 Trails and polling';
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
@@ -114,7 +114,7 @@
     store.allVisits().then(function (visits) {
       visits.sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
       var html = '<div class="brand"><div class="logo-tile"><img src="dnem_logo.png" alt="Disability Network Eastern Michigan"></div>' +
-        '<p>Walk a site and record parking, routes, entrances, rooms and outdoor areas. Works with no signal.</p></div>' +
+        '<p>Walk a site and record parking, routes, entrances, rooms, outdoor areas and polling places. Works with no signal.</p></div>' +
         '<h2>Site visits</h2>' +
         '<p class="help">Everything is saved on this phone, even with no signal. Tap "Send visit" when you are done, choose Drive, and save it to the shared DNEM field-visits folder.</p>';
       if (!db) html += '<p class="card status-manual">This browser is not allowing storage, so visits will be lost if you close the app. Send each visit before closing.</p>';
@@ -136,16 +136,21 @@
 
   function visitForm(v, isNew) {
     setTitle(isNew ? 'New site visit' : 'Visit details', isNew ? '#' : '#visit/' + v.id);
-    var st = R.buildingStatus.map(function (s) {
-      return '<label class="choice" style="width:100%"><input type="radio" name="bstatus" value="' + s.id + '"' + (v.buildingStatus === s.id ? ' checked' : '') + '> ' + esc(s.label) + '</label>';
-    }).join('');
+    function radios(name, list, cur) {
+      return list.map(function (s) {
+        return '<label class="choice" style="width:100%"><input type="radio" name="' + name + '" value="' + s.id + '"' + (cur === s.id ? ' checked' : '') + '> ' + esc(s.label) + '</label>';
+      }).join('');
+    }
+    var st = radios('bstatus', R.buildingStatus, v.buildingStatus);
     main.innerHTML = '<h2>' + (isNew ? 'Start a site visit' : 'Edit visit details') + '</h2><form id="vf" novalidate>' +
       '<div class="field"><label for="siteName">Site or facility name (required)</label><input type="text" id="siteName" required autocomplete="off" value="' + esc(v.siteName) + '"></div>' +
       '<div class="field"><label for="address">Address</label><input type="text" id="address" autocomplete="street-address" value="' + esc(v.address) + '"></div>' +
       '<div class="field"><label for="client">Client</label><input type="text" id="client" value="' + esc(v.client) + '"></div>' +
       '<div class="field"><label for="consultant">Your name (required)</label><input type="text" id="consultant" required autocomplete="name" value="' + esc(v.consultant) + '"></div>' +
       '<div class="field"><label for="date">Visit date</label><input type="date" id="date" value="' + esc(v.date) + '"></div>' +
+      '<fieldset><legend>Type of visit</legend><div class="choices">' + radios('vtype', R.visitTypes, v.visitType || 'site') + '</div></fieldset>' +
       '<fieldset><legend>Building status</legend><p class="help">Decides whether the 2021 Michigan new-building sizes apply (for example a 67 in turning circle). Leave "Not known" if unsure; the report will flag those items.</p><div class="choices">' + st + '</div></fieldset>' +
+      '<fieldset><legend>Federal funds</legend><p class="help">Decides whether the federal rules for trails, park paths, beaches, picnic and camping areas are required or best practice. Leave "Not known" if unsure; the report will flag those items.</p><div class="choices">' + radios('ffunds', R.federalFunds, v.federalFunds || 'unknown') + '</div></fieldset>' +
       '<div class="field"><label for="vnotes">Visit notes</label><textarea id="vnotes">' + esc(v.notes) + '</textarea></div>' +
       '<p id="vfErr" class="status-fail" role="alert"></p>' +
       (isNew ? '' : '<h3>Remove</h3><p><button class="btn danger" type="button" id="delV">Delete this visit from the phone</button></p>') +
@@ -164,6 +169,8 @@
       v.siteName = g('siteName'); v.address = g('address'); v.client = g('client'); v.consultant = g('consultant');
       v.date = g('date') || today(); v.notes = g('vnotes');
       var b = main.querySelector('input[name=bstatus]:checked'); v.buildingStatus = b ? b.value : 'unknown';
+      var vt = main.querySelector('input[name=vtype]:checked'); v.visitType = vt ? vt.value : 'site';
+      var ff = main.querySelector('input[name=ffunds]:checked'); v.federalFunds = ff ? ff.value : 'unknown';
       pref('consultant', v.consultant);
       store.putVisit(v).then(function () { toast('Saved'); go('#visit/' + v.id); });
     };
@@ -177,8 +184,8 @@
     var fs = areaFindings(v, areaId);
     if (!fs.length) return '';
     var st = fs.map(function (f) { return E.evaluateFinding(f, v, R).status; });
-    var fail = st.filter(function (s) { return s === 'fail'; }).length, man = st.filter(function (s) { return s === 'manual'; }).length;
-    return fs.length + ' recorded' + (fail ? ' · <span class="status-fail">' + fail + ' do not comply</span>' : '') + (man ? ' · <span class="status-manual">' + man + ' need input</span>' : '');
+    var fail = st.filter(function (s) { return s === 'fail'; }).length, man = st.filter(function (s) { return s === 'manual'; }).length, adv = st.filter(function (s) { return s === 'advice'; }).length;
+    return fs.length + ' recorded' + (fail ? ' · <span class="status-fail">' + fail + ' do not comply</span>' : '') + (man ? ' · <span class="status-manual">' + man + ' need input</span>' : '') + (adv ? ' · ' + adv + ' best practice' : '');
   }
   // Wording for the two kinds of added areas: indoor rooms, and outdoor and recreation areas.
   var KIND = {
@@ -191,10 +198,12 @@
     var areas = W.areas(v), done = v.doneAreas || [];
     if (afterId === undefined) {
       for (var i = 0; i < areas.length; i++) if (done.indexOf(areas[i].id) < 0 && !areaFindings(v, areas[i].id).length) return '#area/' + v.id + '/' + areas[i].id;
+      if (W.isPolling(v)) return '#area/' + v.id + '/' + areas[areas.length - 1].id;
       return (v.rooms || []).some(W.isOutdoor) ? '#outdoor/' + v.id : '#rooms/' + v.id;
     }
     var idx = areas.map(function (a) { return a.id; }).indexOf(afterId);
     var cur = areas[idx], nxt = areas[idx + 1];
+    if (W.isPolling(v)) return nxt ? '#area/' + v.id + '/' + nxt.id : '#visit/' + v.id;
     if (cur && cur.id === 'entrance') return '#rooms/' + v.id;
     if (cur && cur.kind === 'outdoor') return nxt ? '#area/' + v.id + '/' + nxt.id : '#outdoor/' + v.id;
     if (!nxt || (cur && cur.kind === 'room' && nxt.kind !== 'room')) return '#rooms/' + v.id;
@@ -203,6 +212,7 @@
   function nextLabel(v, hash) {
     if (hash.indexOf('#rooms/') === 0) return 'Rooms';
     if (hash.indexOf('#outdoor/') === 0) return 'Outdoor areas';
+    if (hash.indexOf('#visit/') === 0) return 'Finish and send';
     var id = hash.split('/')[2], a = W.areas(v).filter(function (x) { return x.id === id; })[0];
     return a ? a.label : 'Next';
   }
@@ -219,13 +229,14 @@
       var nh = nextHash(v);
       var html = '<button class="btn block big" type="button" id="cont">' + (v.findings && v.findings.length ? 'Continue: ' : 'Start: ') + esc(nextLabel(v, nh)) + '</button>' +
         '<h2>' + esc(v.siteName) + '</h2><p class="help">' + esc(v.date) + ' · ' + esc(v.consultant) + '</p><ol class="walk">';
-      W.stops.forEach(function (s, i) {
+      W.stopsFor(v).forEach(function (s, i) {
         var done = (v.doneAreas || []).indexOf(s.id) >= 0 || areaFindings(v, s.id).length;
         html += '<li><button type="button" class="card link" data-go="#area/' + v.id + '/' + s.id + '"><strong>' + (i + 1) + '. ' + esc(s.label) + (done ? ' <span aria-label="started">✓</span>' : '') + '</strong><span class="meta">' + (areaStatus(v, s.id) || 'Not started') + '</span></button></li>';
       });
       var rooms = (v.rooms || []).filter(function (r) { return !W.isOutdoor(r); }), outs = (v.rooms || []).filter(W.isOutdoor);
-      html += '<li><button type="button" class="card link" data-go="#rooms/' + v.id + '"><strong>4. Rooms</strong><span class="meta">' + rooms.length + ' room' + (rooms.length === 1 ? '' : 's') + ' added</span></button></li>';
-      html += '<li><button type="button" class="card link" data-go="#outdoor/' + v.id + '"><strong>5. Outdoor and recreation areas</strong><span class="meta">' + (outs.length ? outs.length + ' area' + (outs.length === 1 ? '' : 's') + ' added' : 'Playgrounds, pools, parks, fields, piers, bus stops') + '</span></button></li></ol>';
+      if (W.isPolling(v)) html += '</ol>';
+      else html += '<li><button type="button" class="card link" data-go="#rooms/' + v.id + '"><strong>4. Rooms</strong><span class="meta">' + rooms.length + ' room' + (rooms.length === 1 ? '' : 's') + ' added</span></button></li>';
+      if (!W.isPolling(v)) html += '<li><button type="button" class="card link" data-go="#outdoor/' + v.id + '"><strong>5. Outdoor and recreation areas</strong><span class="meta">' + (outs.length ? outs.length + ' area' + (outs.length === 1 ? '' : 's') + ' added' : 'Playgrounds, pools, parks, fields, piers, bus stops') + '</span></button></li></ol>';
       var loose = areaFindings(v, '');
       if (loose.length) html += '<button type="button" class="card link" data-go="#area/' + v.id + '/_none"><strong>Other findings</strong><span class="meta">' + areaStatus(v, '') + '</span></button>';
       html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>' +
@@ -261,7 +272,7 @@
       if (fs.length) {
         html += '<h3>Recorded here</h3><ul class="checklist">';
         fs.forEach(function (f) {
-          var ev = E.evaluateFinding(f, v, R), cls = { fail: 'status-fail', manual: 'status-manual', pass: 'status-pass', na: '' }[ev.status];
+          var ev = E.evaluateFinding(f, v, R), cls = { fail: 'status-fail', manual: 'status-manual', advice: 'status-manual', pass: 'status-pass', na: '' }[ev.status];
           html += '<li><button type="button" class="card link" data-go="#finding/' + v.id + '/' + (area.id || '_none') + '/' + f.id + '"><strong>' + esc(elementLabel(f.elementType)) + '</strong><span class="meta">' + esc(f.location) + ' · ' + (f.photos || []).length + ' photo(s)</span><br><span class="' + cls + '">' + esc(E.STATUS_LABEL[ev.status]) + '</span></button></li>';
         });
         html += '</ul>';
@@ -501,7 +512,7 @@
     toast('Packing visit...');
     var zip = new JSZip(), photoDir = zip.folder('photos');
     var out = { format: 'dnem-field-visit', formatVersion: 2, rulesVersion: R.version, exportedAt: new Date().toISOString(), app: 'DNEM Field Capture', visit: {}, findings: [] };
-    ['id', 'siteName', 'address', 'client', 'consultant', 'date', 'buildingStatus', 'notes', 'created', 'updated', 'rooms', 'doneAreas'].forEach(function (k) { out.visit[k] = v[k]; });
+    ['id', 'siteName', 'address', 'client', 'consultant', 'date', 'buildingStatus', 'visitType', 'federalFunds', 'notes', 'created', 'updated', 'rooms', 'doneAreas'].forEach(function (k) { out.visit[k] = v[k]; });
     var jobs = [];
     v.findings.forEach(function (f, i) {
       var copy = JSON.parse(JSON.stringify(f)); copy.photos = [];
@@ -542,7 +553,7 @@
   function route() {
     var h = location.hash.replace(/^#/, '').split('/');
     if (h[0] === 'new') {
-      visitForm({ id: uid(), siteName: '', address: '', client: '', consultant: pref('consultant') || '', date: today(), buildingStatus: 'unknown', notes: '', rooms: [], doneAreas: [], findings: [], created: new Date().toISOString() }, true);
+      visitForm({ id: uid(), siteName: '', address: '', client: '', consultant: pref('consultant') || '', date: today(), buildingStatus: 'unknown', visitType: 'site', federalFunds: 'unknown', notes: '', rooms: [], doneAreas: [], findings: [], created: new Date().toISOString() }, true);
     } else if (h[0] === 'visit' && h[2] === 'edit') {
       store.getVisit(h[1]).then(function (v) { if (v) visitForm(v, false); else go('#'); });
     } else if (h[0] === 'visit') viewVisit(h[1]);
