@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 9 ADA Lens';
+  var APP_VERSION = 'Oct 9 Outdoor areas';
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
@@ -114,7 +114,7 @@
     store.allVisits().then(function (visits) {
       visits.sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
       var html = '<div class="brand"><div class="logo-tile"><img src="dnem_logo.png" alt="Disability Network Eastern Michigan"></div>' +
-        '<p>Walk a site and record parking, routes, entrances and rooms. Works with no signal.</p></div>' +
+        '<p>Walk a site and record parking, routes, entrances, rooms and outdoor areas. Works with no signal.</p></div>' +
         '<h2>Site visits</h2>' +
         '<p class="help">Everything is saved on this phone, even with no signal. Tap "Send visit" when you are done, choose Drive, and save it to the shared DNEM field-visits folder.</p>';
       if (!db) html += '<p class="card status-manual">This browser is not allowing storage, so visits will be lost if you close the app. Send each visit before closing.</p>';
@@ -180,20 +180,29 @@
     var fail = st.filter(function (s) { return s === 'fail'; }).length, man = st.filter(function (s) { return s === 'manual'; }).length;
     return fs.length + ' recorded' + (fail ? ' · <span class="status-fail">' + fail + ' do not comply</span>' : '') + (man ? ' · <span class="status-manual">' + man + ' need input</span>' : '');
   }
+  // Wording for the two kinds of added areas: indoor rooms, and outdoor and recreation areas.
+  var KIND = {
+    room: { list: '#rooms/', title: 'Rooms', add: '+ Add a room', one: 'room', many: 'rooms', legend: 'Room type (required)', pick: 'Choose the room type.', empty: 'No rooms yet. Add each room as you walk into it.', ph: 'e.g. Board of Directors meeting room', num: 'e.g. 2 or 104' },
+    outdoor: { list: '#outdoor/', title: 'Outdoor and recreation areas', add: '+ Add an outdoor area', one: 'area', many: 'areas', legend: 'Area type (required)', pick: 'Choose the area type.', empty: 'No outdoor areas yet. Add playgrounds, pools, parks, sports fields, fishing piers, golf, fitness areas and bus stops here. Skip this if the site has none.', ph: 'e.g. North playground', num: 'e.g. 2' }
+  };
+  function kindOf(r) { return W.isOutdoor(r) ? 'outdoor' : 'room'; }
   // Where "Continue" goes: the first stop with nothing recorded and not marked done, else Rooms.
   function nextHash(v, afterId) {
     var areas = W.areas(v), done = v.doneAreas || [];
     if (afterId === undefined) {
-      for (var i = 0; i < areas.length; i++) if (done.indexOf(areas[i].id) < 0 && !areaFindings(v, areas[i].id).length) return areas[i].kind === 'room' ? '#area/' + v.id + '/' + areas[i].id : '#area/' + v.id + '/' + areas[i].id;
-      return '#rooms/' + v.id;
+      for (var i = 0; i < areas.length; i++) if (done.indexOf(areas[i].id) < 0 && !areaFindings(v, areas[i].id).length) return '#area/' + v.id + '/' + areas[i].id;
+      return (v.rooms || []).some(W.isOutdoor) ? '#outdoor/' + v.id : '#rooms/' + v.id;
     }
     var idx = areas.map(function (a) { return a.id; }).indexOf(afterId);
-    var nxt = areas[idx + 1];
-    if (!nxt || (areas[idx].id === 'entrance')) return '#rooms/' + v.id;
+    var cur = areas[idx], nxt = areas[idx + 1];
+    if (cur && cur.id === 'entrance') return '#rooms/' + v.id;
+    if (cur && cur.kind === 'outdoor') return nxt ? '#area/' + v.id + '/' + nxt.id : '#outdoor/' + v.id;
+    if (!nxt || (cur && cur.kind === 'room' && nxt.kind !== 'room')) return '#rooms/' + v.id;
     return '#area/' + v.id + '/' + nxt.id;
   }
   function nextLabel(v, hash) {
     if (hash.indexOf('#rooms/') === 0) return 'Rooms';
+    if (hash.indexOf('#outdoor/') === 0) return 'Outdoor areas';
     var id = hash.split('/')[2], a = W.areas(v).filter(function (x) { return x.id === id; })[0];
     return a ? a.label : 'Next';
   }
@@ -214,8 +223,9 @@
         var done = (v.doneAreas || []).indexOf(s.id) >= 0 || areaFindings(v, s.id).length;
         html += '<li><button type="button" class="card link" data-go="#area/' + v.id + '/' + s.id + '"><strong>' + (i + 1) + '. ' + esc(s.label) + (done ? ' <span aria-label="started">✓</span>' : '') + '</strong><span class="meta">' + (areaStatus(v, s.id) || 'Not started') + '</span></button></li>';
       });
-      var rooms = v.rooms || [];
-      html += '<li><button type="button" class="card link" data-go="#rooms/' + v.id + '"><strong>4. Rooms</strong><span class="meta">' + rooms.length + ' room' + (rooms.length === 1 ? '' : 's') + ' added</span></button></li></ol>';
+      var rooms = (v.rooms || []).filter(function (r) { return !W.isOutdoor(r); }), outs = (v.rooms || []).filter(W.isOutdoor);
+      html += '<li><button type="button" class="card link" data-go="#rooms/' + v.id + '"><strong>4. Rooms</strong><span class="meta">' + rooms.length + ' room' + (rooms.length === 1 ? '' : 's') + ' added</span></button></li>';
+      html += '<li><button type="button" class="card link" data-go="#outdoor/' + v.id + '"><strong>5. Outdoor and recreation areas</strong><span class="meta">' + (outs.length ? outs.length + ' area' + (outs.length === 1 ? '' : 's') + ' added' : 'Playgrounds, pools, parks, fields, piers, bus stops') + '</span></button></li></ol>';
       var loose = areaFindings(v, '');
       if (loose.length) html += '<button type="button" class="card link" data-go="#area/' + v.id + '/_none"><strong>Other findings</strong><span class="meta">' + areaStatus(v, '') + '</span></button>';
       html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>' +
@@ -234,7 +244,7 @@
       if (!v) return go('#');
       var area = areaId === '_none' ? { id: '', label: 'Other findings', elements: [], kind: 'none' } : W.areas(v).filter(function (a) { return a.id === areaId; })[0];
       if (!area) return go('#visit/' + v.id);
-      var back = area.kind === 'room' ? '#rooms/' + v.id : '#visit/' + v.id;
+      var back = area.kind === 'room' ? '#rooms/' + v.id : area.kind === 'outdoor' ? '#outdoor/' + v.id : '#visit/' + v.id;
       setTitle(area.label, back);
       var nh = area.kind === 'none' ? '#visit/' + v.id : nextHash(v, area.id);
       var fs = areaFindings(v, area.id);
@@ -256,7 +266,7 @@
         });
         html += '</ul>';
       }
-      if (area.kind === 'room') html += '<p><a href="#room/' + v.id + '/' + area.id + '" class="textlink">Rename or remove this room</a></p>';
+      if (area.kind === 'room' || area.kind === 'outdoor') html += '<p><a href="#room/' + v.id + '/' + area.id + '" class="textlink">Rename or remove this ' + KIND[area.kind].one + '</a></p>';
       main.innerHTML = html;
       main.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
       document.getElementById('next').onclick = function () { (area.id ? markDone(v, area.id) : Promise.resolve()).then(function () { go(nh); }); };
@@ -264,57 +274,63 @@
     });
   }
 
-  // Rooms list: add a room at the top, then the rooms in the order added.
-  function viewRooms(visitId) {
+  // Rooms list (or outdoor areas list): add at the top, then the list in the order added.
+  // Rooms end with "Next: Outdoor and recreation areas"; outdoor areas end with Send.
+  function viewRooms(visitId, kind) {
+    var K = KIND[kind];
     store.getVisit(visitId).then(function (v) {
       if (!v) return go('#');
-      setTitle('Rooms', '#visit/' + v.id);
-      var rooms = v.rooms || [];
-      var html = '<button class="btn block big" type="button" id="addRoom">+ Add a room</button><h2>Rooms</h2>';
-      if (!rooms.length) html += '<p class="empty">No rooms yet. Add each room as you walk into it.</p>';
+      setTitle(K.title, '#visit/' + v.id);
+      var rooms = (v.rooms || []).filter(function (r) { return kindOf(r) === kind; });
+      var html = '<button class="btn block big" type="button" id="addRoom">' + K.add + '</button><h2>' + K.title + '</h2>';
+      if (!rooms.length) html += '<p class="empty">' + K.empty + '</p>';
       html += '<ul class="checklist">';
       rooms.forEach(function (r) {
         html += '<li><button type="button" class="card link" data-go="#area/' + v.id + '/' + r.id + '"><strong>' + esc(W.roomLabel(r)) + ((v.doneAreas || []).indexOf(r.id) >= 0 ? ' <span aria-label="done">✓</span>' : '') + '</strong><span class="meta">' + (areaStatus(v, r.id) || 'Nothing recorded yet') + '</span></button></li>';
       });
       html += '</ul>';
-      if (rooms.length) html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>';
+      if (kind === 'room') html += '<h3>When the rooms are finished</h3><button class="btn block" type="button" id="toOut">Next: Outdoor and recreation areas</button>';
+      else html += '<h3>When you are finished</h3><button class="btn block" type="button" id="sendV">Send visit to Google Drive</button>';
       main.innerHTML = html;
       main.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.dataset.go); }; });
-      document.getElementById('addRoom').onclick = function () { go('#room/' + v.id + '/new'); };
-      if (rooms.length) document.getElementById('sendV').onclick = function () { sendVisit(v); };
+      document.getElementById('addRoom').onclick = function () { go('#room/' + v.id + '/new' + (kind === 'outdoor' ? '/outdoor' : '')); };
+      if (kind === 'room') document.getElementById('toOut').onclick = function () { go('#outdoor/' + v.id); };
+      else document.getElementById('sendV').onclick = function () { sendVisit(v); };
       focusMain();
     });
   }
 
   // Add or rename a room: type, number, and the name the reviewer uses.
-  function roomForm(visitId, roomId) {
+  function roomForm(visitId, roomId, newKind) {
     store.getVisit(visitId).then(function (v) {
       if (!v) return go('#');
       v.rooms = v.rooms || [];
       var isNew = roomId === 'new';
       var r = isNew ? { id: uid(), type: '', number: '', name: '' } : v.rooms.filter(function (x) { return x.id === roomId; })[0];
       if (!r) return go('#rooms/' + v.id);
-      setTitle(isNew ? 'Add a room' : 'Rename room', isNew ? '#rooms/' + v.id : '#area/' + v.id + '/' + r.id);
-      var types = W.roomTypes.map(function (t) {
+      if (isNew && newKind === 'outdoor') r.kind = 'outdoor';
+      var kind = kindOf(r), K = KIND[kind];
+      setTitle((isNew ? 'Add ' : 'Rename ') + (kind === 'outdoor' ? (isNew ? 'an outdoor area' : 'area') : (isNew ? 'a room' : 'room')), isNew ? K.list + v.id : '#area/' + v.id + '/' + r.id);
+      var types = W.typesFor(kind).map(function (t) {
         return '<label class="choice" style="width:100%"><input type="radio" name="rtype" value="' + t.id + '"' + (r.type === t.id ? ' checked' : '') + '> ' + esc(t.label) + '</label>';
       }).join('');
       main.innerHTML = '<form id="rf" novalidate>' +
-        '<button class="btn block big" type="submit">' + (isNew ? 'Add room' : 'Save') + '</button>' +
-        '<fieldset><legend>Room type (required)</legend><div class="choices">' + types + '</div></fieldset>' +
-        '<div class="field"><label for="rnum">Number (optional)</label><input type="text" id="rnum" placeholder="e.g. 2 or 104" value="' + esc(r.number) + '"></div>' +
-        '<div class="field"><label for="rname">Name (optional)</label><input type="text" id="rname" placeholder="e.g. Board of Directors meeting room" value="' + esc(r.name) + '"></div>' +
+        '<button class="btn block big" type="submit">' + (isNew ? 'Add ' + K.one : 'Save') + '</button>' +
+        '<fieldset><legend>' + K.legend + '</legend><div class="choices">' + types + '</div></fieldset>' +
+        '<div class="field"><label for="rnum">Number (optional)</label><input type="text" id="rnum" placeholder="' + K.num + '" value="' + esc(r.number) + '"></div>' +
+        '<div class="field"><label for="rname">Name (optional)</label><input type="text" id="rname" placeholder="' + K.ph + '" value="' + esc(r.name) + '"></div>' +
         '<p class="help" id="rprev"></p><p id="rfErr" class="status-fail" role="alert"></p>' +
-        (isNew ? '' : '<p><button class="btn danger" type="button" id="delR">Remove this room</button></p>') + '</form>';
+        (isNew ? '' : '<p><button class="btn danger" type="button" id="delR">Remove this ' + K.one + '</button></p>') + '</form>';
       function preview() {
         var t = main.querySelector('input[name=rtype]:checked');
-        document.getElementById('rprev').textContent = t ? 'Shown as: ' + W.roomLabel({ type: t.value, number: document.getElementById('rnum').value.trim(), name: document.getElementById('rname').value.trim() }) : '';
+        document.getElementById('rprev').textContent = t ? 'Shown as: ' + W.roomLabel({ kind: r.kind, type: t.value, number: document.getElementById('rnum').value.trim(), name: document.getElementById('rname').value.trim() }) : '';
       }
       main.querySelectorAll('input').forEach(function (i) { i.addEventListener('input', preview); i.addEventListener('change', preview); });
       preview();
       document.getElementById('rf').onsubmit = function (e) {
         e.preventDefault();
         var t = main.querySelector('input[name=rtype]:checked');
-        if (!t) { document.getElementById('rfErr').textContent = 'Choose the room type.'; main.querySelector('input[name=rtype]').focus(); return; }
+        if (!t) { document.getElementById('rfErr').textContent = K.pick; main.querySelector('input[name=rtype]').focus(); return; }
         r.type = t.value; r.number = document.getElementById('rnum').value.trim(); r.name = document.getElementById('rname').value.trim();
         if (isNew) v.rooms.push(r);
         store.putVisit(v).then(function () { go('#area/' + v.id + '/' + r.id); });
@@ -325,7 +341,7 @@
         var gone = areaFindings(v, r.id);
         v.findings = (v.findings || []).filter(function (f) { return f.areaId !== r.id; });
         v.rooms = v.rooms.filter(function (x) { return x.id !== r.id; });
-        Promise.all([].concat.apply([], gone.map(function (f) { return f.photos; })).map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast('Room removed'); go('#rooms/' + v.id); });
+        Promise.all([].concat.apply([], gone.map(function (f) { return f.photos; })).map(store.deletePhoto)).then(function () { return store.putVisit(v); }).then(function () { toast((kind === 'outdoor' ? 'Area' : 'Room') + ' removed'); go(K.list + v.id); });
       };
       focusMain();
     });
@@ -531,8 +547,9 @@
       store.getVisit(h[1]).then(function (v) { if (v) visitForm(v, false); else go('#'); });
     } else if (h[0] === 'visit') viewVisit(h[1]);
     else if (h[0] === 'area') viewArea(h[1], h[2]);
-    else if (h[0] === 'rooms') viewRooms(h[1]);
-    else if (h[0] === 'room') roomForm(h[1], h[2]);
+    else if (h[0] === 'rooms') viewRooms(h[1], 'room');
+    else if (h[0] === 'outdoor') viewRooms(h[1], 'outdoor');
+    else if (h[0] === 'room') roomForm(h[1], h[2], h[3]);
     else if (h[0] === 'finding') viewFinding(h[1], h[2], h[3], h[4]);
     else viewHome();
   }

@@ -1,5 +1,5 @@
 /* Offline cache for the DNEM ADA Lens app. Bump VERSION when files change. */
-var VERSION = 'dnem-field-v5';
+var VERSION = 'dnem-field-v6';
 var FILES = ['./', 'index.html', 'styles.css', 'app.js', 'rules.js', 'engine.js', 'walk.js', 'lib/jszip.min.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'dnem_logo.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));

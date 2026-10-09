@@ -21,13 +21,13 @@
   var MI = 'ICC A117.1-2017';
 
   // Shorthand: side(cite, limits) builds one code side.
-  function ada(sec, lim) { return Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); }
+  function ada(sec, lim) { return Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); } // lim.verify = true marks an ADA section to double-check
   function mi(sec, lim, opts) {
     return Object.assign({ cite: MI + ' §' + sec, verify: true }, lim || {}, opts || {});
   }
 
   var RULES = {
-    version: '2026-10-09.1',
+    version: '2026-10-09.2',
     codes: {
       ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
       mi: {
@@ -426,6 +426,319 @@
           { id: 'df-wc', label: 'Wheelchair spout height (36 in max)', field: 'wc_spout', ada: ada('602.4', { max: 36 }), mi: mi('602.4', { max: 36 }) },
           { id: 'df-stand', label: 'Standing spout height (38 to 43 in)', field: 'stand_spout', ada: ada('602.7', { min: 38, max: 43 }), mi: mi('602.7', { min: 38, max: 43 }) },
           { id: 'df-both', label: 'Two heights provided', field: 'both', ada: ada('211.2', { expect: true }), mi: { cite: '2021 MBC §1109.5.1', expect: true, verify: true } }
+        ]
+      },
+      // ================================================================ Outdoor site elements
+      {
+        id: 'curb_ramp', label: 'Curb ramp', group: 'Routes',
+        fields: [
+          { id: 'running_slope', type: 'slope', label: 'Running slope' },
+          { id: 'cross_slope', type: 'slope', label: 'Cross slope' },
+          { id: 'width', type: 'len', label: 'Clear width (not counting flares)' },
+          { id: 'flare_slope', type: 'slope', label: 'Flared side slope (measured along the curb)', allowNA: true },
+          { id: 'counter_slope', type: 'slope', label: 'Gutter / road counter slope at the ramp', allowNA: true },
+          { id: 'landing', type: 'len', label: 'Top landing length' },
+          { id: 'flush', type: 'bool', label: 'Ramp meets walk, gutter and street flush (no lip)?' }
+        ],
+        checks: [
+          { id: 'cr-run', label: 'Running slope (1:12 max)', field: 'running_slope', ada: ada('406.1 and 405.2', { max: 8.33 }), mi: mi('406.1 and 405.2', { max: 8.33 }) },
+          { id: 'cr-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope', ada: ada('406.1 and 405.3', { max: 2.08 }), mi: mi('406.1 and 405.3', { max: 2.08 }) },
+          { id: 'cr-width', label: 'Clear width', field: 'width', ada: ada('406.1 and 405.5', { min: 36 }), mi: mi('406.1 and 405.5', { min: 36 }) },
+          { id: 'cr-flare', label: 'Flared sides (1:10 max)', field: 'flare_slope', ada: ada('406.3', { max: 10 }), mi: mi('406.3', { max: 10 }),
+            note: 'Applies where the flares are part of a pedestrian route; returned curbs are allowed where pedestrians would not cross the sides.' },
+          { id: 'cr-counter', label: 'Counter slope (1:20 max)', field: 'counter_slope', ada: ada('406.2', { max: 5 }), mi: mi('406.2', { max: 5 }) },
+          { id: 'cr-landing', label: 'Top landing length', field: 'landing', ada: ada('406.4', { min: 36 }), mi: mi('406.4', { min: 36 }) },
+          { id: 'cr-flush', label: 'Flush transitions', field: 'flush', ada: ada('406.2', { expect: true }), mi: mi('406.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'loading_zone', label: 'Passenger loading zone (drop-off)', group: 'Site',
+        fields: [
+          { id: 'pullup_width', type: 'len', label: 'Vehicle pull-up space width' },
+          { id: 'aisle_width', type: 'len', label: 'Access aisle width' },
+          { id: 'aisle_length', type: 'len', label: 'Access aisle length (20 ft = 240 in)' },
+          { id: 'slope', type: 'slope', label: 'Steepest slope in pull-up space or aisle' },
+          { id: 'marked', type: 'bool', label: 'Access aisle marked to discourage parking?' },
+          { id: 'clearance', type: 'len', label: 'Vertical clearance (canopies, porte-cocheres)', allowNA: true }
+        ],
+        checks: [
+          { id: 'lz-pullup', label: 'Pull-up space width', field: 'pullup_width', ada: ada('503.2', { min: 96 }), mi: mi('503.2', { min: 96 }) },
+          { id: 'lz-aisle-w', label: 'Access aisle width', field: 'aisle_width', ada: ada('503.3.1', { min: 60 }), mi: mi('503.3', { min: 60 }) },
+          { id: 'lz-aisle-l', label: 'Access aisle length (full 20 ft pull-up space)', field: 'aisle_length', ada: ada('503.2 and 503.3.2', { min: 240 }), mi: mi('503.2 and 503.3', { min: 240 }) },
+          { id: 'lz-slope', label: 'Slope (1:48 max)', field: 'slope', ada: ada('503.4', { max: 2.08 }), mi: mi('503.4', { max: 2.08 }) },
+          { id: 'lz-marked', label: 'Access aisle marked', field: 'marked', ada: ada('503.3.3', { expect: true }), mi: mi('503.3', { expect: true }) },
+          { id: 'lz-clear', label: 'Vertical clearance', field: 'clearance', ada: ada('503.5', { min: 114 }), mi: mi('503.5', { min: 114 }) }
+        ]
+      },
+      {
+        id: 'bus_stop', label: 'Bus stop boarding area', group: 'Site',
+        scopeNote: 'Applies to bus stops built or altered by a public entity (ADA 810.2).',
+        fields: [
+          { id: 'depth', type: 'len', label: 'Clear depth, perpendicular to the curb' },
+          { id: 'width', type: 'len', label: 'Clear width, along the curb' },
+          { id: 'slope', type: 'slope', label: 'Slope perpendicular to the road' },
+          { id: 'route', type: 'bool', label: 'Connected to streets, sidewalks or paths by an accessible route?' }
+        ],
+        checks: [
+          { id: 'bs-depth', label: 'Boarding area depth', field: 'depth', ada: ada('810.2.2', { min: 96 }), mi: mi('810.2.2', { min: 96 }) },
+          { id: 'bs-width', label: 'Boarding area width', field: 'width', ada: ada('810.2.2', { min: 60 }), mi: mi('810.2.2', { min: 60 }) },
+          { id: 'bs-slope', label: 'Slope perpendicular to the road (1:48 max)', field: 'slope', ada: ada('810.2.4', { max: 2.08 }), mi: mi('810.2.4', { max: 2.08 }) },
+          { id: 'bs-route', label: 'Connected by accessible route', field: 'route', ada: ada('810.2.3', { expect: true }), mi: mi('810.2.3', { expect: true }) }
+        ]
+      },
+      {
+        id: 'entrance_signs', label: 'Entrance signs (symbol and directions)', group: 'Doors',
+        fields: [
+          { id: 'isa', type: 'bool', label: 'Accessible entrance marked with the International Symbol of Accessibility?' },
+          { id: 'directional', type: 'bool', label: 'Entrances that are not accessible have signs pointing to the accessible one?', allowNA: true }
+        ],
+        checks: [
+          { id: 'es-isa', label: 'Accessible entrance identified', field: 'isa', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.1', expect: true, verify: true } },
+          { id: 'es-dir', label: 'Directional signs at other entrances', field: 'directional', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.2', expect: true, verify: true },
+            note: 'Not required where every entrance is accessible.' }
+        ]
+      },
+      // ================================================================ Play areas (ADA 240 and 1008)
+      {
+        id: 'play_area', label: 'Play area (overall counts and surfaces)', group: 'Recreation',
+        fields: [
+          { id: 'elevated_total', type: 'count', label: 'Elevated play components (reached by ramp, transfer system or steps)' },
+          { id: 'elevated_route', type: 'count', label: 'Elevated components on an accessible route (ramp or transfer system)' },
+          { id: 'elevated_ramp', type: 'count', label: 'Elevated components reached by a ramp' },
+          { id: 'ground_types', type: 'count', label: 'Different types of ground-level components on an accessible route' },
+          { id: 'route', type: 'bool', label: 'Accessible route connects the play area to the site?' },
+          { id: 'ground_width', type: 'len', label: 'Narrowest ground-level route inside the play area' },
+          { id: 'surface_access', type: 'bool', label: 'Surfacing on routes is accessible (ASTM F1951 documentation, or firm and stable)?' },
+          { id: 'surface_impact', type: 'bool', label: 'Surfacing inside use zones is impact-attenuating (ASTM F1292)?' },
+          { id: 'turning', type: 'bool', label: 'Turning space at each level that has elevated components on a route?' }
+        ],
+        checks: [
+          { id: 'pa-route', label: 'Play area on an accessible route', field: 'route', ada: ada('206.2.17', { expect: true }), mi: { cite: '2021 MBC §1104 and §1110', expect: true, verify: true } },
+          { id: 'pa-elev', label: 'At least 50% of elevated components on an accessible route', kind: 'ratio', num: 'elevated_route', den: 'elevated_total', minPct: 50,
+            ada: ada('240.2.2'), mi: mi('1108 (play areas)') },
+          { id: 'pa-ramp', label: 'With 20 or more elevated components, at least 25% reached by ramp', kind: 'ratio', num: 'elevated_ramp', den: 'elevated_total', minPct: 25,
+            when: { elevated_total: { gt: 19 } }, ada: ada('240.2.2.1'), mi: mi('1108 (play areas)') },
+          { id: 'pa-ground', label: 'Ground-level components: number and types', kind: 'manual', ada: ada('240.2.1 (Table 240.2.1.2)'), mi: mi('1108 (play areas)'),
+            note: 'At least one of each type of ground-level component must be on a route; Table 240.2.1.2 adds more based on the number of elevated components. Compare with the counts recorded.' },
+          { id: 'pa-gwidth', label: 'Ground-level route width', field: 'ground_width', ada: ada('1008.2.4.1', { min: 60, verify: true }), mi: mi('1108.2.4.1', { min: 60 }),
+            note: 'May narrow to 36 in for 60 in max length in play areas under 1,000 sq ft, with conditions (ADA 1008.2.4.1 Exceptions).' },
+          { id: 'pa-surf', label: 'Accessible surfacing', field: 'surface_access', ada: ada('1008.2.6.1', { expect: true }), mi: mi('1108.2.6.1', { expect: true }) },
+          { id: 'pa-impact', label: 'Impact-attenuating surfacing in use zones', field: 'surface_impact', ada: ada('1008.2.6.2', { expect: true }), mi: mi('1108.2.6.2', { expect: true }) },
+          { id: 'pa-turn', label: 'Turning space', field: 'turning', ada: ada('1008.4.1', { expect: true, verify: true }), mi: mi('1108.4.1', { expect: true }) }
+        ],
+        scopeNote: 'Michigan\'s Playground Equipment Safety Act (1997 PA 16) covers equipment safety, not accessibility; it is not checked here.'
+      },
+      {
+        id: 'play_ramp', label: 'Play area ramp or elevated route', group: 'Recreation',
+        fields: [
+          { id: 'level', type: 'choice', label: 'Ramp serves', options: [{ id: 'ground', label: 'Ground-level components' }, { id: 'elevated', label: 'Elevated components' }] },
+          { id: 'running_slope', type: 'slope', label: 'Running slope' },
+          { id: 'rise', type: 'len', label: 'Rise of this ramp run' },
+          { id: 'width', type: 'len', label: 'Clear width' },
+          { id: 'handrail_height', type: 'len', label: 'Handrail height (top of gripping surface)', allowNA: true }
+        ],
+        checks: [
+          { id: 'pr-slope-g', label: 'Ground-level ramp slope (1:16 max)', field: 'running_slope', when: { level: 'ground' }, ada: ada('1008.2.5.1', { max: 6.25, verify: true }), mi: mi('1108.2.5.1', { max: 6.25 }) },
+          { id: 'pr-slope-e', label: 'Elevated ramp slope (1:12 max)', field: 'running_slope', when: { level: 'elevated' }, ada: ada('1008.2.5 and 405.2', { max: 8.33, verify: true }), mi: mi('1108.2.5 and 405.2', { max: 8.33 }) },
+          { id: 'pr-rise', label: 'Rise per run, elevated (12 in max)', field: 'rise', when: { level: 'elevated' }, ada: ada('1008.2.5.2', { max: 12, verify: true }), mi: mi('1108.2.5.2', { max: 12 }) },
+          { id: 'pr-width', label: 'Elevated route width', field: 'width', when: { level: 'elevated' }, ada: ada('1008.2.4.2', { min: 36, verify: true }), mi: mi('1108.2.4.2', { min: 36 }) },
+          { id: 'pr-width-g', label: 'Ground-level route width', field: 'width', when: { level: 'ground' }, ada: ada('1008.2.4.1', { min: 60, verify: true }), mi: mi('1108.2.4.1', { min: 60 }) },
+          { id: 'pr-rail', label: 'Handrail height (20 to 28 in)', field: 'handrail_height', ada: ada('1008.2.5.3', { min: 20, max: 28, verify: true }), mi: mi('1108.2.5.3', { min: 20, max: 28 }),
+            note: 'Handrails are not required on ramps inside ground-level use zones (ADA 1008.2.5.3 Exception).' }
+        ]
+      },
+      {
+        id: 'play_transfer', label: 'Play area transfer platform or transfer steps', group: 'Recreation',
+        fields: [
+          { id: 'kind', type: 'choice', label: 'Type', options: [{ id: 'platform', label: 'Transfer platform' }, { id: 'step', label: 'Transfer step' }] },
+          { id: 'height', type: 'len', label: 'Height of platform or step' },
+          { id: 'width', type: 'len', label: 'Clear width of platform or step' },
+          { id: 'depth', type: 'len', label: 'Clear depth of platform or step' },
+          { id: 'supports', type: 'bool', label: 'Transfer supports (handholds) provided?' }
+        ],
+        checks: [
+          { id: 'pt-h-plat', label: 'Transfer platform height (11 to 18 in)', field: 'height', when: { kind: 'platform' }, ada: ada('1008.3.1.1', { min: 11, max: 18, verify: true }), mi: mi('1108.3.1.1', { min: 11, max: 18 }) },
+          { id: 'pt-h-step', label: 'Transfer step height (8 in max)', field: 'height', when: { kind: 'step' }, ada: ada('1008.3.2.1', { max: 8, verify: true }), mi: mi('1108.3.2.1', { max: 8 }) },
+          { id: 'pt-w', label: 'Clear width (24 in min)', field: 'width', ada: ada('1008.3.1.2 and 1008.3.2.2', { min: 24, verify: true }), mi: mi('1108.3.1.2 and 1108.3.2.2', { min: 24 }) },
+          { id: 'pt-d', label: 'Clear depth (14 in min)', field: 'depth', ada: ada('1008.3.1.2 and 1008.3.2.2', { min: 14, verify: true }), mi: mi('1108.3.1.2 and 1108.3.2.2', { min: 14 }) },
+          { id: 'pt-sup', label: 'Transfer supports', field: 'supports', ada: ada('1008.3.1.4 and 1008.3.2.3', { expect: true, verify: true }), mi: mi('1108.3.1.4 and 1108.3.2.3', { expect: true }) }
+        ]
+      },
+      {
+        id: 'play_component', label: 'Play component (swing, spring rider, play table…)', group: 'Recreation',
+        fields: [
+          { id: 'kind', type: 'choice', label: 'Component', options: [{ id: 'seat', label: 'Seat or entry point (swing, rider, slide entry)' }, { id: 'table', label: 'Play table' }] },
+          { id: 'route', type: 'bool', label: 'On an accessible route?' },
+          { id: 'cfs', type: 'bool', label: '30 x 48 in clear space at the component, same level?' },
+          { id: 'entry_height', type: 'len', label: 'Height of seat or entry point' },
+          { id: 'table_height', type: 'len', label: 'Play table rim or surface height' },
+          { id: 'table_knee', type: 'len', label: 'Play table knee clearance height' }
+        ],
+        checks: [
+          { id: 'pc-route', label: 'On an accessible route', field: 'route', ada: ada('240.2 and 1008.2', { expect: true }), mi: mi('1108.2', { expect: true }) },
+          { id: 'pc-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1008.4.2', { expect: true, verify: true }), mi: mi('1108.4.2', { expect: true }) },
+          { id: 'pc-entry', label: 'Seat or entry point height (11 to 24 in)', field: 'entry_height', when: { kind: 'seat' }, ada: ada('1008.4.4', { min: 11, max: 24, verify: true }), mi: mi('1108.4.4', { min: 11, max: 24 }) },
+          { id: 'pc-table', label: 'Play table height (31 in max)', field: 'table_height', when: { kind: 'table' }, ada: ada('1008.4.3', { max: 31, verify: true }), mi: mi('1108.4.3', { max: 31 }) },
+          { id: 'pc-knee', label: 'Play table knee clearance (24 in min)', field: 'table_knee', when: { kind: 'table' }, ada: ada('1008.4.3', { min: 24, verify: true }), mi: mi('1108.4.3', { min: 24 }),
+            note: 'Tables for children under 5 may use a parallel approach instead of knee clearance (ADA 1008.4.3 Exception).' }
+        ]
+      },
+      // ================================================================ Pools and spas (ADA 242 and 1009)
+      {
+        id: 'pool', label: 'Swimming pool, wading pool or spa (entries)', group: 'Recreation',
+        fields: [
+          { id: 'kind', type: 'choice', label: 'Type', options: [{ id: 'pool', label: 'Swimming pool' }, { id: 'wading', label: 'Wading pool' }, { id: 'spa', label: 'Spa / hot tub' }] },
+          { id: 'wall_ft', type: 'count', label: 'Pool wall length in feet (swimming pools)' },
+          { id: 'primary', type: 'count', label: 'Pool lifts and sloped entries' },
+          { id: 'secondary', type: 'count', label: 'Other accessible entries (transfer wall, transfer system, accessible stairs)' },
+          { id: 'wading_slope', type: 'bool', label: 'Wading pool has a sloped entry?' }
+        ],
+        checks: [
+          { id: 'pl-entries', label: 'Accessible means of entry (number and type)', kind: 'poolEntries', fields: ['kind', 'wall_ft', 'primary', 'secondary'],
+            ada: ada('242.2 and 242.4'), mi: { cite: '2021 MBC §1110 (pools); ' + MI + ' §1109', verify: true } },
+          { id: 'pl-wading', label: 'Wading pool sloped entry', field: 'wading_slope', when: { kind: 'wading' }, ada: ada('242.3', { expect: true }), mi: { cite: '2021 MBC §1110; ' + MI + ' §1109', expect: true, verify: true } }
+        ]
+      },
+      {
+        id: 'pool_lift', label: 'Pool lift', group: 'Recreation',
+        fields: [
+          { id: 'water_depth', type: 'len', label: 'Water depth at the lift' },
+          { id: 'seat_height', type: 'len', label: 'Seat height above the deck (top of seat, in loading position)' },
+          { id: 'seat_width', type: 'len', label: 'Seat width' },
+          { id: 'submerge', type: 'len', label: 'Seat depth below still water when lowered' },
+          { id: 'footrest', type: 'bool', label: 'Footrest that moves with the seat?' },
+          { id: 'operable', type: 'bool', label: 'User can operate it unassisted from deck and water?' },
+          { id: 'capacity', type: 'count', label: 'Rated capacity (lb)' },
+          { id: 'deck', type: 'bool', label: 'Clear deck space beside the seat, slope 1:48 max?' }
+        ],
+        checks: [
+          { id: 'lf-depth', label: 'Located where water is 48 in deep max', field: 'water_depth', ada: ada('1009.2.1', { max: 48 }), mi: mi('1109.2.1', { max: 48 }),
+            note: 'Exception where the entire pool is deeper than 48 in.' },
+          { id: 'lf-seat', label: 'Seat height (16 to 19 in)', field: 'seat_height', ada: ada('1009.2.3', { min: 16, max: 19, verify: true }), mi: mi('1109.2.3', { min: 16, max: 19 }) },
+          { id: 'lf-width', label: 'Seat width (16 in min)', field: 'seat_width', ada: ada('1009.2.4', { min: 16, verify: true }), mi: mi('1109.2.4', { min: 16 }) },
+          { id: 'lf-sub', label: 'Submerged depth (18 in min)', field: 'submerge', ada: ada('1009.2.8', { min: 18, verify: true }), mi: mi('1109.2.8', { min: 18 }) },
+          { id: 'lf-foot', label: 'Footrest', field: 'footrest', ada: ada('1009.2.5', { expect: true, verify: true }), mi: mi('1109.2.5', { expect: true }) },
+          { id: 'lf-op', label: 'Independent operation', field: 'operable', ada: ada('1009.2.7', { expect: true, verify: true }), mi: mi('1109.2.7', { expect: true }) },
+          { id: 'lf-cap', label: 'Lifting capacity (300 lb min)', field: 'capacity', ada: ada('1009.2.9', { min: 300, verify: true }), mi: mi('1109.2.9', { min: 300 }) },
+          { id: 'lf-deck', label: 'Clear deck space', field: 'deck', ada: ada('1009.2.2', { expect: true, verify: true }), mi: mi('1109.2.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'pool_slope', label: 'Pool sloped entry', group: 'Recreation',
+        fields: [
+          { id: 'slope', type: 'slope', label: 'Running slope' },
+          { id: 'submerged', type: 'len', label: 'Depth below still water at the bottom' },
+          { id: 'handrails', type: 'bool', label: 'Handrails on both sides?' }
+        ],
+        checks: [
+          { id: 'ps-slope', label: 'Running slope (1:12 max)', field: 'slope', ada: ada('1009.3.1 and 405.2', { max: 8.33, verify: true }), mi: mi('1109.3.1 and 405.2', { max: 8.33 }) },
+          { id: 'ps-depth', label: 'Submerged depth (24 to 30 in)', field: 'submerged', ada: ada('1009.3.2', { min: 24, max: 30, verify: true }), mi: mi('1109.3.2', { min: 24, max: 30 }) },
+          { id: 'ps-rails', label: 'Handrails both sides', field: 'handrails', ada: ada('1009.3.3', { expect: true, verify: true }), mi: mi('1109.3.3', { expect: true }) }
+        ]
+      },
+      {
+        id: 'transfer_wall', label: 'Pool or spa transfer wall', group: 'Recreation',
+        fields: [
+          { id: 'height', type: 'len', label: 'Wall height above the deck' },
+          { id: 'depth', type: 'len', label: 'Wall depth (top surface)' },
+          { id: 'length', type: 'len', label: 'Wall length' },
+          { id: 'grab', type: 'bool', label: 'Grab bar on the wall, perpendicular to the pool wall?' }
+        ],
+        checks: [
+          { id: 'tw-h', label: 'Height (16 to 19 in)', field: 'height', ada: ada('1009.4.2', { min: 16, max: 19, verify: true }), mi: mi('1109.4.2', { min: 16, max: 19 }) },
+          { id: 'tw-d', label: 'Depth (12 to 16 in)', field: 'depth', ada: ada('1009.4.3', { min: 12, max: 16, verify: true }), mi: mi('1109.4.3', { min: 12, max: 16 }) },
+          { id: 'tw-l', label: 'Length (60 in min)', field: 'length', ada: ada('1009.4.3', { min: 60, verify: true }), mi: mi('1109.4.3', { min: 60 }) },
+          { id: 'tw-grab', label: 'Grab bar', field: 'grab', ada: ada('1009.4.5', { expect: true, verify: true }), mi: mi('1109.4.5', { expect: true }) }
+        ]
+      },
+      // ================================================================ Other recreation (ADA 221, 236-239, 1003-1007)
+      {
+        id: 'assembly', label: 'Bleachers or outdoor assembly seating', group: 'Recreation',
+        fields: [
+          { id: 'seats', type: 'count', label: 'Total seats' },
+          { id: 'wc_spaces', type: 'count', label: 'Wheelchair spaces' },
+          { id: 'pairing', type: 'choice', label: 'Space measured', options: [{ id: 'single', label: 'Single space' }, { id: 'pair', label: 'One of two side-by-side spaces' }] },
+          { id: 'space_width', type: 'len', label: 'Wheelchair space width' },
+          { id: 'entry', type: 'choice', label: 'Entered from', options: [{ id: 'front', label: 'Front or rear' }, { id: 'side', label: 'Side' }] },
+          { id: 'space_depth', type: 'len', label: 'Wheelchair space depth' },
+          { id: 'companion', type: 'bool', label: 'Companion seat beside each wheelchair space?' }
+        ],
+        checks: [
+          { id: 'as-count', label: 'Number of wheelchair spaces', kind: 'seatCount', fields: ['seats', 'wc_spaces'], ada: ada('221.2.1.1 (Table 221.2.1.1)'), mi: { cite: '2021 MBC §1108.2.2 (Table 1108.2.2.1)', verify: true } },
+          { id: 'as-w1', label: 'Width, single space (36 in min)', field: 'space_width', when: { pairing: 'single' }, ada: ada('802.1.2', { min: 36 }), mi: mi('802.3', { min: 36 }) },
+          { id: 'as-w2', label: 'Width, each of two spaces (33 in min)', field: 'space_width', when: { pairing: 'pair' }, ada: ada('802.1.2', { min: 33 }), mi: mi('802.3', { min: 33 }) },
+          { id: 'as-df', label: 'Depth, front or rear entry (48 in min)', field: 'space_depth', when: { entry: 'front' }, ada: ada('802.1.3', { min: 48 }), mi: mi('802.4', { min: 48 }) },
+          { id: 'as-ds', label: 'Depth, side entry (60 in min)', field: 'space_depth', when: { entry: 'side' }, ada: ada('802.1.3', { min: 60 }), mi: mi('802.4', { min: 60 }) },
+          { id: 'as-comp', label: 'Companion seats', field: 'companion', ada: ada('221.3 and 802.3', { expect: true }), mi: mi('802.7', { expect: true }) }
+        ]
+      },
+      {
+        id: 'fishing', label: 'Fishing pier or platform', group: 'Recreation',
+        fields: [
+          { id: 'rail_pct', type: 'bool', label: 'At least 25% of railings are 34 in high max, spread along the pier?', allowNA: true },
+          { id: 'edge', type: 'len', label: 'Edge protection height where there are no railings', allowNA: true },
+          { id: 'cfs', type: 'bool', label: 'Clear floor space at each lowered railing section?' },
+          { id: 'turning', type: 'bool', label: 'Turning space on the pier?' }
+        ],
+        checks: [
+          { id: 'fp-rail', label: 'Lowered railings', field: 'rail_pct', ada: ada('1005.2.1', { expect: true }), mi: mi('1105.2.1', { expect: true }) },
+          { id: 'fp-edge', label: 'Edge protection (2 in min)', field: 'edge', ada: ada('1005.2.2', { min: 2, verify: true }), mi: mi('1105.2.2', { min: 2 }) },
+          { id: 'fp-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1005.3', { expect: true }), mi: mi('1105.3', { expect: true }) },
+          { id: 'fp-turn', label: 'Turning space', field: 'turning', ada: ada('1005.4', { expect: true }), mi: mi('1105.4', { expect: true }) }
+        ]
+      },
+      {
+        id: 'boating', label: 'Boat dock, slip or gangway', group: 'Recreation',
+        fields: [
+          { id: 'gangway_slope', type: 'slope', label: 'Gangway running slope (at typical water level)', allowNA: true },
+          { id: 'pier_width', type: 'len', label: 'Clear pier space beside the accessible boat slip' },
+          { id: 'route', type: 'bool', label: 'Accessible route to the boat slip?' }
+        ],
+        checks: [
+          { id: 'bt-gang', label: 'Gangway slope (1:12 max, exceptions apply)', field: 'gangway_slope', ada: ada('1003.2.1', { max: 8.33, verify: true }), mi: mi('1103.2.1', { max: 8.33 }),
+            note: 'Longer gangways and tidal or changing water levels have exceptions (ADA 1003.2.1 Exceptions); check them before reporting a failure.' },
+          { id: 'bt-pier', label: 'Clear pier space width (60 in min)', field: 'pier_width', ada: ada('1003.3.1', { min: 60, verify: true }), mi: mi('1103.3.1', { min: 60 }) },
+          { id: 'bt-route', label: 'Accessible route', field: 'route', ada: ada('206.2.14 and 1003.2', { expect: true, verify: true }), mi: mi('1103.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'golf', label: 'Golf course or mini golf', group: 'Recreation',
+        fields: [
+          { id: 'kind', type: 'choice', label: 'Type', options: [{ id: 'golf', label: 'Golf course or driving range' }, { id: 'mini', label: 'Miniature golf' }] },
+          { id: 'car_passage', type: 'len', label: 'Golf car passage width', allowNA: true },
+          { id: 'holes', type: 'count', label: 'Mini golf: total holes' },
+          { id: 'holes_route', type: 'count', label: 'Mini golf: holes on an accessible route' }
+        ],
+        checks: [
+          { id: 'gf-car', label: 'Golf car passage width (48 in min)', field: 'car_passage', when: { kind: 'golf' }, ada: ada('1006.3.2', { min: 48, verify: true }), mi: mi('1106.3.2', { min: 48 }) },
+          { id: 'gf-mini', label: 'At least 50% of mini golf holes on an accessible route', kind: 'ratio', num: 'holes_route', den: 'holes', minPct: 50, when: { kind: 'mini' },
+            ada: ada('239.2 and 1007.2'), mi: mi('1107.2') }
+        ]
+      },
+      {
+        id: 'exercise', label: 'Exercise equipment or fitness station', group: 'Recreation',
+        fields: [
+          { id: 'each_type', type: 'bool', label: 'At least one of each type of equipment is on an accessible route?' },
+          { id: 'cfs', type: 'bool', label: '30 x 48 in clear floor space at each accessible machine?' }
+        ],
+        checks: [
+          { id: 'ex-type', label: 'One of each type on a route', field: 'each_type', ada: ada('236.1', { expect: true }), mi: { cite: '2021 MBC §1110; ' + MI + ' §1104', expect: true, verify: true } },
+          { id: 'ex-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1004.1', { expect: true }), mi: mi('1104.1', { expect: true }) }
+        ]
+      },
+      {
+        id: 'picnic', label: 'Picnic table, bench or outdoor seating', group: 'Recreation',
+        fields: [
+          { id: 'route', type: 'bool', label: 'On an accessible route?' },
+          { id: 'height', type: 'len', label: 'Table surface height', allowNA: true },
+          { id: 'knee', type: 'len', label: 'Knee clearance at the wheelchair seating spot', allowNA: true }
+        ],
+        checks: [
+          { id: 'pn-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 226.1', { expect: true }), mi: mi('902', { expect: true }) },
+          { id: 'pn-height', label: 'Table height (28 to 34 in), if treated as a dining surface', field: 'height', ada: ada('226.1 and 902.3', { min: 28, max: 34 }), mi: mi('902.3', { min: 28, max: 34 }) },
+          { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
+          { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
+            note: 'The 2010 ADA Standards have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. Federal outdoor areas follow ABA Chapter 10 instead.' }
         ]
       },
       {

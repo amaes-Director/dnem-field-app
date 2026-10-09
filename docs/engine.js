@@ -195,8 +195,53 @@
       if (h.v > 0.5) return Object.assign(res, { status: 'fail', reason: 'Over 1/2 in must be ramped (ADA 303.4).' });
       if (b.missing) return Object.assign(res, { status: 'manual', reason: 'Between 1/4 and 1/2 in: bevel not recorded.' });
       return Object.assign(res, { status: b.v ? 'pass' : 'fail' });
+    },
+    // part / whole >= minPct (play components on a route, mini golf holes)
+    ratio: function (check, finding, visit, el) {
+      var n = rawVal(finding, el, check.num), dn = rawVal(finding, el, check.den);
+      var sd = sides(check, visit);
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd) };
+      if (dn.na || n.na) return Object.assign(res, { status: 'na', measured: 'N/A', required: '', reason: 'Marked not applicable by the consultant.' });
+      if (n.missing || dn.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: check.minPct + '% min', reason: 'Counts not recorded.' });
+      if (dn.v <= 0) return Object.assign(res, { status: 'na', measured: 'None present', required: '', reason: 'None present.' });
+      var need = Math.ceil(dn.v * check.minPct / 100 - 1e-9);
+      return Object.assign(res, { measured: n.v + ' of ' + dn.v, required: need + ' min (' + check.minPct + '%)', status: n.v >= need ? 'pass' : 'fail' });
+    },
+    // ADA 242.2 / 242.4: pools need 2 accessible entries (1 if under 300 ft of wall), at least one a lift or sloped entry; spas need 1
+    poolEntries: function (check, finding, visit, el) {
+      var k = rawVal(finding, el, 'kind'), w = rawVal(finding, el, 'wall_ft'), p = rawVal(finding, el, 'primary'), o = rawVal(finding, el, 'secondary');
+      var sd = sides(check, visit);
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd) };
+      if (k.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Pool type not recorded.' });
+      if (k.v === 'wading') return Object.assign(res, { status: 'na', measured: '', required: '', reason: 'Wading pools are covered by the sloped-entry check.' });
+      if (p.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Number of lifts and sloped entries not recorded.' });
+      var other = o.missing || o.na ? 0 : o.v, prim = p.v;
+      res.measured = prim + ' lift or sloped entry, ' + other + ' other accessible entry';
+      if (k.v === 'spa') {
+        res.required = '1 min (lift, transfer wall or transfer system)';
+        return Object.assign(res, { status: prim + other >= 1 ? 'pass' : 'fail', reason: 'Where spas are in a cluster, only 5% (at least one) must comply (ADA 242.4).' });
+      }
+      if (w.missing) return Object.assign(res, { status: 'manual', required: '2 min, or 1 if under 300 ft of pool wall', reason: 'Pool wall length not recorded.' });
+      var need = w.v >= 300 ? 2 : 1;
+      res.required = need + ' min, at least 1 a lift or sloped entry';
+      var ok = prim >= 1 && prim + other >= need;
+      return Object.assign(res, { status: ok ? 'pass' : 'fail' });
+    },
+    // ADA Table 221.2.1.1 wheelchair spaces in assembly seating
+    seatCount: function (check, finding, visit, el) {
+      var t = rawVal(finding, el, 'seats'), a = rawVal(finding, el, 'wc_spaces');
+      var sd = sides(check, visit);
+      var res = { cite: citeJoin(sd), verify: true };
+      if (t.missing || a.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Seat or wheelchair space count not recorded.' });
+      var need = table221(t.v);
+      return Object.assign(res, { measured: a.v + ' wheelchair spaces for ' + t.v + ' seats', required: need + ' min', status: a.v >= need ? 'pass' : 'fail' });
     }
   };
+  function table221(n) {
+    if (n <= 3) return 0; if (n <= 25) return 1; if (n <= 50) return 2; if (n <= 150) return 4;
+    if (n <= 300) return 5; if (n <= 500) return 6; if (n <= 5000) return 6 + Math.ceil((n - 500) / 150);
+    return 36 + Math.ceil((n - 5000) / 200);
+  }
 
   // ---- main -------------------------------------------------------------------
   function findElement(rules, id) { for (var i = 0; i < rules.elements.length; i++) if (rules.elements[i].id === id) return rules.elements[i]; return null; }
@@ -217,6 +262,8 @@
         var f = fieldOf(el, check.field);
         r = f.type === 'bool' ? boolCheck(check, f, finding, visit, el) : numericCheck(check, f, finding, visit, el);
       }
+      // citations still to be checked against the code text (Appendix A)
+      r.verifyCites = r.status === 'na' ? [] : sd.filter(function (x) { return x.s.verify; }).map(function (x) { return x.s.cite; });
       return Object.assign(base, r);
     });
     if (finding.flagManual) results.push({ checkId: 'consultant-flag', label: 'Consultant flagged this finding for review', status: 'manual', measured: '', required: '', cite: '', reason: finding.flagReason || 'See consultant notes.' });
@@ -243,7 +290,7 @@
     return hints.filter(function (h, i) { return hints.indexOf(h) === i; }).join(' · ');
   }
 
-  var API = { evaluateFinding: evaluateFinding, hintFor: hintFor, STATUS_LABEL: STATUS_LABEL, findElement: findElement, fieldOf: fieldOf, fmtMeasured: fmtMeasured, table208: table208 };
+  var API = { evaluateFinding: evaluateFinding, hintFor: hintFor, STATUS_LABEL: STATUS_LABEL, findElement: findElement, fieldOf: fieldOf, fmtMeasured: fmtMeasured, table208: table208, table221: table221 };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else root.DNEM_ENGINE = API;
 })(this);

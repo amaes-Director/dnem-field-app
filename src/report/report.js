@@ -24,14 +24,17 @@
         items.push({ visit: v, visitIndex: vi, finding: f, ev: ev, photos: (f.photos || []).map(function (p) { return vz.photos[p.file]; }).filter(Boolean) });
       });
     });
-    // ---- walk order: Parking, Route, Entrance, then each visit's rooms, then anything unassigned
+    // ---- walk order: Parking, Route, Entrance, then each visit's rooms, outdoor areas, then anything unassigned
     var multiSite = uniq(visits.map(function (z) { return z.data.visit.siteName; })).length > 1;
     var groups = W.stops.map(function (st) { return { key: 'stop:' + st.id, label: st.label, kind: 'stop', items: [] }; });
     visits.forEach(function (vz, vi) {
       (vz.data.visit.rooms || []).forEach(function (r) {
-        groups.push({ key: vi + ':' + r.id, label: W.roomLabel(r) + (multiSite ? ' (' + vz.data.visit.siteName + ')' : ''), kind: 'room', items: [] });
+        groups.push({ key: vi + ':' + r.id, label: W.roomLabel(r) + (multiSite ? ' (' + vz.data.visit.siteName + ')' : ''), kind: W.isOutdoor(r) ? 'outdoor' : 'room', items: [] });
       });
     });
+    // indoor rooms before outdoor areas, keeping the order they were added
+    var KORD = { stop: 0, room: 1, outdoor: 2 };
+    groups = groups.map(function (g, i) { return [g, i]; }).sort(function (a, b) { return KORD[a[0].kind] - KORD[b[0].kind] || a[1] - b[1]; }).map(function (x) { return x[0]; });
     var other = { key: 'other', label: 'Other findings', kind: 'other', items: [] };
     groups.push(other);
     var gIndex = {}; groups.forEach(function (g, i) { gIndex[g.key] = i; });
@@ -119,7 +122,7 @@
     children.push(table(sumRows));
 
     children.push(h(d.HeadingLevel.HEADING_2, 'How to read this report'));
-    children.push(bullet([txt('Order. ', { bold: true }), txt('Findings follow the order the site was walked: parking, the route to the entrance, the entrance, then each room. Finding numbers follow the same order.')]));
+    children.push(bullet([txt('Order. ', { bold: true }), txt('Findings follow the order the site was walked: parking, the route to the entrance, the entrance, each room, then outdoor and recreation areas such as playgrounds and pools. Finding numbers follow the same order.')]));
     children.push(bullet([txt('Which code governs. ', { bold: true }), txt('Each measurement is compared with the 2010 ADA Standards and with the Michigan barrier-free requirements (2021 Michigan Building Code, which adopts ICC A117.1-2017). Where both set a limit, the stricter one is used and cited. When the two match, both are cited with "(same requirement)".')]));
     children.push(bullet([txt('Results. ', { bold: true }), txt('"Does not comply" means a recorded measurement or answer falls outside the stricter requirement. "Complies" means every recorded value meets it. "Needs manual input" means the tool could not decide: a value was not recorded, the requirement depends on something not captured (such as the building\'s permit date), or the item needs a consultant\'s judgment.')]));
     children.push(bullet([txt('Citations marked †. ', { bold: true }), txt('These citations have not yet been checked against the printed code text. They are listed in Appendix A for confirmation before the report is issued.')]));
@@ -155,6 +158,14 @@
       children.push(h(d.HeadingLevel.HEADING_2, g.label));
       groupBody(g, d.HeadingLevel.HEADING_3);
     });
+    var outGroups = groups.filter(function (g) { return g.kind === 'outdoor'; });
+    if (outGroups.length) {
+      children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Outdoor and Recreation Areas'));
+      outGroups.forEach(function (g) {
+        children.push(h(d.HeadingLevel.HEADING_2, g.label));
+        groupBody(g, d.HeadingLevel.HEADING_3);
+      });
+    }
     if (other.items.length) {
       children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Other Findings'));
       groupBody(other, d.HeadingLevel.HEADING_2);
@@ -165,6 +176,7 @@
       var elLabel = it.ev.element ? it.ev.element.label : f.elementType;
       out.push(h(level, 'Finding ' + it.no + ' - ' + elLabel + (f.location && f.location !== it.group.label ? ' - ' + f.location : '')));
       out.push(small('Site: ' + it.visit.siteName + '. Recorded by ' + (f.consultant || it.visit.consultant) + ' on ' + (it.visit.date || '') + '. Overall result: ' + E.STATUS_LABEL[it.ev.status] + '.'));
+      if (it.ev.element && it.ev.element.scopeNote) out.push(small(it.ev.element.scopeNote));
       var shown = it.ev.results.filter(function (r) { return r.status !== 'na'; });
       var naCount = it.ev.results.length - shown.length;
       if (shown.length) {
@@ -216,16 +228,14 @@
     items.forEach(function (it) {
       it.ev.results.forEach(function (r) {
         if (!r.verify || !r.cite || r.status === 'na') return;
-        r.cite.replace(/ \(same requirement\)$/, '').split('; ').forEach(function (c) {
-          if (/^ADA 2010/.test(c)) return; // ADA 2010 section numbers are standard
-          verify[c] = (verify[c] || 0) + 1;
-        });
+        var list = r.verifyCites || r.cite.replace(/ \(same requirement\)$/, '').split('; ').filter(function (c) { return !/^ADA 2010/.test(c); });
+        list.forEach(function (cs) { cs.split('; ').forEach(function (c) { verify[c] = (verify[c] || 0) + 1; }); });
       });
     });
     children.push(h(d.HeadingLevel.HEADING_1, 'Appendix A. Citations to Verify (†)'));
-    children.push(para('These citations come from the tool\'s rules table and have not yet been confirmed against the printed ICC A117.1-2017 or 2021 Michigan Building Code text. ADA 2010 section numbers are standard; Michigan section numbers can differ from ADA numbering, especially for parking and signage. Confirm each one, then initial it.'));
+    children.push(para('These citations come from the tool\'s rules table and have not yet been confirmed against the printed ICC A117.1-2017 or 2021 Michigan Building Code text. Michigan section numbers can differ from ADA numbering, especially for parking and signage. ADA 2010 citations appear here only for recreation sections (play areas, pools and similar) whose sub-section numbers should be confirmed. Confirm each one, then initial it.'));
     var vk = Object.keys(verify).sort();
-    if (vk.length) children.push(table([headRow(['Michigan citation', 'Uses', 'Confirmed by / date'], [62, 10, 28])].concat(vk.map(function (k) {
+    if (vk.length) children.push(table([headRow(['Citation', 'Uses', 'Confirmed by / date'], [62, 10, 28])].concat(vk.map(function (k) {
       return new d.TableRow({ cantSplit: true, children: [cell(k), cell(String(verify[k])), cell('')] });
     }))));
     else children.push(para('None.'));
