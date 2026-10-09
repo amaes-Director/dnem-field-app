@@ -4,6 +4,7 @@
  */
 (function () {
   'use strict';
+  var APP_VERSION = 'Oct 9 walk update';
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
@@ -122,6 +123,7 @@
           '<span class="meta">' + esc(v.date) + ' · ' + n + ' finding' + (n === 1 ? '' : 's') + '</span>' +
           (v.exportedAt && v.exportedAt >= v.updated ? '<span class="badge">Sent</span>' : (n ? '<span class="badge">Not sent yet</span>' : '')) + '</button>';
       });
+      html += '<p class="help" style="text-align:center">App version ' + APP_VERSION + '</p>';
       html += '<div class="sticky-actions"><button type="button" class="btn" id="newVisit">+ New site visit</button></div>';
       main.innerHTML = html;
       main.querySelectorAll('[data-open]').forEach(function (b) { b.onclick = function () { go('#visit/' + b.dataset.open); }; });
@@ -539,6 +541,6 @@
     route();
   });
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js').catch(function () {});
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
   }
 })();
