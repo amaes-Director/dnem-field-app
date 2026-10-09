@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DNEM Field Capture</title>
+<meta name="theme-color" content="#0758B5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DNEM Field">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <button id="back" class="icon-btn" type="button" aria-label="Back" hidden>&#8592;</button>
+  <h1 id="title">DNEM Field Capture</h1>
+  <span id="net" class="net" role="status" aria-live="polite"></span>
+</header>
+<main id="main" tabindex="-1"></main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="lib/jszip.min.js"></script>
+<script src="rules.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
