@@ -1,12 +1,12 @@
 {
-  "name": "DNEM Field Capture",
-  "short_name": "DNEM Field",
+  "name": "DNEM ADA Lens",
+  "short_name": "ADA Lens",
   "description": "Capture accessibility findings, photos and measurements on site.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0758B5",
+  "background_color": "#F3F6FA",
+  "theme_color": "#0057BF",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

@@ -1,9 +1,11 @@
-/* DNEM Field Report Builder - turns visit ZIPs from the phone app into a Word report.
+/* DNEM ADA Lens Report Builder - turns visit ZIPs from the phone app into a Word report.
  * Runs in the browser (single HTML file) and in Node (for testing): buildReport(deps, visits, opts) -> docx.Document
  * visits: [{ data: <visit.json>, photos: { 'photos/F01_1.jpg': { bytes: Uint8Array, width, height } } }]
  */
 (function (root) {
-  var BLUE = '0758B5', TINT = 'E7EFF9';
+  // Same palette and type as the DNEM Access Lens reports (layout.py): Calibri, 14 pt minimum.
+  var BLUE = '0758B5', TINT = 'E7EFF9', INK = '17263A', MUTED = '485668', LINE = 'CBD7E5';
+  var APP_NAME = 'DNEM ADA Lens';
   var RESULT_FILL = { fail: 'FBE3E4', manual: 'FFF1CC', pass: 'E3F1E6', na: 'F2F2F2' };
   var RESULT_TEXT = { fail: 'A4161A', manual: '6B4300', pass: '1E6B2E', na: '4A4A4A' };
   var ORDER = { fail: 0, manual: 1, pass: 2, na: 3 };
@@ -51,12 +53,12 @@
     function txt(s, o) { return new T(Object.assign({ text: String(s == null ? '' : s) }, o || {})); }
     function para(s, o) { return new P(Object.assign({ children: Array.isArray(s) ? s : [txt(s)], spacing: { after: 120 } }, o || {})); }
     function h(level, s) { return new P({ text: s, heading: level, keepNext: true }); }
-    function small(s) { return new P({ children: [txt(s, { size: 18, color: '4A4A4A' })], spacing: { after: 120 } }); }
+    function small(s) { return new P({ children: [txt(s, { color: MUTED })], spacing: { after: 120 } }); }
     function bullet(runs) { return new P({ children: Array.isArray(runs) ? runs : [txt(runs)], bullet: { level: 0 }, spacing: { after: 60 } }); }
     function cell(content, o) {
       o = o || {};
       var kids = (Array.isArray(content) ? content : [content]).map(function (c) {
-        return c instanceof P ? c : new P({ children: [txt(c, { bold: o.bold, color: o.color, size: o.size || 19 })], spacing: { after: 0 } });
+        return c instanceof P ? c : new P({ children: [txt(c, { bold: o.bold, color: o.color, size: 28 })], spacing: { after: 0 } });
       });
       return new d.TableCell({ children: kids, shading: o.fill ? { type: d.ShadingType.CLEAR, color: 'auto', fill: o.fill } : undefined,
         margins: { top: 60, bottom: 60, left: 90, right: 90 }, width: o.width ? { size: o.width, type: d.WidthType.PERCENTAGE } : undefined });
@@ -68,13 +70,13 @@
       return new d.Table({ rows: rows, width: { size: 100, type: d.WidthType.PERCENTAGE }, layout: d.TableLayoutType.AUTOFIT,
         borders: { top: border(), bottom: border(), left: border(), right: border(), insideHorizontal: border(), insideVertical: border() } });
     }
-    function border() { return { style: d.BorderStyle.SINGLE, size: 4, color: 'A6A6A6' }; }
+    function border() { return { style: d.BorderStyle.SINGLE, size: 4, color: LINE }; }
     function kv(rows) {
       return table(rows.map(function (r) { return new d.TableRow({ cantSplit: true, children: [cell(r[0], { bold: true, fill: TINT, width: 28 }), cell(r[1], { width: 72 })] }); }));
     }
     function resultCell(status, extra) {
-      var kids = [new P({ children: [txt(E.STATUS_LABEL[status], { bold: true, color: RESULT_TEXT[status], size: 19 })], spacing: { after: 0 } })];
-      if (extra) kids.push(new P({ children: [txt(extra, { size: 17, color: '3A3A3A' })], spacing: { after: 0 } }));
+      var kids = [new P({ children: [txt(E.STATUS_LABEL[status], { bold: true, color: RESULT_TEXT[status], size: 28 })], spacing: { after: 0 } })];
+      if (extra) kids.push(new P({ children: [txt(extra, { size: 28, color: INK })], spacing: { after: 0 } }));
       return new d.TableCell({ children: kids, shading: { type: d.ShadingType.CLEAR, color: 'auto', fill: RESULT_FILL[status] }, margins: { top: 60, bottom: 60, left: 90, right: 90 }, width: { size: 20, type: d.WidthType.PERCENTAGE } });
     }
     function citeText(r) { return (r.cite || '') + (r.verify ? ' †' : ''); }
@@ -85,8 +87,10 @@
 
     var children = [];
     // ---- title page -------------------------------------------------------------
+    if (opts.logo) children.push(new P({ children: [new d.ImageRun({ type: 'png', data: opts.logo, transformation: { width: 240, height: 90 },
+      altText: { name: 'DNEM logo', title: 'Disability Network Eastern Michigan', description: 'Disability Network Eastern Michigan logo' } })], spacing: { after: 160 } }));
     children.push(new P({ text: opts.title || 'Facility Accessibility Field Evaluation', heading: d.HeadingLevel.TITLE }));
-    children.push(new P({ children: [txt(sites.join('; '), { size: 30, color: BLUE })], spacing: { after: 240 } }));
+    children.push(new P({ children: [txt(sites.join('; '), { size: 36, color: MUTED })], spacing: { after: 240 } }));
     children.push(kv([
       ['Site', sites.join('; ')],
       ['Address', uniq(visits.map(function (z) { return z.data.visit.address; })).join('; ') || 'Not recorded'],
@@ -168,7 +172,7 @@
         shown.sort(function (a, b) { return ORDER[a.status] - ORDER[b.status]; }).forEach(function (r) {
           var extra = r.reason || '';
           if (r.status === 'fail' && r.note) extra = r.note;
-          rows.push(new d.TableRow({ cantSplit: true, children: [cell(r.label, { width: 24 }), cell(r.measured || '', { width: 16 }), cell(r.required || '', { width: 18 }), cell(citeText(r), { width: 22, size: 17 }), resultCell(r.status, extra)] }));
+          rows.push(new d.TableRow({ cantSplit: true, children: [cell(r.label, { width: 24 }), cell(r.measured || '', { width: 16 }), cell(r.required || '', { width: 18 }), cell(citeText(r), { width: 22 }), resultCell(r.status, extra)] }));
         });
         out.push(table(rows));
       }
@@ -203,7 +207,7 @@
     if (manualRows.length) {
       children.push(para(manualRows.length + ' check(s) could not be decided automatically. Resolve each one before the report is issued, then delete this section or record the outcome.'));
       children.push(table([headRow(['Finding', 'Area', 'Check', 'Why it needs input', 'Citation'], [9, 20, 25, 26, 20])].concat(manualRows.map(function (r) {
-        return new d.TableRow({ cantSplit: true, children: r.map(function (c, i) { return cell(c, { size: i === 4 ? 17 : 19 }); }) });
+        return new d.TableRow({ cantSplit: true, children: r.map(function (c, i) { return cell(c); }) });
       }))));
     } else children.push(para('None. Every check had enough information to decide.'));
 
@@ -222,33 +226,34 @@
     children.push(para('These citations come from the tool\'s rules table and have not yet been confirmed against the printed ICC A117.1-2017 or 2021 Michigan Building Code text. ADA 2010 section numbers are standard; Michigan section numbers can differ from ADA numbering, especially for parking and signage. Confirm each one, then initial it.'));
     var vk = Object.keys(verify).sort();
     if (vk.length) children.push(table([headRow(['Michigan citation', 'Uses', 'Confirmed by / date'], [62, 10, 28])].concat(vk.map(function (k) {
-      return new d.TableRow({ cantSplit: true, children: [cell(k, { size: 17 }), cell(String(verify[k])), cell('')] });
+      return new d.TableRow({ cantSplit: true, children: [cell(k), cell(String(verify[k])), cell('')] });
     }))));
     else children.push(para('None.'));
 
     // ---- appendix B: method -------------------------------------------------------------
     children.push(h(d.HeadingLevel.HEADING_1, 'Appendix B. Method'));
-    children.push(para('DNEM ADA-certified consultants recorded each element on site with the DNEM Field Capture app: element type, location, photos, measurements and yes/no observations. The DNEM Field Report Builder compared each recorded value with the rules table (version ' + R.version + ').'));
+    children.push(para('DNEM ADA-certified consultants recorded each element on site with the DNEM ADA Lens phone app: element type, location, photos, measurements and yes/no observations. The DNEM ADA Lens report builder compared each recorded value with the rules table (version ' + R.version + ').'));
     children.push(para(R.codes.mi.note + ' Requirements that A117.1-2017 applies only to new buildings (for example the 67 in turning circle and 30 x 52 in clear floor space) are applied when the visit records the building as built or altered under the 2021 Michigan Building Code (effective April 9, 2025). When building status is unknown and a measurement meets only the older size, the item is marked "Needs manual input".'));
     children.push(para('This report covers the elements the consultants recorded. It is not a complete survey of every element at the site unless stated in the visit notes.'));
     visits.forEach(function (z) { if (z.data.visit.notes) children.push(para([txt('Visit notes (' + z.data.visit.consultant + ', ' + z.data.visit.date + '): ', { bold: true }), txt(z.data.visit.notes)])); });
 
     return new d.Document({
-      creator: 'DNEM Field Report Builder', title: (opts.title || 'Facility Accessibility Field Evaluation') + ' - ' + sites.join('; '),
+      creator: APP_NAME, title: (opts.title || 'Facility Accessibility Field Evaluation') + ' - ' + sites.join('; '),
       description: 'Accessibility field evaluation citing the 2010 ADA Standards and the Michigan barrier-free code.',
       styles: {
-        default: { document: { run: { font: 'Calibri', size: 22 } } },
+        default: { document: { run: { font: 'Calibri', size: 28, color: INK }, paragraph: { spacing: { after: 120, line: 264, lineRule: d.LineRuleType.AUTO } } } },
         paragraphStyles: [
-          { id: 'Title', name: 'Title', basedOn: 'Normal', next: 'Normal', run: { size: 48, bold: true, color: BLUE }, paragraph: { spacing: { after: 120 } } },
-          { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 32, bold: true, color: BLUE }, paragraph: { spacing: { before: 360, after: 160 }, keepNext: true } },
-          { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 23, bold: true, color: '04407F' }, paragraph: { spacing: { before: 220, after: 80 }, keepNext: true } },
-          { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 26, bold: true, color: '04407F' }, paragraph: { spacing: { before: 280, after: 100 }, keepNext: true } }
+          { id: 'Title', name: 'Title', basedOn: 'Normal', next: 'Normal', run: { size: 52, bold: true, color: BLUE }, paragraph: { spacing: { after: 60 } } },
+          { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 44, bold: true, color: BLUE }, paragraph: { spacing: { before: 220, after: 120 }, keepNext: true } },
+          { id: 'Heading3', name: 'Heading 3', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 32, bold: true, color: BLUE }, paragraph: { spacing: { before: 220, after: 120 }, keepNext: true } },
+          { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { size: 36, bold: true, color: BLUE }, paragraph: { spacing: { before: 220, after: 120 }, keepNext: true } }
         ]
       },
       features: { updateFields: false },
       sections: [{
-        properties: { page: { margin: { top: 1080, bottom: 1080, left: 1080, right: 1080 } } },
-        footers: { default: new d.Footer({ children: [new P({ alignment: d.AlignmentType.CENTER, children: [txt('DNEM Field Evaluation - ' + sites.join('; ') + ' - Page ', { size: 16, color: '595959' }), new T({ children: [d.PageNumber.CURRENT], size: 16, color: '595959' })] })] }) },
+        properties: { page: { size: { width: 12240, height: 15840, orientation: d.PageOrientation.LANDSCAPE }, margin: { top: 936, bottom: 936, left: 1080, right: 1080, header: 331, footer: 331 } } },
+        headers: { default: new d.Header({ children: [new P({ children: [txt(APP_NAME, { color: MUTED })], spacing: { after: 0 } })] }) },
+        footers: { default: new d.Footer({ children: [new P({ alignment: d.AlignmentType.CENTER, children: [txt('Field evaluation draft - consultant review required. Page ', { color: MUTED }), new T({ children: [d.PageNumber.CURRENT], color: MUTED }), txt(' of ', { color: MUTED }), new T({ children: [d.PageNumber.TOTAL_PAGES], color: MUTED })] })] }) },
         children: children
       }]
     });

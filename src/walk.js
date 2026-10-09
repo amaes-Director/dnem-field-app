@@ -1,4 +1,4 @@
-/* DNEM Field Capture - site walk order.
+/* DNEM ADA Lens - site walk order.
  * A visit is walked in this order: the three fixed stops, then the rooms the consultant adds.
  * Each stop or room type lists the elements usually checked there (the consultant can add any other).
  */

@@ -1,11 +1,11 @@
-# DNEM Field Capture (first version, 2026-10-09)
+# DNEM ADA Lens (2026-10-09)
 
 Two tools that share one rules table.
 
 | What | File | Who uses it |
 |---|---|---|
 | Phone app | https://amaes-director.github.io/dnem-field-app/ (source: `docs/` folder, published by GitHub Pages) | Consultants on site |
-| Report builder | `DNEM Field Report Builder.html` (one file; open in Chrome or Edge) | Amy, at the desk |
+| Report builder | `DNEM ADA Lens Report Builder.html` (one file; open in Chrome or Edge) | Amy, at the desk |
 | Rules review | `Rules review - Michigan citations to verify.xlsx` | A consultant confirming Michigan citations |
 | Samples | `samples/` (made-up test data) | Anyone trying it out |
 
@@ -18,7 +18,7 @@ Two tools that share one rules table.
 5. When you finish, tap **Send visit**. The phone's share sheet opens. Choose **Drive** (the Google Drive app must be installed and signed in), then pick the shared DNEM field-visits folder and tap Upload.
 
 ## Amy, at the desk
-1. Double-click `DNEM Field Report Builder.html`. It opens in your browser and nothing is uploaded anywhere.
+1. Double-click `DNEM ADA Lens Report Builder.html`. It opens in your browser and nothing is uploaded anywhere.
 2. Choose the visit ZIPs, or choose the whole field-visits folder. With Google Drive for desktop installed, it shows up as a drive (usually G:) under My Drive or Shared drives. Otherwise download the ZIPs from drive.google.com first.
 3. Tick the visits to include. Several visits to one site combine into one report.
 4. Click **Create Word report**. The .docx goes to Downloads. It follows the walk order: a list of problems to fix, then Parking, Route, Entrance and each room.
@@ -29,6 +29,7 @@ Two tools that share one rules table.
 - Michigan citations are marked † until someone confirms them against the printed code. Use the rules review workbook for that, and send corrections back so the rules table can be updated.
 
 ## For whoever maintains it
+- Branding (logo, colors, Calibri 14 pt report text) follows the desktop Access Lens tools. Logos are in `src/brand/`.
 - Source lives in `src/`: `rules.js` (rules table), `engine.js` (checks), `phone/` (app), `report/` (builder).
 - Rebuild with `node src/build.js`. It writes the phone app (`docs/` in the GitHub repo, `phone-app/` elsewhere) and the builder HTML. Pushing to the repo's main branch updates the live app.
 - When the phone app changes, bump `VERSION` in `src/phone/sw.js` so phones pick up the update.

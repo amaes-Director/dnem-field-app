@@ -1,10 +1,10 @@
-/* DNEM Field Capture - phone app. Plain JavaScript, no build step.
+/* DNEM ADA Lens - phone app. Plain JavaScript, no build step.
  * Data stays on the phone (IndexedDB) until the consultant taps "Send visit",
  * which packs visit.json + photos into one ZIP and opens the share sheet.
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 9 walk update';
+  var APP_VERSION = 'Oct 9 ADA Lens';
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, W = window.DNEM_WALK;
   var main = document.getElementById('main');
   var titleEl = document.getElementById('title');
@@ -84,7 +84,7 @@
   function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2600); }
   function go(hash) { location.hash = hash; }
-  function setTitle(t, back) { titleEl.textContent = t; document.title = t + ' - DNEM Field Capture'; backBtn.hidden = !back; backBtn.onclick = function () { go(back); }; }
+  function setTitle(t, back) { titleEl.textContent = t; document.title = t === 'DNEM ADA Lens' ? t : t + ' - DNEM ADA Lens'; backBtn.hidden = !back; backBtn.onclick = function () { go(back); }; }
   function focusMain() { main.focus(); window.scrollTo(0, 0); }
   function slug(s) { return String(s || 'site').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'site'; }
   function elementLabel(id) { var el = E.findElement(R, id); return el ? el.label : id; }
@@ -110,10 +110,12 @@
 
   // ---------------------------------------------------------------- screens
   function viewHome() {
-    setTitle('DNEM Field Capture');
+    setTitle('DNEM ADA Lens');
     store.allVisits().then(function (visits) {
       visits.sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
-      var html = '<h2>Site visits</h2>' +
+      var html = '<div class="brand"><div class="logo-tile"><img src="dnem_logo.png" alt="Disability Network Eastern Michigan"></div>' +
+        '<p>Walk a site and record parking, routes, entrances and rooms. Works with no signal.</p></div>' +
+        '<h2>Site visits</h2>' +
         '<p class="help">Everything is saved on this phone, even with no signal. Tap "Send visit" when you are done, choose Drive, and save it to the shared DNEM field-visits folder.</p>';
       if (!db) html += '<p class="card status-manual">This browser is not allowing storage, so visits will be lost if you close the app. Send each visit before closing.</p>';
       if (!visits.length) html += '<p class="empty">No visits yet.</p>';
@@ -498,7 +500,7 @@
       zip.file('visit.json', JSON.stringify(out, null, 2));
       return zip.generateAsync({ type: 'blob', compression: 'STORE' });
     }).then(function (blob) {
-      var name = 'DNEM_Field_' + slug(v.siteName) + '_' + (v.date || today()) + '_' + slug(v.consultant) + '.zip';
+      var name = 'DNEM_ADA_Lens_' + slug(v.siteName) + '_' + (v.date || today()) + '_' + slug(v.consultant) + '.zip';
       var file = new File([blob], name, { type: 'application/zip' });
       var markSent = function (msg) {
         v.exportedAt = new Date().toISOString();

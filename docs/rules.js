@@ -1,4 +1,4 @@
-/* DNEM Field Capture - rules table
+/* DNEM ADA Lens - rules table
  *
  * One entry per element type. "fields" are what the phone app asks for.
  * "checks" compare those fields against two codes:

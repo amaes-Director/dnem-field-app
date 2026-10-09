@@ -1,4 +1,4 @@
-/* DNEM Field Capture - checking engine.
+/* DNEM ADA Lens - checking engine.
  * evaluateFinding(finding, visit, rules) -> { results: [...], status }
  * Each result: { checkId, label, status: pass|fail|manual|na, measured, required, cite, reason, verify, note }
  */

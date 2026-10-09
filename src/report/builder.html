@@ -3,20 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DNEM Field Report Builder</title>
+<title>DNEM ADA Lens Report Builder</title>
 <style>
-  :root { --blue: #0758B5; --tint: #E7EFF9; --text: #1a1a1a; --muted: #4a4a4a; --line: #8a8a8a; --fail: #a4161a; --pass: #1e6b2e; --warn: #6b4300; }
+  /* DNEM Access Lens colors (branding.py) */
+  :root { --blue: #0057BF; --blue-dark: #004A9F; --orange: #EF5323; --tint: #EAF2FD; --text: #14263E; --heading: #172B46; --muted: #4C5E74; --line: #70839B; --card-line: #CCD6E3; --bg: #F3F6FA; --fail: #8A2030; --pass: #175331; --warn: #763600; }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 17px/1.5 Calibri, "Segoe UI", system-ui, sans-serif; color: var(--text); background: #fff; }
-  header { background: var(--blue); color: #fff; padding: 16px 24px; }
-  header h1 { margin: 0; font-size: 1.5rem; }
+  body { margin: 0; font: 17px/1.5 "Segoe UI", Calibri, system-ui, sans-serif; color: var(--text); background: var(--bg); }
+  header { max-width: 960px; margin: 14px auto 0; padding: 0 24px; }
+  .brand { display: flex; gap: 16px; align-items: center; background: var(--blue); color: #fff; border-radius: 12px; padding: 14px 16px; border-bottom: 5px solid var(--orange); }
+  .logo-tile { background: #fff; border-radius: 8px; padding: 8px 10px; flex: 0 0 auto; }
+  .logo-tile img { display: block; width: 150px; height: auto; }
+  header h1 { margin: 0; font-size: 26px; font-weight: 700; }
   header p { margin: 4px 0 0; }
   main { max-width: 960px; margin: 0 auto; padding: 16px 24px 48px; }
-  h2 { color: #04407f; font-size: 1.25rem; margin: 28px 0 8px; }
-  :focus-visible { outline: 3px solid #ffbf47; outline-offset: 2px; box-shadow: 0 0 0 5px #000; }
-  .step { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
-  .btn { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 18px; font: inherit; font-weight: 600; border-radius: 8px; border: 2px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; }
-  .btn.secondary { background: #fff; color: #04407f; }
+  h2 { color: var(--blue); font-size: 1.15rem; margin: 0 0 8px; font-weight: 600; }
+  :focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  .step { background: #fff; border: 1px solid var(--card-line); border-radius: 10px; padding: 16px 18px; margin: 14px 0; }
+  .btn { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 18px; font: inherit; font-weight: 600; border-radius: 7px; border: 3px solid var(--blue); background: var(--blue); color: #fff; cursor: pointer; }
+  .btn:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
+  .btn.secondary { background: #fff; color: var(--blue); border-width: 2px; }
+  .btn.secondary:hover { background: var(--tint); }
   .btn[disabled] { opacity: .55; cursor: not-allowed; }
   .file-btn { position: relative; overflow: hidden; }
   .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -34,13 +40,16 @@
 </head>
 <body>
 <header>
-  <h1>DNEM Field Report Builder</h1>
-  <p>Turns site visits from the DNEM Field Capture app into a Word report citing the 2010 ADA Standards and the Michigan barrier-free code.</p>
+  <div class="brand">
+    <div class="logo-tile"><img src="__LOGO_DATA_URI__" alt="Disability Network Eastern Michigan"></div>
+    <div><h1>DNEM ADA Lens</h1>
+    <p>Turn site visits from the ADA Lens phone app into a Word report citing the 2010 ADA Standards and the Michigan barrier-free code.</p></div>
+  </div>
 </header>
 <main>
   <section class="step" aria-labelledby="s1">
     <h2 id="s1">Step 1. Load site visits</h2>
-    <p class="help">Choose the visit ZIP files consultants sent (named DNEM_Field_...zip), or choose the whole shared folder. Load several visits to the same site to combine them in one report.</p>
+    <p class="help">Choose the visit ZIP files consultants sent (named DNEM_ADA_Lens_...zip, or DNEM_Field_...zip from before the rename), or choose the whole shared folder. Load several visits to the same site to combine them in one report.</p>
     <div class="row">
       <label class="btn file-btn">Choose ZIP files<input type="file" id="zips" accept=".zip,application/zip" multiple></label>
       <label class="btn secondary file-btn">Choose a folder<input type="file" id="folder" webkitdirectory multiple></label>
@@ -73,6 +82,7 @@
 <script>
 (function () {
   var R = window.DNEM_RULES, E = window.DNEM_ENGINE, REP = window.DNEM_REPORT;
+  var REPORT_LOGO = Uint8Array.from(atob('__REPORT_LOGO_B64__'), function (c) { return c.charCodeAt(0); });
   var loaded = []; // { name, data, photos }
   var msg = document.getElementById('msg');
   document.getElementById('rv').textContent = R.version;
@@ -124,12 +134,12 @@
     var sel = loaded.filter(function (v) { return v.selected; });
     msg.textContent = 'Building report...';
     try {
-      var doc = REP.buildReport({ docx: docx, rules: R, engine: E, walk: window.DNEM_WALK }, sel, { title: document.getElementById('rtitle').value.trim(), preparedBy: document.getElementById('rprep').value.trim() });
+      var doc = REP.buildReport({ docx: docx, rules: R, engine: E, walk: window.DNEM_WALK }, sel, { title: document.getElementById('rtitle').value.trim(), preparedBy: document.getElementById('rprep').value.trim(), logo: REPORT_LOGO });
       docx.Packer.toBlob(doc).then(function (blob) {
         var site = sel[0].data.visit.siteName.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
         var dates = sel.map(function (v) { return v.data.visit.date; }).sort();
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = 'DNEM_Field_Report_' + site + '_' + dates[dates.length - 1] + '.docx';
+        a.download = 'DNEM_ADA_Lens_Report_' + site + '_' + dates[dates.length - 1] + '.docx';
         document.body.appendChild(a); a.click(); a.remove();
         msg.textContent = 'Report created: ' + a.download + ' (check your Downloads folder).';
       }).catch(function (e) { msg.innerHTML = '<span class="err">Could not create the report: ' + esc(e.message) + '</span>'; });
