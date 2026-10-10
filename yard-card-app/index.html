@@ -1,0 +1,1339 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1E5C3B"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Yard Cards"><link rel="icon" type="image/png" href="icons/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Yard Card Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#F1F5EF; --surface:#FFFFFF; --surface-2:#E6EEE3; --line:#D2DDCD;
+  --ink:#17231B; --ink-2:#4A5A4E; --ink-3:#768679;
+  --lawn:#1E5C3B; --lawn-ink:#FFFFFF; --lawn-soft:#DCEBDF;
+  --pop:#F2B632; --pop-ink:#2A1E00; --pop-soft:#FCEFC9;
+  --sky:#2F6FA8; --sky-soft:#DDEAF6;
+  --warn:#B4441F; --warn-soft:#F8E1D8;
+  --shadow:0 1px 2px rgba(23,35,27,.06),0 6px 18px rgba(23,35,27,.06);
+  --display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0F1712; --surface:#18231C; --surface-2:#213027; --line:#2E3F33;
+    --ink:#E9F0EA; --ink-2:#B3C2B6; --ink-3:#83958A;
+    --lawn:#5DBB84; --lawn-ink:#08140D; --lawn-soft:#1D3527;
+    --pop:#F5C451; --pop-ink:#231800; --pop-soft:#3A2F12;
+    --sky:#7DB3E6; --sky-soft:#1B2C3D;
+    --warn:#F08A63; --warn-soft:#3A2018;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0F1712; --surface:#18231C; --surface-2:#213027; --line:#2E3F33;
+  --ink:#E9F0EA; --ink-2:#B3C2B6; --ink-3:#83958A;
+  --lawn:#5DBB84; --lawn-ink:#08140D; --lawn-soft:#1D3527;
+  --pop:#F5C451; --pop-ink:#231800; --pop-soft:#3A2F12;
+  --sky:#7DB3E6; --sky-soft:#1B2C3D;
+  --warn:#F08A63; --warn-soft:#3A2018;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{font-family:var(--body);color:var(--ink);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:0 96px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);padding-block:14px 10px;display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;flex:none;display:grid;place-items:center;background:var(--lawn);color:var(--lawn-ink);border-radius:10px;font-family:var(--display);font-size:22px;transform:rotate(-4deg)}
+.logo img{width:100%;height:100%;object-fit:contain;border-radius:inherit;display:block}
+.logo.has-img{background:var(--surface);border:1px solid var(--line);transform:none}
+.brand-row{display:flex;align-items:center;gap:14px}
+.brand-prev{width:72px;height:72px;flex:none;display:grid;place-items:center;border-radius:18px;overflow:hidden;color:#fff;font-family:var(--display);font-size:34px;border:1px solid var(--line);background:var(--surface)}
+.brand-prev img{width:100%;height:100%;object-fit:contain}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatches label{display:block;position:relative;cursor:pointer}
+.swatches input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.swatches span{display:block;width:34px;height:34px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.swatches input:checked+span{box-shadow:0 0 0 3px var(--ink)}
+.swatches input:focus-visible+span{outline:3px solid var(--pop);outline-offset:2px}
+.chk{display:flex;gap:10px;align-items:center;padding:7px 0;cursor:pointer;font-size:14.5px}
+.chk input{width:20px;height:20px;flex:none;accent-color:var(--lawn)}
+.chk-row{display:flex;align-items:center;gap:8px}
+.chk-row .chk{flex:1;min-width:0}
+.qty{width:68px;flex:none;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-align:center;font-weight:700}
+/* sign inventory: Sign | Qty | On hand */
+.inv-head,.inv-row{display:grid;grid-template-columns:minmax(0,1fr) 66px 66px;gap:8px;align-items:center}
+.inv-head{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:10px 0 0}
+.inv-head span:nth-child(n+2){text-align:center}
+.inv-row .qty{width:100%}
+.inv-row select.qty{padding:7px 4px;text-align-last:center}
+.inv-sub{display:block;font-size:12px;color:var(--ink-3);font-weight:500;line-height:1.3}
+.onhand{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;border-radius:8px;padding:8px 0;background:var(--lawn-soft);color:var(--lawn)}
+.onhand.neg{background:var(--warn-soft);color:var(--warn)}
+.inv-edit{display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.ie-line{display:grid;grid-template-columns:minmax(0,1fr) 84px 44px;gap:8px;align-items:center}
+.ie-line .x{height:46px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;color:var(--warn);font-size:16px}
+details.cat{border-top:1px solid var(--line);padding:6px 0}
+details.cat summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.cat summary::-webkit-details-marker{display:none}
+details.cat summary .n{font-weight:600;color:var(--ink-3);font-size:12.5px}
+.ex{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ex img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none;border:1px solid var(--line)}
+.ex .grow{flex:1;min-width:0;overflow-wrap:anywhere}
+.exprev{width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-top:8px;border:1px solid var(--line)}
+.top h1{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.3px;line-height:1.1}
+.top .sub{font-size:12.5px;color:var(--ink-3)}
+.top .back{border:0;background:var(--surface);border:1px solid var(--line);width:40px;height:40px;border-radius:10px;cursor:pointer;flex:none;font-size:18px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
+.nav-in{display:grid;grid-template-columns:1fr 1fr auto 1fr;gap:8px;align-items:center;width:100%;max-width:560px}
+.nav button{border:0;background:none;cursor:pointer;padding:6px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button[aria-current="page"]{color:var(--lawn)}
+.nav .ico{font-size:18px;line-height:1}
+.nav .add{background:var(--pop);color:var(--pop-ink);border-radius:999px;padding:10px 22px;flex-direction:row;gap:6px;font-size:15px;font-weight:700;box-shadow:var(--shadow)}
+
+/* banners */
+.banner{border-radius:12px;padding:10px 12px;font-size:13.5px;margin-block:4px 12px;background:var(--pop-soft);color:var(--ink)}
+.banner.warn{background:var(--warn-soft)}
+.banner b{font-weight:700}
+
+/* sections & job cards */
+.sec{margin-block:18px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sec h2{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.sec .count{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.list{display:grid;gap:10px}
+.job{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px 10px 10px;cursor:pointer;text-align:left;width:100%}
+.job:hover{border-color:var(--ink-3)}
+.thumb{width:56px;height:56px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;overflow:hidden;font-family:var(--display);font-size:22px;color:var(--lawn)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.job .nm{font-weight:700;font-size:15.5px;line-height:1.25}
+.job .meta{font-size:13px;color:var(--ink-2);margin-top:2px}
+.job .when{font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-booked{background:var(--sky-soft);color:var(--sky)}
+.st-confirmed{background:var(--sky-soft);color:var(--sky)}
+.st-setup{background:var(--pop-soft);color:var(--ink)}
+.st-setup::before{background:var(--pop)}
+.st-complete{background:var(--lawn-soft);color:var(--lawn)}
+.st-due{background:var(--warn-soft);color:var(--warn)}
+.empty{padding:22px 16px;text-align:center;color:var(--ink-3);border:1.5px dashed var(--line);border-radius:14px;font-size:14px}
+
+/* detail */
+.hero{background:var(--lawn);color:var(--lawn-ink);border-radius:16px;padding:16px;display:grid;gap:6px;position:relative;overflow:hidden}
+.hero .occ{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;font-weight:700}
+.hero h2{font-family:var(--display);font-weight:400;font-size:28px;line-height:1.08}
+.hero .msg{font-size:14px;opacity:.92}
+.hero .stakes{position:absolute;right:14px;top:12px;display:flex;gap:3px;opacity:.9}
+.hero .stakes span{width:22px;height:26px;border-radius:4px;background:var(--pop);color:var(--pop-ink);font-family:var(--display);font-size:16px;display:grid;place-items:center}
+.hero .stakes span:nth-child(2n){transform:translateY(3px) rotate(4deg)}
+.hero .stakes span:nth-child(3n){transform:rotate(-5deg)}
+
+.steps{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12px;color:var(--ink-3);display:flex;gap:6px;align-items:center;font-weight:600}
+.steps .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-size:11px;flex:none;font-variant-numeric:tabular-nums}
+.steps .done{color:var(--lawn)}
+.steps .done .n{background:var(--lawn);color:var(--lawn-ink)}
+.steps .now{color:var(--ink);border-color:var(--pop);box-shadow:0 0 0 2px var(--pop-soft)}
+.steps .now .n{background:var(--pop);color:var(--pop-ink)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.card p.hint{margin:0 0 10px;color:var(--ink-2);font-size:13.5px}
+.card.action{border:2px solid var(--pop);box-shadow:var(--shadow)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
+.kv dt{color:var(--ink-3);font-size:13px}
+.kv dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:11px 14px;font-weight:700;font-size:14.5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--lawn);color:var(--lawn-ink);border-color:var(--lawn)}
+.btn.pop{background:var(--pop);color:var(--pop-ink);border-color:var(--pop)}
+.btn.ghost{background:none}
+.btn.danger{color:var(--warn);background:none}
+.btn.wide{flex:1 1 100%}
+.btn[disabled]{opacity:.55;cursor:default}
+.sent{font-size:12.5px;color:var(--lawn);font-weight:600;margin-top:8px}
+.photo{border-radius:12px;overflow:hidden;background:var(--surface-2);margin-top:6px;aspect-ratio:4/3;max-width:100%;display:grid;place-items:center;color:var(--ink-3);font-size:13.5px}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.countdown{font-family:var(--display);font-size:22px;color:var(--warn);font-weight:400;line-height:1.1}
+
+/* forms */
+form{display:grid;gap:14px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:12px}
+legend{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:8px;padding:0}
+label{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--ink-2)}
+input,textarea,select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;color:var(--ink)}
+textarea{min-height:88px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.two{grid-template-columns:1fr}}
+.addon{display:grid;grid-template-columns:1fr 96px 40px;gap:8px;align-items:end}
+.addon .x{height:46px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+.total{display:flex;justify-content:space-between;font-weight:700;font-variant-numeric:tabular-nums;padding-top:8px;border-top:1px solid var(--line)}
+.fine{font-size:12.5px;color:var(--ink-3)}
+
+/* sheet (email preview) */
+.scrim{position:fixed;inset:0;background:rgba(10,18,12,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--ground);width:100%;max-width:600px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet h3{font-family:var(--display);font-weight:400;font-size:22px}
+.sheet .to{font-size:13.5px;color:var(--ink-2);margin:4px 0 12px;overflow-wrap:anywhere}
+.mail{background:#FFFFFF;color:#17231B;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14px;margin-top:10px;overflow-x:auto}
+.mail table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.mail td{padding:5px 0;border-bottom:1px solid var(--line)}
+.mail td:last-child{text-align:right}
+.status{margin-top:10px;font-size:13.5px;border-radius:10px;padding:10px 12px}
+.status.ok{background:var(--lawn-soft);color:var(--ink)}
+.status.err{background:var(--warn-soft);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:30;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+</style>
+
+<div class="wrap" id="app"></div>
+<nav class="nav" aria-label="Main">
+  <div class="nav-in">
+    <button type="button" id="nav-jobs" data-go="jobs"><span class="ico" aria-hidden="true">▤</span>Jobs</button>
+    <button type="button" id="nav-crew" data-go="crew"><span class="ico" aria-hidden="true">👷</span>Crew</button>
+    <button type="button" class="add" id="nav-new" data-go="new"><span aria-hidden="true">＋</span> New booking</button>
+    <button type="button" id="nav-settings" data-go="settings"><span class="ico" aria-hidden="true">⚙</span>Business</button>
+  </div>
+</nav>
+<div id="sheet-root"></div>
+
+<script>
+(function(){
+"use strict";
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => "$" + (Number(n)||0).toFixed(2);
+const DEFAULT_SETTINGS = {
+  name:"", email:"", phone:"", payment:"", facebook:"", instagram:"", google:"", signoff:"Thanks for celebrating with us!",
+  logo:"", iconText:"", iconColor:"#1E5C3B",
+  workers:"", workerLeadHours:"24", workerText:"", signs:"", signInv:""
+};
+const SPORTS_CAT = "Michigan sports";
+const SPORTS_TEAMS = ["Red Wings","Tigers","Lions","Pistons","WNBA team"];
+const DEFAULT_WORKER_TEXT = "Hi {worker}, set-up for {honoree} ({occasion}) — {setup}.\nAddress: {address}\nMessage on the lawn: {message}\nSigns to bring: {signs}\nNotes: {notes}\nExample photo: {photo}\nTake-down: {takedown}\nCustomer: {customer} {phone}\nQuestions? Call {business}.";
+const DEFAULT_SIGNS = "Birthday: Happy Birthday banner, Age number sign, Balloon arch, Cake topper sign, Confetti stakes\nGraduation: Congrats Grad banner, Class year sign, Cap & diploma stakes, School-color balloons\nNew baby: Welcome baby sign, Stork sign, Baby name letters, Pink or blue balloons\nAnniversary: Happy Anniversary banner, Years-together number sign, Heart stakes\nWelcome home: Welcome home banner, Flag stakes, Balloon bouquet\nRetirement: Happy Retirement banner, Years-of-service sign, Hobby theme stakes\nHoliday: Seasonal theme sign, String lights, Lawn ornaments\nMichigan sports: Red Wings, Tigers, Lions, Pistons, WNBA team";
+const ICON_COLORS = ["#1E5C3B","#2F6FA8","#B4441F","#7A3E9D","#C48A00","#222222"];
+
+/* ---------- storage: db when available, this browser otherwise ---------- */
+const store = {
+  mode:"loading", jobs:[], examples:[], settings:{...DEFAULT_SETTINGS}, db:null, listeners:[],
+  emit(){ this.listeners.forEach(f=>f()); },
+  local(key, val){
+    try{
+      if(val===undefined){ const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+      localStorage.setItem(key, JSON.stringify(val));
+    }catch(e){ return null; }
+  },
+  async init(){
+    let db = null;
+    try{ db = window.claude && await window.claude.use("db"); }catch(e){ db = null; }
+    if(db){
+      this.db = db; this.mode = "db";
+      db.collection("jobs").onSnapshot(snap=>{
+        this.jobs = snap.docs.map(d=>({id:d.id, ...d.data()})); this.emit();
+      }, ()=>{ this.mode="db-error"; this.emit(); });
+      db.doc("settings/business").onSnapshot(s=>{
+        this.settings = {...DEFAULT_SETTINGS, ...(s.exists ? s.data() : {})}; this.emit();
+      });
+      db.collection("examples").onSnapshot(snap=>{
+        this.examples = snap.docs.map(d=>({id:d.id, ...d.data()})); this.emit();
+      }, ()=>{});
+    }else{
+      this.mode = "local";
+      this.jobs = this.local("ycj-jobs") || [];
+      this.settings = {...DEFAULT_SETTINGS, ...(this.local("ycj-settings")||{})};
+      this.examples = this.local("ycj-examples") || [];
+      this.emit();
+    }
+  },
+  async saveJob(job){
+    job.updatedAt = new Date().toISOString();
+    const {id, ...data} = job;
+    if(this.db){ await this.db.doc("jobs/"+id).set(JSON.parse(JSON.stringify(data))); }
+    else{
+      const i = this.jobs.findIndex(j=>j.id===id);
+      if(i<0) this.jobs.push(job); else this.jobs[i] = job;
+      this.local("ycj-jobs", this.jobs); this.emit();
+    }
+  },
+  async removeJob(id){
+    if(this.db){ await this.db.doc("jobs/"+id).delete(); }
+    else{ this.jobs = this.jobs.filter(j=>j.id!==id); this.local("ycj-jobs", this.jobs); this.emit(); }
+  },
+  async saveSettings(s){
+    if(this.db){ await this.db.doc("settings/business").set(s); this.settings = s; }
+    else{ this.settings = s; this.local("ycj-settings", s); this.emit(); }
+  },
+  async saveExample(ex){
+    const {id, ...data} = ex;
+    if(this.db){ await this.db.doc("examples/"+id).set(JSON.parse(JSON.stringify(data))); }
+    const i = this.examples.findIndex(x=>x.id===id);
+    if(i<0) this.examples.push(ex); else this.examples[i] = ex;
+    if(!this.db){ this.local("ycj-examples", this.examples); this.emit(); }
+  },
+  async removeExample(id){
+    if(this.db){ await this.db.doc("examples/"+id).delete(); }
+    this.examples = this.examples.filter(x=>x.id!==id);
+    if(!this.db){ this.local("ycj-examples", this.examples); this.emit(); }
+  }
+};
+
+/* ---------- helpers ---------- */
+const newId = () => "j" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const toDate = s => s ? new Date(s) : null;
+function fmtWhen(s){
+  const d = toDate(s); if(!d || isNaN(d)) return "—";
+  return d.toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+}
+function fmtDay(s){
+  const d = toDate(s); if(!d || isNaN(d)) return "—";
+  return d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+}
+function fmtTime(s){
+  const d = toDate(s); if(!d || isNaN(d)) return "—";
+  return d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+}
+function relTime(s){
+  const d = toDate(s); if(!d) return "";
+  const mins = Math.round((d - Date.now())/60000);
+  const a = Math.abs(mins);
+  const txt = a < 60 ? a+" min" : a < 60*36 ? Math.round(a/60)+" hr" : Math.round(a/1440)+" days";
+  return mins >= 0 ? "in " + txt : txt + " ago";
+}
+function totals(j){
+  const base = Number(j.price)||0;
+  const adds = (j.addons||[]).reduce((s,a)=>s+(Number(a.amount)||0),0);
+  const total = base + adds;
+  const paid = Number(j.deposit)||0;
+  return {base, adds, total, paid, due: Math.max(0,total-paid)};
+}
+function stage(j){
+  if(j.status==="complete") return 3;
+  if(j.status==="setup") return 2;
+  return 1;
+}
+function parseWorkers(text){
+  return String(text||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const m = l.match(/^(.*?)[,\s]+([+(]?\d[\d\s().+-]{5,})$/);
+    return m ? {name:m[1].trim(), phone:m[2].trim()} : {name:l, phone:""};
+  });
+}
+function parseSigns(text){
+  return String(text||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const i = l.indexOf(":");
+    if(i<0) return {name:l, items:[]};
+    return {name:l.slice(0,i).trim(), items:l.slice(i+1).split(",").map(x=>x.trim()).filter(Boolean)};
+  }).filter(c=>c.items.length);
+}
+/* ---------- sign inventory ----------
+   settings.signInv = JSON array of {cat, name, total}. total null = not counted.
+   Until the inventory is saved once, the old "Category: sign, sign" text list is used. */
+function getInv(){
+  const raw = store.settings.signInv;
+  if(raw){ try{ const a = JSON.parse(raw); if(Array.isArray(a)) return a.filter(x=>x && x.name); }catch(e){} }
+  const out = [];
+  parseSigns(store.settings.signs||DEFAULT_SIGNS).forEach(c=>c.items.forEach(n=>out.push({cat:c.name, name:n, total:null})));
+  return out;
+}
+function invCats(){
+  const m = new Map();
+  getInv().forEach(it=>{
+    const c = String(it.cat||"").trim() || "Other";
+    if(!m.has(c)) m.set(c, []);
+    const t = (it.total===null || it.total===undefined || it.total==="") ? null : Math.max(0, Number(it.total)||0);
+    m.get(c).push({name:it.name, total:t});
+  });
+  return [...m].map(([name,items])=>({name, items}));
+}
+// How many of a sign are out on jobs that aren't finished yet (optionally ignoring one job).
+function signOut(name, exceptId){
+  return store.jobs.reduce((n,j)=>{
+    if(j.id===exceptId || j.status==="complete") return n;
+    return n + ((j.signs||[]).includes(name) ? (Number((j.signQty||{})[name])||1) : 0);
+  }, 0);
+}
+function exSrc(ex){ return ex.photoId ? "/_blob/"+ex.photoId : (ex.photoData||""); }
+function pickExample(j){
+  const list = store.examples || [];
+  if(j.exampleId){ const e = list.find(x=>x.id===j.exampleId); if(e) return e; }
+  const occ = (j.occasion||"").trim().toLowerCase();
+  return occ ? (list.find(x=>(x.category||"").trim().toLowerCase()===occ) || null) : null;
+}
+function buildCrewText(j, worker){
+  const s = store.settings;
+  const vals = {worker: worker||"team", customer:j.customerName, honoree:j.honoree||j.customerName, occasion:j.occasion, message:j.message, address:j.address,
+    setup: j.setupAt?fmtWhen(j.setupAt):"", takedown: j.takedownAt?fmtWhen(j.takedownAt):"", signs:(j.signs||[]).map(i=>{ const q = Number((j.signQty||{})[i])||1; return q>1 ? q+" × "+i : i; }).join(", "), notes:j.workerNote, phone:j.phone, business:s.name||s.phone, photo:((typeof pickExample==="function" && pickExample(j))||{}).link||""};
+  const tpl = s.workerText||DEFAULT_WORKER_TEXT;
+  const out = tpl.split("\n").map(line=>{
+    const keys = [...line.matchAll(/\{(\w+)\}/g)].map(m=>m[1]);
+    if(keys.length && keys.every(k=>!String(vals[k]||"").trim())) return null;
+    return line.replace(/\{(\w+)\}/g,(m,k)=>k in vals ? String(vals[k]||"").trim() : m).replace(/\s+$/,"");
+  }).filter(l=>l!==null).join("\n");
+  // older saved wording may not have {photo}; add the link anyway
+  return (!/\{photo\}/.test(tpl) && vals.photo) ? out + "\nExample photo: " + vals.photo : out;
+}
+function needsCrewText(j){
+  if((j.status!=="booked" && j.status!=="confirmed") || j.crewSent || j.crewSkip) return false;
+  const st = toDate(j.setupAt); if(!st || isNaN(st) || st <= Date.now()) return false;
+  const hrs = Number(store.settings.workerLeadHours)||24;
+  return st <= Date.now() + hrs*3600e3;
+}
+function smsHref(phone, text){
+  const sep = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "&" : "?";
+  return "sms:" + String(phone||"").replace(/[^\d+]/g,"") + sep + "body=" + encodeURIComponent(text);
+}
+function needsPickupReminder(j){
+  if(j.status!=="setup" || (j.emails && j.emails.pickup) || j.pickupSkip) return false;
+  const td = toDate(j.takedownAt); if(!td || isNaN(td) || td <= Date.now()) return false;
+  const end = new Date(); end.setDate(end.getDate()+1); end.setHours(23,59,59,999);   // end of tomorrow
+  return td <= end;                                                                    // due once it's the day before
+}
+function statusPill(j){
+  const now = Date.now();
+  if(needsPickupReminder(j) && !(toDate(j.takedownAt) <= now + 3*3600e3)) return `<span class="pill st-due">Remind customer</span>`;
+  if(j.status==="setup" && toDate(j.takedownAt) && toDate(j.takedownAt) <= now + 3*3600e3) return `<span class="pill st-due">Take down ${toDate(j.takedownAt)<=now?"overdue":"soon"}</span>`;
+  const map = {booked:["st-booked","Booked"],confirmed:["st-confirmed","Confirmed"],setup:["st-setup","Up in yard"],complete:["st-complete","Complete"]};
+  const [c,t] = map[j.status] || map.booked;
+  return `<span class="pill ${c}">${t}</span>`;
+}
+function photoSrc(j){ return j.photoId ? "/_blob/" + j.photoId : (j.photoData || ""); }
+function toast(msg){
+  const t = document.createElement("div"); t.className="toast"; t.role="status"; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2600);
+}
+function invoiceNo(j){ return j.invoiceNo || ("YC-" + (j.setupAt||"").slice(0,10).replace(/-/g,"") + "-" + j.id.slice(-4).toUpperCase()); }
+
+/* ---------- routing ---------- */
+let route = {view:"jobs", id:null};
+function go(view, id=null){ route = {view, id}; render(); window.scrollTo(0,0); }
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+function iconInitials(s){ return (s.iconText || (s.name||"Y").trim().slice(0,1) || "Y").toUpperCase().slice(0,2); }
+function brandMark(){
+  const s = store.settings;
+  if(s.logo) return `<div class="logo has-img" aria-hidden="true"><img src="${esc(s.logo)}" alt=""></div>`;
+  return `<div class="logo" aria-hidden="true" style="background:${esc(s.iconColor||"#1E5C3B")}">${esc(iconInitials(s))}</div>`;
+}
+function topBar(title, sub, back){
+  return `<header class="top">
+    ${back ? `<button type="button" class="back" data-back aria-label="Back to jobs">←</button>` : `${brandMark()}`}
+    <div><h1>${esc(title)}</h1>${sub?`<div class="sub">${esc(sub)}</div>`:""}</div>
+  </header>`;
+}
+function modeBanner(){
+  if(store.mode==="local") return `<div class="banner"><b>Saving on this device only.</b> Jobs are kept in this browser. Open the app from your claude.ai link to keep them synced.</div>`;
+  if(store.mode==="db-error") return `<div class="banner warn"><b>Lost connection to your saved jobs.</b> Reload the page to reconnect.</div>`;
+  return "";
+}
+
+/* ---------- views ---------- */
+function viewJobs(){
+  const s = store.settings;
+  const jobs = [...store.jobs];
+  const now = Date.now(), soon = now + 36*3600e3;
+  const takedowns = jobs.filter(j=>j.status==="setup").sort((a,b)=>String(a.takedownAt).localeCompare(String(b.takedownAt)));
+  const upcoming = jobs.filter(j=>j.status==="booked"||j.status==="confirmed").sort((a,b)=>String(a.setupAt).localeCompare(String(b.setupAt)));
+  const done = jobs.filter(j=>j.status==="complete").sort((a,b)=>String(b.takedownAt).localeCompare(String(a.takedownAt)));
+  const setupSoon = upcoming.filter(j=>toDate(j.setupAt) && toDate(j.setupAt) <= soon);
+  const card = (j, whenLabel, whenVal) => `
+    <button type="button" class="job" data-open="${esc(j.id)}">
+      <div class="thumb">${photoSrc(j) ? `<img src="${esc(photoSrc(j))}" alt="">` : esc((j.honoree||j.customerName||"?").trim().charAt(0).toUpperCase())}</div>
+      <div>
+        <div class="nm">${esc(j.honoree ? j.honoree : j.customerName)}${j.occasion?` · ${esc(j.occasion)}`:""}</div>
+        <div class="meta">${esc(j.customerName)}${j.address?` · ${esc(j.address.split(",")[0])}`:""}</div>
+        <div class="when">${whenLabel} ${esc(fmtWhen(whenVal))} · ${esc(relTime(whenVal))}</div>
+      </div>
+      ${statusPill(j)}
+    </button>`;
+  const due = takedowns.filter(needsPickupReminder);
+  const dueBanner = due.length ? `<section class="banner warn" aria-label="Pick-up reminders due">
+      <b>${due.length===1?"1 pick-up reminder is due":due.length+" pick-up reminders are due"}</b> — take-down is tomorrow or sooner.
+      ${due.map(j=>`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:150px"><b>${esc(j.honoree||j.customerName)}</b><br><span class="fine">${esc(fmtWhen(j.takedownAt))}</span></div>
+        <button type="button" class="btn pop" data-remind="${esc(j.id)}">Review & send</button>
+        <button type="button" class="btn ghost" data-skip="${esc(j.id)}">Skip</button>
+      </div>`).join("")}
+    </section>` : "";
+  const crewDue = upcoming.filter(needsCrewText);
+  const crewBanner = crewDue.length ? `<section class="banner warn" aria-label="Crew texts due">
+      <b>${crewDue.length===1?"1 crew text is due":crewDue.length+" crew texts are due"}</b> — set-up is within ${esc(String(Number(s.workerLeadHours)||24))} hours.
+      ${crewDue.map(j=>`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:150px"><b>${esc(j.honoree||j.customerName)}</b><br><span class="fine">${esc(fmtWhen(j.setupAt))} · ${esc((j.address||"").split(",")[0])}</span></div>
+        <button type="button" class="btn pop" data-crewopen="${esc(j.id)}">Review & text</button>
+        <button type="button" class="btn ghost" data-crewskip="${esc(j.id)}">Skip</button>
+      </div>`).join("")}
+    </section>` : "";
+  const setupNote = s.name ? "" : `<div class="banner"><b>Add your business details</b> so emails carry your name, payment info and review links. <button type="button" class="btn ghost" data-go2="settings" style="padding:4px 8px;margin-left:4px">Set up</button></div>`;
+  return topBar(s.name || "Yard Card Jobs", `${takedowns.length} in yards · ${upcoming.length} upcoming`) + modeBanner() + crewBanner + dueBanner + setupNote + `
+    <div class="sec"><h2>Take-downs</h2><span class="count">${takedowns.length}</span></div>
+    <div class="list">${takedowns.length ? takedowns.map(j=>card(j,"Take down",j.takedownAt)).join("") : `<div class="empty">Nothing in a yard right now.</div>`}</div>
+    <div class="sec"><h2>Set-ups coming up</h2><span class="count">${setupSoon.length} in next 36 hr</span></div>
+    <div class="list">${upcoming.length ? upcoming.map(j=>card(j,"Set up",j.setupAt)).join("") : `<div class="empty">No bookings yet. Tap <b>New booking</b> to add one.</div>`}</div>
+    <div class="sec"><h2>Completed</h2><span class="count">${done.length}</span></div>
+    <div class="list">${done.length ? done.slice(0,20).map(j=>card(j,"Taken down",j.takedownAt)).join("") : `<div class="empty">Finished jobs land here.</div>`}</div>`;
+}
+
+function addonRow(a={desc:"",amount:""}, i){
+  return `<div class="addon" data-addon>
+    <label>Add-on<input id="ad-desc-${i}" name="addon-desc" value="${esc(a.desc)}" placeholder="e.g. Extra balloons"></label>
+    <label>Price<input id="ad-amt-${i}" name="addon-amt" type="number" inputmode="decimal" step="0.01" min="0" value="${esc(a.amount)}"></label>
+    <button type="button" class="x" data-rm-addon aria-label="Remove add-on">✕</button>
+  </div>`;
+}
+function viewForm(j){
+  const edit = !!j;
+  j = j || {addons:[]};
+  return topBar(edit ? "Edit booking" : "New booking", edit ? j.customerName : "Step 1 of 3 · details & times", true) + `
+  <form id="jobform" novalidate>
+    <fieldset><legend>Customer</legend>
+      <label>Customer name<input id="f-customer" name="customerName" required value="${esc(j.customerName)}" autocomplete="off"></label>
+      <div class="two">
+        <label>Email<input id="f-email" name="email" type="email" inputmode="email" required value="${esc(j.email)}" autocomplete="off"></label>
+        <label>Phone<input id="f-phone" name="phone" type="tel" inputmode="tel" value="${esc(j.phone)}" autocomplete="off"></label>
+      </div>
+      <label>Set-up address<input id="f-address" name="address" required value="${esc(j.address)}" autocomplete="off"></label>
+    </fieldset>
+    <fieldset><legend>The sign</legend>
+      <div class="two">
+        <label>Occasion<input id="f-occasion" name="occasion" list="occasions" value="${esc(j.occasion)}" placeholder="Birthday">
+        <datalist id="occasions"><option>Birthday</option><option>Graduation</option><option>New baby</option><option>Anniversary</option><option>Welcome home</option><option>Retirement</option><option>Holiday</option></datalist></label>
+        <label>Who it's for<input id="f-honoree" name="honoree" value="${esc(j.honoree)}" placeholder="Maya, 10"></label>
+      </div>
+      <label>Message on the lawn<input id="f-message" name="message" value="${esc(j.message)}" placeholder="HAPPY 10TH MAYA"></label>
+      <label>Summary of the customer's request<textarea id="f-request" name="request" placeholder="Colors, theme, extras, gate code, where to place it…">${esc(j.request)}</textarea></label>
+    </fieldset>
+    <fieldset><legend>Times</legend>
+      <div class="two">
+        <label>Set up<input id="f-setup" name="setupAt" type="datetime-local" required value="${esc(j.setupAt)}"></label>
+        <label>Take down<input id="f-takedown" name="takedownAt" type="datetime-local" required value="${esc(j.takedownAt)}"></label>
+      </div>
+    </fieldset>
+    <fieldset><legend>Price</legend>
+      <div class="two">
+        <label>Package price<input id="f-price" name="price" type="number" inputmode="decimal" step="0.01" min="0" value="${esc(j.price)}"></label>
+        <label>Deposit paid<input id="f-deposit" name="deposit" type="number" inputmode="decimal" step="0.01" min="0" value="${esc(j.deposit)}"></label>
+      </div>
+      <div id="addons" style="display:grid;gap:8px">${(j.addons||[]).map(addonRow).join("")}</div>
+      <button type="button" class="btn ghost" id="add-addon">＋ Add an extra</button>
+      <div class="total"><span>Balance due at take-down</span><span id="f-total">${money(totals(j).due)}</span></div>
+    </fieldset>
+    <div id="form-err" class="status err" hidden></div>
+    <button class="btn primary wide" type="submit">${edit ? "Save changes" : "Save booking"}</button>
+  </form>`;
+}
+
+// One sign on a job: checkbox + name, quantity dropdown, and (once checked) how many are left on hand.
+// it.total === null means the sign isn't counted, so the dropdown is open-ended and there is no on-hand number.
+function invRow(j, it, checked){
+  const name = it.name, tracked = it.total !== null && it.total !== undefined;
+  const q = Math.max(1, Number((j.signQty||{})[name])||1);
+  const away = signOut(name, j.id);                       // out on OTHER unfinished jobs
+  const free = tracked ? Math.max(0, it.total - away) : null;  // what this job could still take
+  const maxQ = tracked ? Math.max(free, checked ? q : 0) : Math.max(20, q);
+  let opts = ""; for(let n=1; n<=maxQ; n++) opts += `<option value="${n}" ${n===q?"selected":""}>${n}</option>`;
+  const left = tracked ? it.total - away - q : null;
+  const sub = tracked
+    ? `Available: ${it.total}${away?` · ${away} out on other jobs`:""}`
+    : `No count yet — set it in Business`;
+  return `<div class="chk-row inv-row" data-total="${tracked?it.total:""}" data-away="${away}" data-free="${tracked?free:""}">
+    <label class="chk"><input type="checkbox" data-sign value="${esc(name)}" ${checked?"checked":""}><span>${esc(name)}<small class="inv-sub">${esc(sub)}</small></span></label>
+    <select class="qty" data-qty aria-label="How many: ${esc(name)}" ${checked?"":"hidden"}>${opts}</select>
+    <div class="onhand ${left!==null&&left<0?"neg":""}" data-onhand aria-label="On hand: ${esc(name)}" ${checked?"":"hidden"}>${left===null?"—":left}</div>
+  </div>`;
+}
+function signRow(j,i,checked){ return invRow(j, {name:i, total:null}, checked); }
+function crewCard(j){
+  const s = store.settings, workers = parseWorkers(s.workers), cats = invCats();
+  const occ = (j.occasion||"").trim().toLowerCase(), picked = new Set(j.signs||[]);
+  const ex = pickExample(j), exs = store.examples || [];
+  const sent = j.crewSent ? `<div class="sent">✓ Texted${j.crewSent.worker?" to "+esc(j.crewSent.worker):""} ${esc(fmtWhen(j.crewSent.at))}</div>` : "";
+  return `<section class="card" id="crew-card">
+    <h3>Crew set-up sheet</h3>
+    <p class="hint">Pick the signs for this job, then text the details and an example photo to your worker.</p>
+    <label>Worker<select id="crew-worker"><option value="">Choose in Messages</option>${workers.map(w=>`<option value="${esc(w.name)}" ${j.worker===w.name?"selected":""}>${esc(w.name)}${w.phone?" · "+esc(w.phone):""}</option>`).join("")}</select></label>
+    ${workers.length?"":`<p class="fine" style="margin:4px 0 0">Add your crew under the <b>Crew</b> tab to pick them here.</p>`}
+    <div style="margin-top:12px"><b style="font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)">Signs for this job</b>
+      ${cats.length ? `<div class="inv-head" aria-hidden="true"><span>Sign</span><span>Qty</span><span>On hand</span></div>` : ""}
+      ${cats.length ? cats.map(c=>{
+        const n = c.items.filter(i=>picked.has(i.name)).length;
+        return `<details class="cat" ${(n||c.name.toLowerCase()===occ)?"open":""}><summary><span>${esc(c.name)}</span><span class="n">${n?n+" selected":""}</span></summary>
+          ${c.items.map(i=>invRow(j, i, picked.has(i.name))).join("")}</details>`;
+      }).join("") : `<p class="fine">No sign list yet — add one under the <b>Business</b> tab.</p>`}
+      ${(()=>{
+        const known = new Set(cats.flatMap(c=>c.items.map(i=>i.name)));
+        const orphans = (j.signs||[]).filter(i=>!known.has(i));
+        return orphans.length ? `<details class="cat" open><summary><span>Not on your list anymore</span><span class="n">${orphans.length} selected</span></summary>
+          <p class="fine" style="margin:0 0 4px">These were checked before the checklist changed. They still go in the text. Uncheck to remove.</p>
+          ${orphans.map(i=>signRow(j,i,true)).join("")}</details>` : "";
+      })()}
+    </div>
+    <label style="margin-top:10px">Notes for the crew<textarea id="crew-note" placeholder="Gate code, where to place it, colors…">${esc(j.workerNote||"")}</textarea></label>
+    <label style="margin-top:10px">Example photo<select id="crew-ex"><option value="">Auto-match by occasion${ex&&!j.exampleId?" ("+esc(ex.label||"example")+")":""}</option>${exs.map(e=>`<option value="${esc(e.id)}" ${j.exampleId===e.id?"selected":""}>${esc(e.label||"Example")}${e.category?" · "+esc(e.category):""}</option>`).join("")}</select></label>
+    <div id="crew-ex-prev">${ex?`<img class="exprev" src="${esc(exSrc(ex))}" alt="Example: ${esc(ex.label||"")}">`:`<p class="fine" style="margin:6px 0 0">${exs.length?"No example matches this occasion.":"No example photos yet — add some under the Crew tab."}</p>`}</div>
+    ${sent}
+    <div class="row"><button type="button" class="btn pop wide" data-crew-open>${j.crewSent?"Text crew again":"Preview & text crew"}</button></div>
+  </section>`;
+}
+function viewDetail(j){
+  if(!j) return topBar("Job not found","",true) + `<div class="empty">This job was deleted.</div>`;
+  const st = stage(j), t = totals(j), s = store.settings;
+  const letters = (j.message||j.honoree||"YAY").replace(/[^A-Za-z0-9]/g,"").slice(0,4).toUpperCase().split("");
+  const stepCls = n => n < st || j.status==="complete" ? "done" : n===st ? "now" : "";
+  const sentLine = (k) => j.emails && j.emails[k] ? `<div class="sent">✓ ${j.emails[k].draft?"Saved as Gmail draft":"Emailed"} ${esc(fmtWhen(j.emails[k].at))}</div>` : "";
+
+  let action = "";
+  if(st===1){
+    action = `<section class="card action">
+      <h3>Confirm the booking</h3>
+      <p class="hint">Emails ${esc(j.email||"the customer")} a summary of their request with the set-up and take-down times.</p>
+      ${sentLine("confirmation")}
+      <div class="row">
+        <button type="button" class="btn pop" data-mail="confirmation">${j.emails&&j.emails.confirmation?"Send again":"Preview confirmation email"}</button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+      <h3>Sign is up?</h3>
+      <p class="hint">Add a photo of the finished yard, then mark it set up. The take-down reminder starts here.</p>
+      <label class="btn" for="photo-in" style="display:inline-flex">📷 ${photoSrc(j)?"Replace photo":"Add photo of finished job"}</label>
+      <input id="photo-in" type="file" accept="image/*" capture="environment" hidden>
+      ${photoSrc(j)?`<div class="photo"><img src="${esc(photoSrc(j))}" alt="Finished yard card for ${esc(j.honoree||j.customerName)}"></div>`:""}
+      <div class="row"><button type="button" class="btn primary wide" data-act="setup" ${photoSrc(j)?"":"disabled"}>Mark set up</button></div>
+      ${photoSrc(j)?"":`<p class="fine" style="margin:6px 0 0">Add the photo first — it goes into the customer's email.</p>`}
+    </section>`;
+  }else if(st===2){
+    const td = toDate(j.takedownAt), overdue = td && td <= Date.now();
+    action = `<section class="card action">
+      <h3>Take-down reminder</h3>
+      <div class="countdown">${overdue?"Overdue — ":""}${esc(fmtWhen(j.takedownAt))}</div>
+      <p class="hint" style="margin-top:4px">${esc(relTime(j.takedownAt))} · ${esc(j.address)}</p>
+      ${needsPickupReminder(j)?`<div class="banner warn" style="margin-top:8px"><b>Pick-up is coming up.</b> Send the customer a reminder below.</div>`:""}
+      <div class="photo"><img src="${esc(photoSrc(j))}" alt="Finished yard card for ${esc(j.honoree||j.customerName)}"></div>
+      <div class="row">
+        <button type="button" class="btn pop" data-mail="setup">${j.emails&&j.emails.setup?"Resend photo email":"Email customer the photo"}</button>
+      </div>
+      ${sentLine("setup")}
+      <div class="row">
+        <button type="button" class="btn pop" data-mail="pickup">${j.emails&&j.emails.pickup?"Resend pick-up reminder":"Remind customer of pick-up"}</button>
+        <button type="button" class="btn" data-mail="reminder">Email me a reminder</button>
+      </div>
+      ${sentLine("pickup")}
+      ${sentLine("reminder")}
+      <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+      <h3>Sign is picked up?</h3>
+      <p class="hint">Marks the job done and opens the invoice + review request email.</p>
+      <div class="row"><button type="button" class="btn primary wide" data-act="takedown">Mark taken down</button></div>
+    </section>`;
+  }else{
+    action = `<section class="card action">
+      <h3>Invoice & review request</h3>
+      <p class="hint">Invoice ${esc(invoiceNo(j))} · balance ${money(t.due)}. Includes links to ${["facebook","instagram","google"].filter(k=>s[k]).map(k=>k[0].toUpperCase()+k.slice(1)).join(", ")||"your review pages (add them under Business)"}.</p>
+      ${sentLine("final")}
+      <div class="row"><button type="button" class="btn pop wide" data-mail="final">${j.emails&&j.emails.final?"Send again":"Preview invoice email"}</button></div>
+      ${photoSrc(j)?`<div class="photo"><img src="${esc(photoSrc(j))}" alt="Finished yard card for ${esc(j.honoree||j.customerName)}"></div>`:""}
+    </section>`;
+  }
+
+  return topBar(j.customerName, j.address, true) + `
+    <div class="hero">
+      <div class="stakes" aria-hidden="true">${letters.map(l=>`<span>${esc(l)}</span>`).join("")}</div>
+      <div class="occ">${esc(j.occasion||"Yard card")}</div>
+      <h2>${esc(j.honoree||j.customerName)}</h2>
+      ${j.message?`<div class="msg">“${esc(j.message)}”</div>`:""}
+    </div>
+    <ol class="steps" aria-label="Job progress">
+      <li class="${stepCls(1)}"><span class="n">1</span>Booked</li>
+      <li class="${stepCls(2)}"><span class="n">2</span>Set up</li>
+      <li class="${stepCls(3)}"><span class="n">3</span>Taken down</li>
+    </ol>
+    ${action}
+    ${j.status!=="complete" ? crewCard(j) : ""}
+    <section class="card">
+      <h3>Booking</h3>
+      <dl class="kv">
+        <dt>Set up</dt><dd>${esc(fmtWhen(j.setupAt))}</dd>
+        <dt>Take down</dt><dd>${esc(fmtWhen(j.takedownAt))}</dd>
+        <dt>Email</dt><dd>${esc(j.email)}</dd>
+        ${j.phone?`<dt>Phone</dt><dd>${esc(j.phone)}</dd>`:""}
+        <dt>Address</dt><dd>${esc(j.address)}</dd>
+        <dt>Request</dt><dd>${esc(j.request||"—")}</dd>
+        <dt>Total</dt><dd>${money(t.total)}${t.paid?` · ${money(t.paid)} paid`:""}</dd>
+      </dl>
+      <div class="row">
+        <button type="button" class="btn" data-act="edit">Edit</button>
+        ${st>1?`<button type="button" class="btn ghost" data-act="undo">Move back a step</button>`:""}
+        <button type="button" class="btn danger" data-act="delete">Delete</button>
+      </div>
+      <div id="del-confirm" hidden class="status err">Delete this job for good?
+        <div class="row"><button type="button" class="btn danger" data-act="delete-yes">Delete</button><button type="button" class="btn" data-act="delete-no">Keep</button></div></div>
+    </section>`;
+}
+
+function invEditRow(it){
+  const name = it.name || "", tracked = it.total !== null && it.total !== undefined && it.total !== "";
+  const out = name ? signOut(name) : 0;
+  return `<div class="inv-edit" data-inv data-orig="${esc(name)}">
+    <input class="ie-name" placeholder="Sign name (e.g. Red Wings)" value="${esc(name)}" aria-label="Sign name" autocomplete="off">
+    <div class="ie-line">
+      <input class="ie-cat" list="inv-cats" placeholder="Category" value="${esc(it.cat||"")}" aria-label="Category" autocomplete="off">
+      <input class="ie-tot" type="number" inputmode="numeric" min="0" max="9999" placeholder="Total" value="${tracked?esc(String(it.total)):""}" aria-label="Total owned">
+      <button type="button" class="x" data-inv-rm aria-label="Remove this sign">✕</button>
+    </div>
+    ${name && tracked ? `<div class="fine">In the shop now: ${Math.max(0, Number(it.total)-out)} of ${esc(String(it.total))}${out?` · ${out} out on jobs`:""}</div>` : ""}
+  </div>`;
+}
+function viewSettings(){
+  const s = store.settings;
+  const inv = getInv(), invCatNames = [...new Set(inv.map(i=>String(i.cat||"").trim()).filter(Boolean))];
+  const f = (id,key,label,type="text",ph="") => `<label>${label}<input id="${id}" name="${key}" type="${type}" value="${esc(s[key])}" placeholder="${esc(ph)}" autocomplete="off"></label>`;
+  return topBar("Your business","Used in every email",true) + modeBanner() + `
+  <form id="setform">
+    <fieldset><legend>Business</legend>
+      ${f("s-name","name","Business name","text","Front Yard Greetings")}
+      <div class="two">${f("s-email","email","Your email","email","you@example.com")}${f("s-phone","phone","Phone","tel")}</div>
+      <label>How customers pay<textarea id="s-payment" name="payment" placeholder="Venmo @frontyardgreetings · Zelle 555-0100 · cash at take-down">${esc(s.payment)}</textarea></label>
+      ${f("s-signoff","signoff","Email sign-off")}
+    </fieldset>
+    <fieldset id="inv-fs"><legend>Sign inventory</legend>
+      <p class="fine" style="margin:0">List every sign you own and how many (the total). On a job, checking a sign takes that many out of the shop, and they come back when the job is marked complete. Leave Total blank for signs you don't want to count.</p>
+      <datalist id="inv-cats">${invCatNames.map(c=>`<option value="${esc(c)}"></option>`).join("")}</datalist>
+      <div id="inv-rows">${inv.map(it=>invEditRow({cat:it.cat, name:it.name, total:(it.total===undefined?null:it.total)})).join("")}</div>
+      <div class="row">
+        <button type="button" class="btn" id="inv-add">＋ Add a sign</button>
+        <button type="button" class="btn ghost" id="inv-sports">＋ Michigan teams</button>
+      </div>
+      <div id="inv-err" class="status err" hidden></div>
+    </fieldset>
+    <fieldset><legend>Logo & app icon</legend>
+      <div class="brand-row">
+        <div class="brand-prev" id="brand-prev" aria-hidden="true"></div>
+        <div style="display:grid;gap:8px">
+          <label class="btn" for="logo-in" style="display:inline-flex">🖼 ${s.logo?"Replace logo":"Upload your logo"}</label>
+          <input id="logo-in" type="file" accept="image/*" hidden>
+          ${s.logo?`<button type="button" class="btn ghost" id="logo-rm">Remove logo</button>`:""}
+        </div>
+      </div>
+      <p class="fine" style="margin:0">Your logo shows in the app header and as the app's icon. No logo? Use a colored badge with your initials.</p>
+      <label>Badge letters (1–2)<input id="s-icontext" name="iconText" maxlength="2" value="${esc(s.iconText)}" placeholder="${esc(iconInitials({...s,iconText:""}))}" autocomplete="off"></label>
+      <div class="swatches" role="radiogroup" aria-label="Badge color">${ICON_COLORS.map(c=>`<label><input type="radio" name="iconColor" value="${c}" ${(s.iconColor||"#1E5C3B")===c?"checked":""} aria-label="Color ${c}"><span style="background:${c}"></span></label>`).join("")}</div>
+    </fieldset>
+    <fieldset><legend>Review links</legend>
+      <p class="fine" style="margin:0">Paste the page where customers leave a review or tag you. Blank ones are left out of the email.</p>
+      ${f("s-fb","facebook","Facebook","url","https://facebook.com/yourpage/reviews")}
+      ${f("s-ig","instagram","Instagram","url","https://instagram.com/yourhandle")}
+      ${f("s-gg","google","Google reviews","url","https://g.page/r/…/review")}
+    </fieldset>
+    <button class="btn primary wide" type="submit">Save business details</button>
+  </form>`;
+}
+
+function viewCrew(){
+  const s = store.settings;
+  const cats = invCats().map(c=>c.name);
+  return topBar("Crew","Texts, signs & example photos",true) + modeBanner() + `
+  <form id="crewform">
+    <fieldset><legend>Your crew</legend>
+      <label>Workers (one per line: name, phone)<textarea id="c-workers" name="workers" rows="3" placeholder="Jordan, 555-0123&#10;Sam, 555-0177">${esc(s.workers)}</textarea></label>
+      <label>Remind me to text the crew<select id="c-lead" name="workerLeadHours">${[12,24,36,48].map(h=>`<option value="${h}" ${String(Number(s.workerLeadHours)||24)===String(h)?"selected":""}>${h} hours before set-up</option>`).join("")}</select></label>
+    </fieldset>
+    <fieldset><legend>Text to workers</legend>
+      <p class="fine" style="margin:0">Fill-ins: {worker} {honoree} {occasion} {setup} {address} {message} {signs} {notes} {photo} {takedown} {customer} {phone} {business}. A line is dropped if everything in it is blank.</p>
+      <label>Message<textarea id="c-wtext" name="workerText" rows="9">${esc(s.workerText||DEFAULT_WORKER_TEXT)}</textarea></label>
+      <button type="button" class="btn ghost" data-reset="workerText">Reset to default wording</button>
+    </fieldset>
+    <fieldset><legend>Sign checklist</legend>
+      <p class="fine" style="margin:0">Your signs and how many you own now live in one place: <b>Business → Sign inventory</b>. Add, rename or remove signs there and the checkboxes on every job follow.</p>
+      <button type="button" class="btn" data-go2="settings">Open sign inventory</button>
+    </fieldset>
+    <button class="btn primary wide" type="submit" style="margin-top:12px">Save crew settings</button>
+  </form>
+  <section class="card">
+    <h3>Example photos</h3>
+    <p class="hint">Photos of past jobs to show the crew what to build. Tag each with an occasion and the right one is picked automatically.</p>
+    <div id="ex-grid"></div>
+    <label style="margin-top:10px">Photo link (optional)<input id="ex-link" type="url" inputmode="url" placeholder="https://… (Google Drive, Facebook, etc.)" autocomplete="off"></label>
+    <div class="two" style="margin-top:10px">
+      <label>Label<input id="ex-label" placeholder="Balloon arch, 10th birthday" autocomplete="off"></label>
+      <label>Occasion<input id="ex-cat" list="occ-list" placeholder="Birthday" autocomplete="off"></label>
+    </div>
+    <datalist id="occ-list">${cats.map(c=>`<option value="${esc(c)}"></option>`).join("")}</datalist>
+    <div class="row"><label class="btn" for="ex-in" style="display:inline-flex">📷 Add example photo</label></div>
+    <input id="ex-in" type="file" accept="image/*" hidden>
+  </section>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const app = $("#app");
+  const j = route.id ? store.jobs.find(x=>x.id===route.id) : null;
+  if(route.view==="jobs") app.innerHTML = viewJobs();
+  else if(route.view==="new") app.innerHTML = viewForm(null);
+  else if(route.view==="edit") app.innerHTML = viewForm(j);
+  else if(route.view==="job") app.innerHTML = viewDetail(j);
+  else if(route.view==="settings") app.innerHTML = viewSettings();
+  else if(route.view==="crew") app.innerHTML = viewCrew();
+  ["jobs","crew","settings"].forEach(v=>{ const b=$("#nav-"+v); if(route.view===v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  bind(j);
+}
+// Re-render on data changes, except while a form is being filled in.
+let holdRender = false;
+store.listeners.push(()=>{ if(holdRender) return; if(!["new","edit","settings","crew"].includes(route.view)) render(); });
+
+function bind(j){
+  const app = $("#app");
+  app.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>go(route.view==="edit"&&j?"job":"jobs", route.view==="edit"&&j?j.id:null));
+  app.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>go("job", b.dataset.open));
+  app.querySelectorAll("[data-go2]").forEach(b=>b.onclick=()=>go(b.dataset.go2));
+  app.querySelectorAll("[data-remind]").forEach(b=>b.onclick=()=>{ const jj = store.jobs.find(x=>x.id===b.dataset.remind); if(jj) openMail("pickup", jj); });
+  app.querySelectorAll("[data-crewopen]").forEach(b=>b.onclick=()=>{ const jj = store.jobs.find(x=>x.id===b.dataset.crewopen); if(jj) openCrew(jj); });
+  app.querySelectorAll("[data-crewskip]").forEach(b=>b.onclick=async()=>{ const jj = store.jobs.find(x=>x.id===b.dataset.crewskip); if(!jj) return; try{ await store.saveJob({...jj, crewSkip:true}); toast("Crew text skipped"); render(); }catch(e){ toast("Couldn't save — try again"); } });
+  app.querySelectorAll("[data-skip]").forEach(b=>b.onclick=async()=>{ const jj = store.jobs.find(x=>x.id===b.dataset.skip); if(!jj) return; try{ await store.saveJob({...jj, pickupSkip:true}); toast("Reminder skipped"); render(); }catch(e){ toast("Couldn't save — try again"); } });
+
+  const form = $("#jobform");
+  if(form){
+    let n = 100;
+    const recalc = ()=>{ $("#f-total").textContent = money(totals(readForm(form)).due); };
+    $("#add-addon").onclick = ()=>{ $("#addons").insertAdjacentHTML("beforeend", addonRow(undefined, n++)); };
+    form.addEventListener("click", e=>{ if(e.target.closest("[data-rm-addon]")){ e.target.closest("[data-addon]").remove(); recalc(); }});
+    form.addEventListener("input", recalc);
+    form.onsubmit = async e=>{
+      e.preventDefault();
+      const data = readForm(form), err = $("#form-err");
+      const missing = [];
+      if(!data.customerName) missing.push("customer name");
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email||"")) missing.push("a valid email");
+      if(!data.address) missing.push("address");
+      if(!data.setupAt) missing.push("set-up time");
+      if(!data.takedownAt) missing.push("take-down time");
+      if(missing.length){ err.hidden=false; err.textContent = "Add " + missing.join(", ") + " to save."; return; }
+      if(data.takedownAt <= data.setupAt){ err.hidden=false; err.textContent = "Take-down needs to be after set-up."; return; }
+      const job = j ? {...j, ...data} : {id:newId(), status:"booked", emails:{}, createdAt:new Date().toISOString(), ...data};
+      try{ await store.saveJob(job); toast(j?"Changes saved":"Booking saved"); go("job", job.id); }
+      catch(ex){ err.hidden=false; err.textContent = "Couldn't save — " + (ex && ex.message || "try again."); }
+    };
+  }
+
+  const sf = $("#setform");
+  if(sf){
+    const invRows = $("#inv-rows"), invErr = $("#inv-err");
+    const invNames = ()=>[...invRows.querySelectorAll(".ie-name")].map(i=>i.value.trim().toLowerCase()).filter(Boolean);
+    const addInvRow = it=>{
+      invRows.insertAdjacentHTML("beforeend", invEditRow(it));
+      return invRows.lastElementChild;
+    };
+    $("#inv-add").onclick = ()=>{
+      const cats = invRows.querySelectorAll(".ie-cat");
+      const last = cats.length ? cats[cats.length-1].value.trim() : "";
+      const row = addInvRow({name:"", cat:last, total:null});
+      row.querySelector(".ie-name").focus();
+    };
+    $("#inv-sports").onclick = ()=>{
+      const have = new Set(invNames());
+      const add = SPORTS_TEAMS.filter(t=>!have.has(t.toLowerCase()));
+      add.forEach(t=>addInvRow({name:t, cat:SPORTS_CAT, total:null}));
+      toast(add.length ? "Added "+add.length+" teams — enter your totals" : "Teams are already on your list");
+    };
+    invRows.addEventListener("click", e=>{ const b = e.target.closest("[data-inv-rm]"); if(b) b.closest("[data-inv]").remove(); });
+    sf.onsubmit = async e=>{
+      e.preventDefault();
+      const s = {...DEFAULT_SETTINGS, ...store.settings};
+      new FormData(sf).forEach((v,k)=>s[k]=String(v).trim());
+      // sign inventory
+      const rows = [...invRows.querySelectorAll("[data-inv]")].map(r=>({
+        orig: r.dataset.orig,
+        name: r.querySelector(".ie-name").value.trim(),
+        cat: r.querySelector(".ie-cat").value.trim() || "Other",
+        t: r.querySelector(".ie-tot").value.trim()
+      })).filter(r=>r.name);
+      const seen = new Set(), dup = [];
+      rows.forEach(r=>{ const k = r.name.toLowerCase(); if(seen.has(k)) dup.push(r.name); seen.add(k); });
+      if(dup.length){
+        invErr.hidden = false; invErr.textContent = "Each sign needs its own name. Duplicate: " + [...new Set(dup)].join(", ") + ".";
+        invErr.scrollIntoView({block:"center"}); return;
+      }
+      invErr.hidden = true;
+      s.signInv = JSON.stringify(rows.map(r=>({cat:r.cat, name:r.name, total: r.t==="" ? null : Math.max(0, Math.min(9999, parseInt(r.t,10)||0))})));
+      const renames = Object.create(null);
+      rows.forEach(r=>{ if(r.orig && r.orig!==r.name) renames[r.orig] = r.name; });
+      try{
+        await store.saveSettings(s);
+        // keep jobs pointing at renamed signs
+        if(Object.keys(renames).length){
+          for(const job of store.jobs.slice()){
+            if(!(job.signs||[]).some(n=>n in renames)) continue;
+            const signQty = {};
+            Object.entries(job.signQty||{}).forEach(([n,q])=>{ signQty[renames[n] ?? n] = q; });
+            await store.saveJob({...job, signs:(job.signs||[]).map(n=>renames[n] ?? n), signQty});
+          }
+        }
+        toast("Business details saved"); go("jobs");
+      }
+      catch(ex){ toast("Couldn't save — try again"); }
+    };
+  }
+
+  if(route.view==="settings"){
+    refreshBrandPreview();
+    const lin = $("#logo-in"); if(lin) lin.onchange = ()=>handleLogo(lin.files[0]);
+    const lrm = $("#logo-rm"); if(lrm) lrm.onclick = async()=>{ try{ await store.saveSettings({...store.settings, logo:""}); toast("Logo removed"); render(); applyIcon(); }catch(e){ toast("Couldn't remove — try again"); } };
+    const it = $("#s-icontext"); if(it) it.oninput = refreshBrandPreview;
+    sf.querySelectorAll('[name="iconColor"]').forEach(r=>r.onchange = refreshBrandPreview);
+  }
+
+  if(route.view==="crew"){
+    refreshExamples();
+    const cf = $("#crewform");
+    cf.onsubmit = async e=>{
+      e.preventDefault();
+      const ns = {...DEFAULT_SETTINGS, ...store.settings};
+      new FormData(cf).forEach((v,k)=>ns[k]=String(v).trim());
+      try{ await store.saveSettings(ns); toast("Crew settings saved"); go("jobs"); }
+      catch(ex){ toast("Couldn't save — try again"); }
+    };
+    cf.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{ const k=b.dataset.reset; cf.elements[k].value = k==="signs" ? DEFAULT_SIGNS : DEFAULT_WORKER_TEXT; });
+    const exin = $("#ex-in"); exin.onchange = ()=>handleExample(exin.files[0]);
+  }
+
+  if(route.view==="job" && j){
+    const cc = $("#crew-card");
+    if(cc){
+      const cur = ()=>store.jobs.find(x=>x.id===j.id) || j;
+      const persist = async patch=>{
+        holdRender = true;
+        try{ await store.saveJob({...cur(), ...patch}); }catch(e){ toast("Couldn't save — try again"); }
+        setTimeout(()=>{ holdRender = false; }, 800);
+      };
+      $("#crew-worker").onchange = e=>persist({worker:e.target.value});
+      const saveSigns = ()=>{
+        const signs = [], signQty = {};
+        cc.querySelectorAll(".chk-row").forEach(r=>{
+          const cb = r.querySelector("[data-sign]"), q = r.querySelector("[data-qty]"), oh = r.querySelector("[data-onhand]");
+          const n = Math.max(1, Math.min(9999, parseInt(q.value,10)||1));
+          q.hidden = !cb.checked;
+          if(oh){
+            oh.hidden = !cb.checked;
+            if(cb.checked && r.dataset.total!==""){
+              const left = Number(r.dataset.total) - Number(r.dataset.away) - n;
+              oh.textContent = left; oh.classList.toggle("neg", left<0);
+            }
+          }
+          if(cb.checked){ signs.push(cb.value); signQty[cb.value] = n; }
+        });
+        persist({signs, signQty});
+        cc.querySelectorAll("details.cat").forEach(d=>{ const n=d.querySelectorAll("[data-sign]:checked").length; d.querySelector(".n").textContent = n? n+" selected":""; });
+      };
+      cc.querySelectorAll("[data-sign]").forEach(cb=>cb.onchange = ()=>{
+        const r = cb.closest(".chk-row");
+        if(cb.checked && r.dataset.free==="0"){ cb.checked = false; toast("None left in the shop"); return; }
+        saveSigns();
+      });
+      cc.querySelectorAll("[data-qty]").forEach(q=>{ q.onchange = saveSigns; });
+      $("#crew-note").onchange = e=>persist({workerNote:e.target.value.trim()});
+      $("#crew-ex").onchange = async e=>{
+        await persist({exampleId:e.target.value});
+        const ex = pickExample(cur()), box = $("#crew-ex-prev");
+        box.innerHTML = ex ? `<img class="exprev" src="${esc(exSrc(ex))}" alt="Example: ${esc(ex.label||"")}">` : `<p class="fine" style="margin:6px 0 0">No example matches this occasion.</p>`;
+      };
+      cc.querySelector("[data-crew-open]").onclick = ()=>openCrew(cur());
+    }
+    app.querySelectorAll("[data-mail]").forEach(b=>b.onclick=()=>openMail(b.dataset.mail, j));
+    const pin = $("#photo-in"); if(pin) pin.onchange = ()=>handlePhoto(pin.files[0], j);
+    app.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
+      const a = b.dataset.act;
+      if(a==="edit") return go("edit", j.id);
+      if(a==="delete"){ $("#del-confirm").hidden=false; return; }
+      if(a==="delete-no"){ $("#del-confirm").hidden=true; return; }
+      if(a==="delete-yes"){ await store.removeJob(j.id); toast("Job deleted"); return go("jobs"); }
+      if(a==="setup"){ await store.saveJob({...j, status:"setup", setupDoneAt:new Date().toISOString()}); toast("Marked set up"); render(); openMail("setup", store.jobs.find(x=>x.id===j.id)||j); return; }
+      if(a==="takedown"){ const up = {...j, status:"complete", takedownDoneAt:new Date().toISOString(), invoiceNo: invoiceNo(j)}; await store.saveJob(up); toast("Job complete"); render(); openMail("final", store.jobs.find(x=>x.id===j.id)||up); return; }
+      if(a==="undo"){ await store.saveJob({...j, status: j.status==="complete"?"setup":"confirmed"}); toast("Moved back a step"); render(); }
+    });
+  }
+}
+function readForm(form){
+  const d = {};
+  ["customerName","email","phone","address","occasion","honoree","message","request","setupAt","takedownAt","price","deposit"].forEach(k=>{
+    const el = form.elements[k]; d[k] = el ? el.value.trim() : "";
+  });
+  d.addons = [...form.querySelectorAll("[data-addon]")].map(r=>({desc:r.querySelector('[name="addon-desc"]').value.trim(), amount:r.querySelector('[name="addon-amt"]').value})).filter(a=>a.desc||a.amount);
+  return d;
+}
+
+/* ---------- logo & app icon ---------- */
+async function squareDataUrl(file, size){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+    const c = document.createElement("canvas"); c.width = c.height = size;
+    const ctx = c.getContext("2d");
+    const k = Math.min(size/img.naturalWidth, size/img.naturalHeight);
+    const w = img.naturalWidth*k, h = img.naturalHeight*k;
+    ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+    let out = c.toDataURL("image/png");
+    if(out.length > 180000){
+      ctx.globalCompositeOperation = "destination-over"; ctx.fillStyle = "#fff"; ctx.fillRect(0,0,size,size);
+      out = c.toDataURL("image/jpeg",0.85);
+    }
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function handleLogo(file){
+  if(!file) return;
+  toast("Adding logo…");
+  let data;
+  try{ data = await squareDataUrl(file, 256); }catch(e){ return toast("That file isn't an image this app can read"); }
+  try{
+    // keep any unsaved text in the form out of this save; only the logo changes
+    await store.saveSettings({...store.settings, logo:data});
+    toast("Logo saved"); render(); applyIcon();
+  }catch(e){ toast("Couldn't save the logo — try a smaller image"); }
+}
+function refreshBrandPreview(){
+  const el = $("#brand-prev"); if(!el) return;
+  const s = store.settings;
+  if(s.logo){ el.style.background = "var(--surface)"; el.innerHTML = `<img src="${esc(s.logo)}" alt="">`; return; }
+  const sf = $("#setform");
+  const col = (sf && sf.elements.iconColor && sf.elements.iconColor.value) || s.iconColor || "#1E5C3B";
+  const txt = ((sf && sf.elements.iconText && sf.elements.iconText.value.trim()) || "") || iconInitials({...s,iconText:""});
+  el.style.background = col; el.textContent = txt.toUpperCase().slice(0,2);
+}
+function applyIcon(){
+  try{
+    const s = store.settings;
+    document.title = s.name || "Yard Card Jobs";
+    const c = document.createElement("canvas"); c.width = c.height = 180;
+    const ctx = c.getContext("2d");
+    const finish = ()=>{
+      const href = c.toDataURL("image/png");
+      [["icon",null],["apple-touch-icon","180x180"]].forEach(([rel,sz])=>{
+        let l = document.querySelector(`link[rel="${rel}"]`);
+        if(!l){ l = document.createElement("link"); l.rel = rel; document.head.appendChild(l); }
+        if(sz) l.setAttribute("sizes",sz);
+        l.href = href;
+      });
+    };
+    if(s.logo){
+      const img = new Image();
+      img.onload = ()=>{ ctx.fillStyle="#fff"; ctx.fillRect(0,0,180,180); ctx.drawImage(img,10,10,160,160); finish(); };
+      img.src = s.logo;
+    }else{
+      ctx.fillStyle = s.iconColor || "#1E5C3B"; ctx.fillRect(0,0,180,180);
+      ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = "96px 'Lilita One','Arial Rounded MT Bold',Arial,sans-serif";
+      ctx.fillText(iconInitials(s),90,96); finish();
+    }
+  }catch(e){}
+}
+store.listeners.push(applyIcon);
+
+/* ---------- example photos ---------- */
+function cleanLink(v){ v = String(v||"").trim(); return /^https?:\/\/\S+$/i.test(v) ? v : ""; }
+function refreshExamples(){
+  const g = $("#ex-grid"); if(!g) return;
+  const list = store.examples || [];
+  g.innerHTML = list.length ? list.map(ex=>`<div class="ex"><img src="${esc(exSrc(ex))}" alt=""><div class="grow"><b>${esc(ex.label||"Example")}</b><br><span class="fine">${esc(ex.category||"No occasion set")}</span><input class="exlink" data-ex-link="${esc(ex.id)}" type="url" inputmode="url" placeholder="Photo link (optional)" value="${esc(ex.link||"")}" aria-label="Photo link for ${esc(ex.label||"example")}" style="width:100%;margin-top:6px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:13px"></div><button type="button" class="btn danger" data-ex-del="${esc(ex.id)}">Delete</button></div>`).join("") : `<div class="empty">No example photos yet.</div>`;
+  g.querySelectorAll("[data-ex-link]").forEach(inp=>inp.onchange = async()=>{
+    const ex = (store.examples||[]).find(x=>x.id===inp.dataset.exLink); if(!ex) return;
+    const v = cleanLink(inp.value);
+    if(inp.value.trim() && !v){ inp.value = ex.link||""; return toast("Links need to start with http:// or https://"); }
+    try{ await store.saveExample({...ex, link:v}); inp.value = v; toast(v?"Link saved":"Link removed"); }catch(e){ toast("Couldn't save — try again"); }
+  });
+  g.querySelectorAll("[data-ex-del]").forEach(b=>b.onclick=async()=>{
+    if(b.dataset.armed!=="1"){ b.dataset.armed="1"; b.textContent="Tap again to delete"; setTimeout(()=>{ b.dataset.armed=""; b.textContent="Delete"; },3000); return; }
+    try{ await store.removeExample(b.dataset.exDel); toast("Example deleted"); refreshExamples(); }catch(e){ toast("Couldn't delete — try again"); }
+  });
+}
+async function handleExample(file){
+  if(!file) return;
+  toast("Adding example…");
+  let blob;
+  try{ blob = await shrink(file, 1400); }catch(e){ return toast("That file isn't a photo this app can read"); }
+  const ex = {id:"e"+Date.now().toString(36)+Math.random().toString(36).slice(2,5), label:($("#ex-label").value.trim()||"Example"), category:$("#ex-cat").value.trim(), link:cleanLink($("#ex-link").value), createdAt:new Date().toISOString()};
+  let assets = null;
+  try{ assets = window.claude && await window.claude.use("assets"); }catch(e){}
+  try{
+    if(assets){ const up = await assets.upload(blob, {type:"image/jpeg"}); ex.photoId = up.id; }
+    else{ ex.photoData = "data:image/jpeg;base64," + await blobToB64(await shrink(file, 600)); }
+    await store.saveExample(ex);
+    $("#ex-label").value = ""; $("#ex-cat").value = ""; $("#ex-link").value = ""; $("#ex-in").value = "";
+    toast("Example added"); refreshExamples();
+  }catch(e){
+    toast(e && e.code==="quota_or_state" ? "Photo storage is full — delete old photos" : "Couldn't save the photo — try again");
+  }
+}
+async function exampleBlob(ex){
+  if(ex.photoId){ const r = await fetch("/_blob/"+ex.photoId); if(!r.ok) throw new Error("fetch"); return await r.blob(); }
+  return await (await fetch(ex.photoData)).blob();
+}
+
+/* ---------- crew text sheet ---------- */
+function openCrew(j0){
+  const root = $("#sheet-root");
+  const cur = ()=>store.jobs.find(x=>x.id===j0.id) || j0;
+  const workers = parseWorkers(store.settings.workers);
+  const j = cur(), ex = pickExample(j);
+  let worker = j.worker || (workers[0] && workers.length===1 ? workers[0].name : "");
+  const phoneOf = n => (workers.find(w=>w.name===n)||{}).phone || "";
+  root.innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
+    <h3 id="sheet-h">Text your crew</h3>
+    <div class="to" id="c-to"></div>
+    <label>Worker<select id="c-worker"><option value="">Choose in Messages</option>${workers.map(w=>`<option value="${esc(w.name)}" ${w.name===worker?"selected":""}>${esc(w.name)}${w.phone?" · "+esc(w.phone):""}</option>`).join("")}</select></label>
+    <label style="margin-top:10px">Message<textarea id="c-text" rows="10"></textarea></label>
+    ${ex?`<img class="exprev" src="${esc(exSrc(ex))}" alt="Example: ${esc(ex.label||"")}"><p class="fine" style="margin:6px 0 0">Example photo: ${esc(ex.label||"Example")}. ${ex.link?"Its photo link is included in the message.":"No photo link is set for it, so the text won't include the photo. Add a link under the Crew tab, or use <b>Share with photo</b>."}</p>`:`<p class="fine" style="margin:8px 0 0">No example photo selected for this job.</p>`}
+    <div id="c-status" class="status" hidden></div>
+    <div class="row">
+      <a class="btn primary" id="c-sms" href="#">Text it</a>
+      ${ex && navigator.share ? `<button type="button" class="btn pop" id="c-share">Share with photo</button>` : ""}
+      <button type="button" class="btn ghost" id="c-copy">Copy text</button>
+      <button type="button" class="btn ghost" id="c-close">Close</button>
+    </div>
+  </div></div>`;
+  const ta = $("#c-text");
+  const refreshTo = ()=>{ const ph = phoneOf(worker); $("#c-to").innerHTML = `To: <b>${esc(worker ? worker + (ph?" · "+ph:"") : "pick a contact in Messages")}</b>`; $("#c-sms").href = smsHref(ph, ta.value); };
+  const regen = ()=>{ ta.value = buildCrewText(cur(), worker); refreshTo(); };
+  regen();
+  ta.oninput = refreshTo;
+  $("#c-worker").onchange = e=>{ worker = e.target.value; regen(); };
+  const close = ()=>{ root.innerHTML=""; render(); };
+  $("#c-close").onclick = close;
+  $("#scrim").onclick = e=>{ if(e.target.id==="scrim") close(); };
+  const markSent = async ()=>{ try{ await store.saveJob({...cur(), worker, crewSent:{at:new Date().toISOString(), worker}}); }catch(e){} };
+  $("#c-sms").onclick = ()=>{ markSent(); };
+  $("#c-copy").onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(ta.value); toast("Message copied"); }
+    catch(e){ ta.select(); toast("Text selected — copy it"); }
+  };
+  const sh = $("#c-share");
+  if(sh) sh.onclick = async ()=>{
+    const st = $("#c-status");
+    try{
+      const blob = await exampleBlob(ex);
+      const file = new File([blob], (ex.label||"example").replace(/[^A-Za-z0-9]+/g,"-")+".jpg", {type:"image/jpeg"});
+      if(!(navigator.canShare && navigator.canShare({files:[file]}))) throw {code:"nofiles"};
+      await navigator.share({files:[file], text: ta.value});
+      await markSent(); toast("Shared");
+    }catch(e){
+      if(e && e.name==="AbortError") return;
+      st.hidden = false; st.className = "status err";
+      st.textContent = "Sharing a photo isn't available here. Use Text it for the message, or Copy text.";
+    }
+  };
+}
+
+/* ---------- photos ---------- */
+async function shrink(file, max=1600){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+    const k = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight));
+    const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth*k); c.height = Math.round(img.naturalHeight*k);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    return await new Promise(res=>c.toBlob(res,"image/jpeg",0.85));
+  }finally{ URL.revokeObjectURL(url); }
+}
+const blobToB64 = b => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(b); });
+async function handlePhoto(file, j){
+  if(!file) return;
+  toast("Adding photo…");
+  let blob;
+  try{ blob = await shrink(file); }catch(e){ return toast("That file isn't a photo this app can read"); }
+  let assets = null;
+  try{ assets = window.claude && await window.claude.use("assets"); }catch(e){}
+  try{
+    if(assets){
+      const up = await assets.upload(blob, {type:"image/jpeg"});
+      await store.saveJob({...j, photoId: up.id, photoData: null});
+    }else{
+      const data = "data:image/jpeg;base64," + await blobToB64(await shrink(file, 700));
+      await store.saveJob({...j, photoData: data});
+    }
+    toast("Photo added"); render();
+  }catch(e){
+    const code = e && e.code;
+    toast(code==="too_large" ? "Photo is too large — try another" : code==="quota_or_state" ? "Photo storage is full — delete old jobs' photos" : "Couldn't save the photo — try again");
+  }
+}
+async function photoAttachment(j){
+  try{
+    let blob;
+    if(j.photoId){ const r = await fetch("/_blob/"+j.photoId); if(!r.ok) return null; blob = await r.blob(); }
+    else if(j.photoData){ blob = await (await fetch(j.photoData)).blob(); }
+    else return null;
+    const name = ((j.honoree||j.customerName||"yard-card").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "yard-card") + "-yard-card.jpg";
+    return {content: await blobToB64(blob), filename: name, mimeType:"image/jpeg"};
+  }catch(e){ return null; }
+}
+
+/* ---------- emails ---------- */
+function buildMail(kind, j){
+  const s = store.settings, biz = s.name || "Your yard card team", t = totals(j);
+  const first = (j.customerName||"").split(" ")[0] || "there";
+  const who = j.honoree || "your celebration";
+  const sign = [s.signoff, biz, s.phone, s.email].filter(Boolean);
+  const timesRows = [["Set up", fmtWhen(j.setupAt)], ["Take down", fmtWhen(j.takedownAt)], ["Address", j.address]];
+  let subject="", intro="", sections=[], to=[j.email], attach=false;
+
+  if(kind==="confirmation"){
+    subject = `You're booked! ${j.occasion||"Yard card"} for ${who} — ${fmtDay(j.setupAt)}`;
+    intro = `Hi ${first},\n\nThank you for booking with ${biz}! Here's a summary of your order so you can double-check everything. Just reply to this email if anything needs to change.`;
+    sections = [
+      {title:"Your sign", rows:[["Occasion", j.occasion||"—"],["For", j.honoree||"—"],["Message", j.message||"—"]], note: j.request ? "Your request: " + j.request : ""},
+      {title:"Set-up & take-down", rows: timesRows, note:"We'll place the sign at the set-up time above and come back to pick it up at take-down — no need to be home."},
+      {title:"Price", rows: priceRows(j), note: s.payment ? "Payment: " + s.payment : ""}
+    ];
+  }else if(kind==="setup"){
+    subject = `${j.honoree ? j.honoree+"'s" : "Your"} yard card is up! 🎉`;
+    intro = `Hi ${first},\n\nYour yard card is set up and looking great — a photo is attached. We hope ${who==="your celebration"?"everyone":j.honoree} loves it!`;
+    sections = [{title:"Pick-up reminder", rows:[["Take down", fmtWhen(j.takedownAt)],["Address", j.address]], note:"Please leave the sign in place until then. If you'd like it picked up at a different time, just reply."}];
+    attach = true;
+  }else if(kind==="pickup"){
+    subject = `Reminder: we're picking up ${j.honoree ? j.honoree+"'s" : "your"} yard card ${fmtDay(j.takedownAt)}`;
+    intro = `Hi ${first},\n\nA quick heads-up that ${biz} will be stopping by to take down ${j.honoree ? j.honoree+"'s" : "your"} yard card on ${fmtDay(j.takedownAt)} around ${fmtTime(j.takedownAt)}. No need to be home.`;
+    sections = [{title:"Pick-up", rows:[["Take down", fmtWhen(j.takedownAt)],["Address", j.address]], note:"Please leave the sign where it is until then. Need a different pick-up time? Just reply to this email" + (s.phone ? " or call/text " + s.phone : "") + "."}];
+    if(t.due>0) sections.push({title:"Balance due", rows:[["Balance due", money(t.due), true]], note: s.payment ? "Pay by: " + s.payment : "We'll send your invoice after pick-up."});
+  }else if(kind==="reminder"){
+    to = [s.email].filter(Boolean);
+    subject = `Take-down reminder: ${j.customerName} · ${fmtWhen(j.takedownAt)}`;
+    intro = `Pick up the yard card for ${j.customerName}${j.honoree?" ("+j.honoree+")":""}.`;
+    sections = [{title:"Take-down", rows:[["When", fmtWhen(j.takedownAt)],["Address", j.address],["Customer phone", j.phone||"—"],["Balance due", money(t.due)]], note: j.request ? "Notes: " + j.request : ""}];
+  }else if(kind==="final"){
+    subject = `Thank you! Invoice ${invoiceNo(j)} from ${biz}`;
+    intro = `Hi ${first},\n\nYour yard card has been picked up — thank you for letting us be part of ${j.honoree ? j.honoree+"'s" : "your"} ${ (j.occasion||"celebration").toLowerCase() }! Your invoice is below.`;
+    const links = [["Facebook",s.facebook],["Instagram",s.instagram],["Google",s.google]].filter(x=>x[1]);
+    sections = [
+      {title:"Invoice " + invoiceNo(j), rows: priceRows(j).concat([["Balance due", money(t.due), true]]), note: (t.due>0 && s.payment) ? "Pay by: " + s.payment : (t.due<=0 ? "Paid in full — thank you!" : "")},
+      {title:"Loved your sign?", rows:[], note:"A quick review or a tagged photo helps our small business more than you know." + (links.length ? "" : " Just reply and let us know how we did!"), links}
+    ];
+    attach = true;
+  }
+  return {kind, to, subject, intro, sections, sign, attach};
+}
+function priceRows(j){
+  const t = totals(j), rows = [["Package", money(t.base)]];
+  (j.addons||[]).forEach(a=>rows.push([a.desc||"Extra", money(a.amount)]));
+  if(t.adds || t.paid) rows.push(["Total", money(t.total)]);
+  if(t.paid) rows.push(["Deposit paid", "−" + money(t.paid)]);
+  return rows;
+}
+function mailText(m){
+  const out = [m.intro, ""];
+  m.sections.forEach(s=>{
+    out.push(s.title.toUpperCase());
+    s.rows.forEach(r=>out.push(`${r[0]}: ${r[1]}`));
+    if(s.note) out.push(s.note);
+    (s.links||[]).forEach(l=>out.push(`${l[0]}: ${l[1]}`));
+    out.push("");
+  });
+  out.push(m.sign.join("\n"));
+  return out.join("\n");
+}
+function mailHtml(m, forPreview){
+  const p = t => esc(t).replace(/\n/g,"<br>");
+  const green = "#1E5C3B";
+  let h = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#17231B;max-width:560px">`;
+  h += `<p>${p(m.intro)}</p>`;
+  m.sections.forEach(s=>{
+    h += `<h3 style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:${green};margin:20px 0 6px">${esc(s.title)}</h3>`;
+    if(s.rows.length){
+      h += `<table style="border-collapse:collapse;width:100%">` + s.rows.map(r=>`<tr><td style="padding:6px 0;border-bottom:1px solid #D2DDCD;color:#4A5A4E">${esc(r[0])}</td><td style="padding:6px 0;border-bottom:1px solid #D2DDCD;text-align:right;${r[2]?"font-weight:bold;font-size:17px":""}">${esc(r[1])}</td></tr>`).join("") + `</table>`;
+    }
+    if(s.note) h += `<p style="margin:8px 0">${p(s.note)}</p>`;
+    if(s.links && s.links.length) h += `<p>` + s.links.map(l=>`<a href="${esc(l[1])}" style="display:inline-block;background:${green};color:#fff;text-decoration:none;padding:9px 16px;border-radius:8px;margin:4px 6px 4px 0;font-weight:bold">Review us on ${esc(l[0])}</a>`).join("") + `</p>`;
+  });
+  h += `<p style="margin-top:22px">${m.sign.map(esc).join("<br>")}</p></div>`;
+  return h;
+}
+
+let sending = false;
+function openMail(kind, j){
+  const m = buildMail(kind, j);
+  const root = $("#sheet-root");
+  const titles = {confirmation:"Booking confirmation", setup:"Set-up photo email", reminder:"Reminder to yourself", pickup:"Pick-up reminder to customer", final:"Invoice & review request"};
+  const noTo = !m.to.length;
+  root.innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
+    <h3 id="sheet-h">${titles[kind]}</h3>
+    <div class="to">To: <b>${esc(m.to.join(", ")||"— add your email under Business")}</b>${m.attach?(photoSrc(j)?" · 📎 yard photo attached":" · no photo yet"):""}</div>
+    <label>Subject<input id="m-subject" value="${esc(m.subject)}"></label>
+    <label style="margin-top:10px">Opening message<textarea id="m-intro" rows="5">${esc(m.intro)}</textarea></label>
+    <div class="mail" id="m-preview">${mailHtml(m, true)}</div>
+    <div id="m-status" class="status" hidden></div>
+    <div class="row">
+      <button type="button" class="btn primary" id="m-send" ${noTo?"disabled":""}>Send with Gmail</button>
+      <button type="button" class="btn" id="m-draft" ${noTo?"disabled":""}>Save as Gmail draft</button>
+      <button type="button" class="btn ghost" id="m-copy">Copy text</button>
+      <button type="button" class="btn ghost" id="m-close">Close</button>
+    </div>
+  </div></div>`;
+  const close = ()=>{ root.innerHTML=""; };
+  $("#m-close").onclick = close;
+  $("#scrim").onclick = e=>{ if(e.target.id==="scrim") close(); };
+  const sync = ()=>{ m.subject = $("#m-subject").value; m.intro = $("#m-intro").value; $("#m-preview").innerHTML = mailHtml(m, true); };
+  $("#m-subject").oninput = sync; $("#m-intro").oninput = sync;
+  $("#m-copy").onclick = async ()=>{
+    sync();
+    const text = `To: ${m.to.join(", ")}\nSubject: ${m.subject}\n\n${mailText(m)}`;
+    try{ await navigator.clipboard.writeText(text); toast("Email copied"); }
+    catch(e){ const ta = $("#m-intro"); ta.value = text; ta.select(); toast("Text selected — copy it"); }
+  };
+  const doSend = async (draft)=>{
+    if(sending) return; sending = true; sync();
+    const st = $("#m-status"), bs = [$("#m-send"),$("#m-draft")];
+    bs.forEach(b=>b.disabled=true); st.hidden=false; st.className="status"; st.textContent = draft ? "Saving draft…" : "Sending…";
+    try{
+      let mcp = null;
+      try{ mcp = window.claude && await window.claude.use("mcp"); }catch(e){}
+      if(!mcp) throw {code:"no_mcp"};
+      const input = {to:m.to, subject:m.subject, body:mailText(m), htmlBody:mailHtml(m)};
+      if(m.attach){ const a = await photoAttachment(j); if(a) input.attachments = [a]; }
+      await mcp.callTool("Gmail", draft ? "create_draft" : "send_message", input, {cache:false});
+      const fresh = store.jobs.find(x=>x.id===j.id) || j;
+      const emails = {...(fresh.emails||{}), [kind]: {at:new Date().toISOString(), draft}};
+      const up = {...fresh, emails};
+      if(kind==="confirmation" && fresh.status==="booked") up.status = "confirmed";
+      await store.saveJob(up);
+      st.className="status ok"; st.textContent = draft ? "Draft saved in Gmail — open Gmail to review and send it." : "Sent from your Gmail.";
+      setTimeout(()=>{ close(); render(); }, 1400);
+    }catch(e){
+      st.className="status err"; st.textContent = mailError(e);
+      bs.forEach(b=>b.disabled=false);
+    }finally{ sending = false; }
+  };
+  $("#m-send").onclick = ()=>doSend(false);
+  $("#m-draft").onclick = ()=>doSend(true);
+}
+function mailError(e){
+  const c = e && e.code;
+  switch(c){
+    case "no_mcp": case "not_granted": case "capability_disabled": case "capability_removed":
+      return "Gmail isn't available in this view. Use Copy text and paste it into your email app.";
+    case "needs_reauth": return "Gmail needs you to sign in again: reconnect Gmail in claude.ai Settings → Connectors, then try again.";
+    case "server_not_connected": case "selection_required": case "server_not_found":
+      return "Gmail isn't connected. Add Gmail in claude.ai Settings → Connectors, or use Copy text.";
+    case "not_in_manifest": return "Gmail is turned off for this app. Allow it when asked, or use Copy text.";
+    case "blocked_by_policy": case "approval_required": return "Your organization blocks sending email from here. Use Copy text instead.";
+    case "tool_error": return "Gmail refused the message: " + (e.message || "check the address and try again.");
+    case "server_unavailable": case "upstream_error":
+      return "Gmail didn't confirm. Check your Sent folder before trying again so the customer doesn't get it twice.";
+    default: return "Couldn't send: " + (e && e.message || "try again or use Copy text.");
+  }
+}
+
+/* ---------- boot ---------- */
+render();
+store.init();
+// The "reminder due" alert depends on the clock, so refresh the Jobs list now and then.
+setInterval(()=>{ if(route.view==="jobs" && !document.hidden) render(); }, 5*60*1000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && route.view==="jobs") render(); });
+setInterval(()=>{ if(route.view==="jobs"||route.view==="job") render(); }, 60000);
+})();
+</script>
+<script>
+// Makes the app installable and lets it open without a connection.
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
+</script>
+
+</body></html>
