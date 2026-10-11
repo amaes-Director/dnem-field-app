@@ -1,5 +1,5 @@
 /* Offline cache for the DNEM ADA Lens app. Bump VERSION when files change. */
-var VERSION = 'dnem-field-v9';
+var VERSION = 'dnem-field-v10';
 var FILES = ['./', 'index.html', 'styles.css', 'app.js', 'rules.js', 'engine.js', 'walk.js', 'lib/jszip.min.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'dnem_logo.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
@@ -12,6 +12,8 @@ self.addEventListener('activate', function (e) {
 // Network first so updates arrive when online; cache when offline.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
+  // Videos stream straight from GitHub (phones need partial downloads to play them)
+  if (new URL(e.request.url).pathname.indexOf('/videos/') !== -1) return;
   // no-cache: always ask GitHub for the newest copy when online, so updates show up right away
   e.respondWith(fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then(function (r) {
     var copy = r.clone(); caches.open(VERSION).then(function (c) { c.put(e.request, copy); });

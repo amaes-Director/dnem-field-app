@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yard Card Jobs Tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: one narrow column. Video first, then three short questions, then the step list. */
+:root{
+  --bg:#F1F5EF; --panel:#FFFFFF; --fg:#17251C; --muted:#56665B; --line:#D5DED3;
+  --green:#1E5C3B; --gold:#F2B632; --gold-ink:#3A2A00; --ok:#1E7A45;
+  --display:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1A13; --panel:#17251C; --fg:#E7EFE8; --muted:#A5B5A9; --line:#2C3D31;
+  --green:#7FCB9C; --gold:#F2B632; --gold-ink:#3A2A00; --ok:#7FCB9C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1A13; --panel:#17251C; --fg:#E7EFE8; --muted:#A5B5A9; --line:#2C3D31;
+  --green:#7FCB9C; --gold:#F2B632; --gold-ink:#3A2A00; --ok:#7FCB9C; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:28px 16px 64px;display:grid;gap:28px}
+h1{font-family:var(--display);font-weight:400;font-size:2.1rem;line-height:1.1;margin:0;color:var(--green);text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:1.45rem;margin:0 0 6px;color:var(--green)}
+.lead{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.stakes{display:flex;gap:6px;margin-bottom:12px}
+.stakes span{font-family:var(--display);background:var(--gold);color:var(--gold-ink);width:34px;height:34px;display:grid;place-items:center;border-radius:6px;font-size:1.2rem}
+.stakes span:nth-child(2){transform:translateY(4px) rotate(-4deg)}.stakes span:nth-child(3){transform:rotate(3deg)}
+video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:14px;background:#0d1410;display:block}
+.hint{font-size:.9rem;color:var(--muted);margin:8px 0 0}
+form{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:18px}
+label{display:block;font-weight:700;margin-bottom:6px}
+label small{font-weight:400;color:var(--muted)}
+textarea,input[type=text]{width:100%;box-sizing:border-box;font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:84px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,video:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:12px 26px;background:var(--gold);color:var(--gold-ink);cursor:pointer;justify-self:start}
+button:disabled{opacity:.6;cursor:default}
+.msg{margin:0;font-weight:600}.msg.ok{color:var(--ok)}
+ol.steps{margin:0;padding-left:1.4em;display:grid;gap:8px}
+ol.steps b{color:var(--green)}
+.list{display:grid;gap:12px}
+.fb{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.fb .who{font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.fb p{margin:4px 0}
+.fb .k{font-weight:700}
+.empty{color:var(--muted);margin:0}
+details{margin-top:14px}summary{cursor:pointer;font-weight:700;color:var(--green)}.tr h3{font-size:1.05rem;margin:18px 0 4px;color:var(--green)}.tr p{margin:4px 0;max-width:65ch}
+</style>
+<style>body{margin:0} ul.qs{margin:0;padding-left:1.2em;display:grid;gap:6px;font-weight:700} .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="stakes" aria-hidden="true"><span>Y</span><span>A</span><span>Y</span></div>
+    <h1>Yard Card Jobs: quick tour</h1>
+    <p class="lead">A narrated video of the app, about 4 and a half minutes, from setting up your business to the final invoice. Watch it, then answer the three questions below.</p>
+  </header>
+
+  <section aria-label="Demo video">
+    <video controls playsinline preload="metadata" poster="yard-card-tour.jpg"><source src="yard-card-tour.mp4" type="video/mp4"></video>
+    <p class="hint">Turn your sound on for the narration. Every spoken word is also shown as a caption, and the full transcript is below. Pause any time.</p>
+  </section>
+
+  <section class="box">
+    <h2>What do you think?</h2>
+    <ul class="qs"><li>👍 What do you like?</li><li>👎 What is confusing or missing?</li><li>➕ What should we add?</li></ul>
+    <p class="hint" style="font-size:1rem">Reply to the email this link came in with your answers. A few words is plenty.</p>
+  </section>
+
+  <section>
+    <h2>What the video shows</h2>
+    <ol class="steps">
+      <li><b>Your business.</b> Name, email, phone, how customers pay, the email sign-off, your logo or badge, review links, local teams, and how many of each sign you own.</li>
+      <li><b>Crew and signs.</b> Workers, the crew text template, the sign checklist and example photos.</li>
+      <li><b>Your jobs.</b> Signs up in yards, set-ups coming up, finished jobs, and alerts for what is due.</li>
+      <li><b>New booking.</b> Customer, the sign, a team theme, times, price and extras.</li>
+      <li><b>Confirm the booking.</b> Preview the email, then send it from Gmail or save it as a draft.</li>
+      <li><b>Get the crew ready.</b> Pick the signs and see how many are free, add number signs, add notes, preview the text, and see what the worker receives.</li>
+      <li><b>Sign is up.</b> Add a photo and mark it set up. The customer gets an email with the photo.</li>
+      <li><b>Pick-up.</b> A reminder the day before, then the invoice and review links.</li>
+    </ol>
+    <p class="hint">All names, addresses and phone numbers in the video are made up.</p>
+    <details><summary>Read the full transcript</summary><div class="tr"><h3>Yard Card Jobs</h3><p>This is Yard Card Jobs, a simple app for running a yard sign business, from the first booking to the final invoice.</p><p>It runs on your phone, and keeps everything in one place: your jobs, your crew, and your customer emails.</p><p>As you watch, think about what you like, what&#x27;s confusing, and what you&#x27;d add.</p><h3>Your business</h3><p>Let&#x27;s start with the one-time setup. Tap Business at the bottom of the screen.</p><p>Type your business name, your email and phone number, and how customers pay you, like Venmo, Zelle or cash.</p><p>The sign-off is the friendly line at the end of every email.</p><h3>Logo and app icon</h3><p>Next, your logo. You can upload one, or use a colored badge with your initials.</p><p>Watch the badge change as you pick a color. It also becomes the app&#x27;s icon on your phone.</p><h3>Review links</h3><p>Then paste your review links for Facebook, Instagram and Google.</p><p>They&#x27;re added to the thank-you email, so happy customers can leave a review in one tap.</p><h3>Local teams</h3><p>Under Teams, type the area you serve, and the local high schools, youth leagues and clubs, one per line.</p><p>Michigan pro and college teams are already built in. Your local teams show first when you pick a team for a booking.</p><h3>Sign inventory</h3><p>Inventory is where you count the signs you own, like two birthday banners or twelve confetti stakes. Number signs, from zero to ten, have their own rows.</p><p>The app then shows how many of each sign are free on a job&#x27;s dates, and warns you if you&#x27;re short.</p><p>Tap Save business details. You only need to do this once.</p><h3>Your crew and your signs</h3><p>Next is Crew. List your workers with their phone numbers, and choose how early the app reminds you to text them.</p><p>The crew text is a template. The words in curly brackets fill in by themselves for each job, like the address and the signs to bring.</p><p>Below that is your sign checklist for each occasion, and example photos of past jobs that show the crew what to build.</p><h3>Everything on one screen</h3><p>Now the Jobs screen. It shows signs that are up in yards, set-ups coming soon, and finished jobs.</p><p>The colored alerts at the top tell you what&#x27;s due, like texting your crew before tomorrow&#x27;s set-up, or reminding a customer about pick-up.</p><h3>Add a booking</h3><p>To add a booking, tap New booking.</p><p>Fill in the customer&#x27;s name, email, phone and address.</p><p>Then the sign: the occasion, who it&#x27;s for, the message on the lawn, a team theme if they want one, and any notes.</p><p>Set the set-up and take-down times, the price and the deposit. Extras, like extra balloons, add to the balance automatically.</p><p>Then tap Save.</p><h3>Booked, set up, taken down</h3><p>This is the job page. The three steps across the top show where the job is.</p><p>The highlighted card always shows the next thing to do.</p><h3>Email the customer</h3><p>First, confirm the booking. Tap Preview confirmation email.</p><p>You see the email before it goes out. Change the wording if you like, then send it from your Gmail, or save it as a draft.</p><h3>Pick the signs</h3><p>Next, get the crew ready. Pick the worker, check off the signs for this job, and set how many. Each sign shows how many are free on these dates.</p><p>For the age, open Numbers and pick from the drop-down. For Maya&#x27;s tenth birthday, that&#x27;s the number ten sign. For an age like forty, you&#x27;d add a four and a zero.</p><p>Add notes, like a gate code.</p><h3>Preview the text</h3><p>Tap Preview and text crew. The message fills itself in with the time, the address, the message on the lawn, the team, the signs, your notes, and a link to an example photo.</p><p>You can change anything here. When it looks right, tap Text it, and your phone&#x27;s Messages app opens with everything filled in.</p><h3>What the crew sees</h3><p>And here&#x27;s what Jordan sees on their phone.</p><p>Everything the crew needs, in one text.</p><h3>Add a photo</h3><p>When the sign is up, add a photo of the finished yard, and tap Mark set up.</p><p>The customer gets an email with the photo, so they can see it right away.</p><h3>Reminders before take-down</h3><p>The day before pick-up, the app reminds you to email the customer. You can also email yourself a reminder.</p><h3>Invoice and reviews</h3><p>After pick-up, tap Mark taken down. The invoice email opens, with the balance due, how to pay, and your review links.</p><p>The job then moves to Completed on the Jobs screen.</p><h3>What do you think?</h3><p>That&#x27;s the tour. What do you like? What&#x27;s confusing or missing? And what should we add?</p><p>Please answer the three questions below the video. Thank you!</p></div></details>
+  </section>
+</div>
+</body>
+</html>
