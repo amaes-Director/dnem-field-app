@@ -1,10 +1,10 @@
-/* DNEM ADA Lens - phone app. Plain JavaScript, no build step.
+/* DNEM ADA Access Lens - phone app. Plain JavaScript, no build step.
  * Data stays on the phone (IndexedDB) until the consultant taps "Send visit",
  * which packs visit.json + photos into one ZIP and opens the share sheet.
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 9 Direct to Drive';
+  var APP_VERSION = 'Oct 12 ADA Access Lens';
   // DNEM's Google Drive upload service (Apps Script web app, see src/drive/Code.gs).
   // When empty, "Send visit" uses the phone's share sheet instead.
   var UPLOAD_URL = '';
@@ -87,7 +87,7 @@
   function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2600); }
   function go(hash) { location.hash = hash; }
-  function setTitle(t, back) { titleEl.textContent = t; document.title = t === 'DNEM ADA Lens' ? t : t + ' - DNEM ADA Lens'; backBtn.hidden = !back; backBtn.onclick = function () { go(back); }; }
+  function setTitle(t, back) { titleEl.textContent = t; document.title = t === 'DNEM ADA Access Lens' ? t : t + ' - DNEM ADA Access Lens'; backBtn.hidden = !back; backBtn.onclick = function () { go(back); }; }
   function focusMain() { main.focus(); window.scrollTo(0, 0); }
   function slug(s) { return String(s || 'site').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'site'; }
   function elementLabel(id) { var el = E.findElement(R, id); return el ? el.label : id; }
@@ -113,7 +113,7 @@
 
   // ---------------------------------------------------------------- screens
   function viewHome() {
-    setTitle('DNEM ADA Lens');
+    setTitle('DNEM ADA Access Lens');
     store.allVisits().then(function (visits) {
       visits.sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
       var html = '<button type="button" class="btn block big" id="newVisit">+ New site visit</button>' +
@@ -530,7 +530,7 @@
       zip.file('visit.json', JSON.stringify(out, null, 2));
       return zip.generateAsync({ type: 'blob', compression: 'STORE' });
     }).then(function (blob) {
-      var name = 'DNEM_ADA_Lens_' + slug(v.siteName) + '_' + (v.date || today()) + '_' + slug(v.consultant) + '.zip';
+      var name = 'DNEM_ADA_Access_Lens_' + slug(v.siteName) + '_' + (v.date || today()) + '_' + slug(v.consultant) + '.zip';
       var file = new File([blob], name, { type: 'application/zip' });
       var markSent = function (msg) {
         v.exportedAt = new Date().toISOString();

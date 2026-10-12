@@ -1,11 +1,13 @@
-# DNEM ADA Lens (2026-10-09)
+# DNEM ADA Access Lens (2026-10-09, renamed 2026-10-12)
+
+Renamed from DNEM ADA Lens on 2026-10-12; visit files are now named `DNEM_ADA_Access_Lens_...zip` and older names still open. The Lens folder's `READ ME.txt` is the short version of this page.
 
 Two tools that share one rules table.
 
 | What | File | Who uses it |
 |---|---|---|
-| Phone app | https://amaes-director.github.io/dnem-field-app/ (source: `docs/` folder, published by GitHub Pages) | Consultants on site |
-| Report builder | `DNEM ADA Lens Report Builder.html` (one file; open in Chrome or Edge) | Amy, at the desk |
+| Phone app | https://amaes-director.github.io/dnem-field-app/ (source: `phone-app/` folder (published copy: GitHub Pages)) | Consultants on site |
+| Report builder | `DNEM ADA Access Lens.html` (one file; open in Chrome or Edge) | Amy, at the desk |
 | Rules review | `Rules review - Michigan citations to verify.xlsx` | A consultant confirming Michigan citations |
 | Samples | `samples/` (made-up test data) | Anyone trying it out |
 
@@ -21,7 +23,7 @@ Two tools that share one rules table.
 5. When you finish, tap **Send visit**. Once DNEM's upload service is set up (see `Google Drive setup.md`), the visit goes straight into the DNEM Google Drive folder. The first time, the phone asks for the team code. Until then, the phone's share sheet opens: choose **Drive**, pick the shared DNEM field-visits folder and tap Upload.
 
 ## Amy, at the desk
-1. Double-click `DNEM ADA Lens Report Builder.html`. It opens in your browser and nothing is uploaded anywhere.
+1. Double-click `DNEM ADA Access Lens.html`. It opens in your browser and nothing is uploaded anywhere.
 2. Choose the visit ZIPs, or choose the whole field-visits folder. With Google Drive for desktop installed, it shows up as a drive (usually G:) under My Drive or Shared drives. Otherwise download the ZIPs from drive.google.com first.
 3. Tick the visits to include. Several visits to one site combine into one report.
 4. Click **Create Word report**. The .docx goes to Downloads. It follows the walk order: a list of problems to fix, then Parking, Route, Entrance, each room and each outdoor area.

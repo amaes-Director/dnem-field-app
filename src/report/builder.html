@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DNEM ADA Lens Report Builder</title>
+<title>DNEM's ADA Access Lens</title>
 <style>
   /* DNEM Access Lens colors (branding.py) */
   :root { --blue: #0057BF; --blue-dark: #004A9F; --orange: #EF5323; --tint: #EAF2FD; --text: #14263E; --heading: #172B46; --muted: #4C5E74; --line: #70839B; --card-line: #CCD6E3; --bg: #F3F6FA; --fail: #8A2030; --pass: #175331; --warn: #763600; }
@@ -42,14 +42,14 @@
 <header>
   <div class="brand">
     <div class="logo-tile"><img src="__LOGO_DATA_URI__" alt="Disability Network Eastern Michigan"></div>
-    <div><h1>DNEM ADA Lens</h1>
-    <p>Turn site visits from the ADA Lens phone app into a Word report citing the 2010 ADA Standards, the Michigan barrier-free code and, for trails and parks, the federal ABA standards.</p></div>
+    <div><h1>DNEM's ADA Access Lens</h1>
+    <p>Turn site visits from the ADA Access Lens phone app into a Word report citing the 2010 ADA Standards, the Michigan barrier-free code and, for trails and parks, the federal ABA standards.</p></div>
   </div>
 </header>
 <main>
   <section class="step" aria-labelledby="s1">
     <h2 id="s1">Step 1. Load site visits</h2>
-    <p class="help">Choose the visit ZIP files consultants sent (named DNEM_ADA_Lens_...zip, or DNEM_Field_...zip from before the rename), or choose the whole shared folder. Load several visits to the same site to combine them in one report.</p>
+    <p class="help">Choose the visit ZIP files consultants sent (named DNEM_ADA_Access_Lens_...zip; older DNEM_ADA_Lens_ and DNEM_Field_ files still work), or choose the whole shared folder. Load several visits to the same site to combine them in one report.</p>
     <div class="row">
       <label class="btn file-btn">Choose ZIP files<input type="file" id="zips" accept=".zip,application/zip" multiple></label>
       <label class="btn secondary file-btn">Choose a folder<input type="file" id="folder" webkitdirectory multiple></label>
@@ -139,7 +139,7 @@
         var site = sel[0].data.visit.siteName.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
         var dates = sel.map(function (v) { return v.data.visit.date; }).sort();
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = 'DNEM_ADA_Lens_Report_' + site + '_' + dates[dates.length - 1] + '.docx';
+        a.download = 'DNEM_ADA_Access_Lens_Report_' + site + '_' + dates[dates.length - 1] + '.docx';
         document.body.appendChild(a); a.click(); a.remove();
         msg.textContent = 'Report created: ' + a.download + ' (check your Downloads folder).';
       }).catch(function (e) { msg.innerHTML = '<span class="err">Could not create the report: ' + esc(e.message) + '</span>'; });

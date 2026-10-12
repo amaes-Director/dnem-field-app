@@ -5,17 +5,17 @@ Do this once, signed in to Google with your DNEM account. It takes about 10 minu
 ## 1. Create the upload service
 
 1. Go to **script.google.com** and make sure the account in the top right is your DNEM account.
-2. Click **New project**. Click "Untitled project" at the top and rename it **DNEM ADA Lens upload**.
+2. Click **New project**. Click "Untitled project" at the top and rename it **DNEM ADA Access Lens upload**.
 3. Delete everything in the editor. Paste in the whole of `src/drive/Code.gs` from the field-app folder, then click **Save** (the disk icon).
 
 ## 2. Run the setup once
 
 1. In the toolbar, pick **setup** from the function list, then click **Run**.
 2. Google asks for permission. Click **Review permissions** and choose your DNEM account.
-   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to DNEM ADA Lens upload**. This warning appears because you wrote the script yourself.
+   - If you see "Google hasn't verified this app", click **Advanced**, then **Go to DNEM ADA Access Lens upload**. This warning appears because you wrote the script yourself.
 3. Click **Allow**.
 4. The log at the bottom shows two things:
-   - the **folder** where visits will be saved, called "DNEM ADA Lens field visits" in your My Drive;
+   - the **folder** where visits will be saved, called "DNEM ADA Access Lens field visits" in your My Drive;
    - the 6-digit **team code**.
 5. Write the team code down. Give it to consultants in person or by text. Don't post it anywhere public.
 
@@ -47,7 +47,7 @@ Paste the URL in the thread, but **not** the team code. I'll add the URL to the 
 
 ## At the desk
 
-- Install **Google Drive for desktop**, and the "DNEM ADA Lens field visits" folder appears in File Explorer.
+- Install **Google Drive for desktop**, and the "DNEM ADA Access Lens field visits" folder appears in File Explorer.
 - In the report builder, click **Choose a folder** and pick it.
 - Ignore the folder called "_incoming (do not use)". It holds pieces of large visits while they upload.
 

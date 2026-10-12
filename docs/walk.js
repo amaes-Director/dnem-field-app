@@ -1,4 +1,4 @@
-/* DNEM ADA Lens - site walk order.
+/* DNEM ADA Access Lens - site walk order.
  * A visit is walked in this order: the three fixed stops, then the rooms the consultant adds,
  * then outdoor and recreation areas (playgrounds, pools, parks...). Outdoor areas are stored in
  * visit.rooms with kind: 'outdoor'; rooms without a kind are indoor rooms.

@@ -1,4 +1,4 @@
-/* DNEM ADA Lens - Google Drive upload service.
+/* DNEM ADA Access Lens - Google Drive upload service.
  *
  * Runs in DNEM's Google account as an Apps Script web app. The phone app's "Send visit"
  * posts the visit ZIP here in pieces, and this script saves it in one DNEM Drive folder.
@@ -7,7 +7,7 @@
  * One-time setup: see "Google Drive setup.md". Run setup() once, then deploy as a web app
  * (Execute as: Me; Who has access: Anyone).
  */
-var FOLDER_NAME = 'DNEM ADA Lens field visits';
+var FOLDER_NAME = 'DNEM ADA Access Lens field visits';
 var MAX_PARTS = 40; // 40 x 6 MB = 240 MB, far above any real visit
 
 // Run once from the editor. Creates the folder and a team code, and prints both in the log.
@@ -30,7 +30,7 @@ function useFolder() {
 }
 
 // Simple check that the deployment works: open the web app address in a browser.
-function doGet() { return reply({ ok: true, service: 'DNEM ADA Lens upload' }); }
+function doGet() { return reply({ ok: true, service: 'DNEM ADA Access Lens upload' }); }
 
 // Body (sent as text): { code, name, upload, part, parts, data }
 // data is base64 of one piece of the ZIP. Every piece except the last is a multiple of 3 bytes,

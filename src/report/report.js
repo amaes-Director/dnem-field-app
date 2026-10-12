@@ -1,11 +1,11 @@
-/* DNEM ADA Lens Report Builder - turns visit ZIPs from the phone app into a Word report.
+/* DNEM ADA Access Lens Report Builder - turns visit ZIPs from the phone app into a Word report.
  * Runs in the browser (single HTML file) and in Node (for testing): buildReport(deps, visits, opts) -> docx.Document
  * visits: [{ data: <visit.json>, photos: { 'photos/F01_1.jpg': { bytes: Uint8Array, width, height } } }]
  */
 (function (root) {
   // Same palette and type as the DNEM Access Lens reports (layout.py): Calibri, 14 pt minimum.
   var BLUE = '0758B5', TINT = 'E7EFF9', INK = '17263A', MUTED = '485668', LINE = 'CBD7E5';
-  var APP_NAME = 'DNEM ADA Lens';
+  var APP_NAME = 'DNEM ADA Access Lens';
   var RESULT_FILL = { fail: 'FBE3E4', manual: 'FFF1CC', advice: 'E7EFF9', pass: 'E3F1E6', na: 'F2F2F2' };
   var RESULT_TEXT = { fail: 'A4161A', manual: '6B4300', advice: '0758B5', pass: '1E6B2E', na: '4A4A4A' };
   var ORDER = { fail: 0, manual: 1, advice: 2, pass: 3, na: 4 };
@@ -271,7 +271,7 @@
 
     // ---- appendix B: method -------------------------------------------------------------
     children.push(h(d.HeadingLevel.HEADING_1, 'Appendix B. Method'));
-    children.push(para('DNEM ADA-certified consultants recorded each element on site with the DNEM ADA Lens phone app: element type, location, photos, measurements and yes/no observations. The DNEM ADA Lens report builder compared each recorded value with the rules table (version ' + R.version + ').'));
+    children.push(para('DNEM ADA-certified consultants recorded each element on site with the DNEM ADA Access Lens phone app: element type, location, photos, measurements and yes/no observations. The DNEM ADA Access Lens report builder compared each recorded value with the rules table (version ' + R.version + ').'));
     children.push(para(R.codes.mi.note + ' Requirements that A117.1-2017 applies only to new buildings (for example the 67 in turning circle and 30 x 52 in clear floor space) are applied when the visit records the building as built or altered under the 2021 Michigan Building Code (effective April 9, 2025). When building status is unknown and a measurement meets only the older size, the item is marked "Needs manual input".'));
     children.push(para('This report covers the elements the consultants recorded. It is not a complete survey of every element at the site unless stated in the visit notes.'));
     visits.forEach(function (z) { if (z.data.visit.notes) children.push(para([txt('Visit notes (' + z.data.visit.consultant + ', ' + z.data.visit.date + '): ', { bold: true }), txt(z.data.visit.notes)])); });

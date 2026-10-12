@@ -1,7 +1,7 @@
 import sys
 from PIL import Image, ImageFilter, ImageDraw, ImageFont
 import numpy as np
-# DNEM ADA Lens app icons from the DNEM logo mark. Run from src/: python3 brand/make_icons.py phone
+# DNEM ADA Access Lens app icons from the DNEM logo mark. Run from src/: python3 brand/make_icons.py phone
 S=sys.argv[1] if len(sys.argv) > 1 else 'phone'
 im=Image.open('brand/dnem_report_logo.png').convert('RGBA')
 mark=im.crop((198,0,315,84))

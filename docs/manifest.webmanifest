@@ -1,6 +1,6 @@
 {
-  "name": "DNEM ADA Lens",
-  "short_name": "ADA Lens",
+  "name": "DNEM ADA Access Lens",
+  "short_name": "ADA Access Lens",
   "description": "Capture accessibility findings, photos and measurements on site.",
   "start_url": "./index.html",
   "scope": "./",
