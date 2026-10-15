@@ -21983,7 +21983,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   }
 
   var RULES = {
-    version: '2026-10-15.2',
+    version: '2026-10-15.3',
     codes: {
       ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
       aba: { short: 'ABA', name: 'Architectural Barriers Act Accessibility Standards, Chapter 10 (outdoor developed areas)' },
@@ -22779,15 +22779,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         checks: [
           { id: 'ar-access', label: 'At least one wheelchair space, transfer seat or transfer device', kind: 'choiceOk', field: 'access', okOptions: ['wc', 'transfer', 'device'], naOptions: ['exempt'],
             naReason: 'This kind of ride is exempt from the ride-seat requirement (ADA 234.3 Exceptions).',
-            ada: ada('234.3'), mi: mi('1002.1') },
-          { id: 'ar-route', label: 'Accessible route to load and unload areas', field: 'route', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('206.2.9 and 1002.2', { expect: true }), mi: mi('1002.2', { expect: true }) },
-          { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.1', { expect: true, verify: true }), mi: mi('1002.3.1', { expect: true }) },
-          { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.2', { max: 2.08, verify: true }), mi: mi('1002.3.2', { max: 2.08 }) },
-          { id: 'ar-entry', label: 'Opening into the wheelchair space (32 in min)', field: 'entry', when: { access: 'wc' }, ada: ada('1002.4.5', { min: 32 }), mi: mi('1002.4.5', { min: 32 }) },
-          { id: 'ar-space', label: 'Wheelchair space size and slope', field: 'space', when: { access: 'wc' }, ada: ada('1002.4.2 and 1002.4.4', { expect: true, verify: true }), mi: mi('1002.4.2 and 1002.4.4', { expect: true }) },
-          { id: 'ar-comp', label: 'Companion seat', field: 'companion', when: { access: 'wc' }, ada: ada('1002.4.7', { expect: true }), mi: mi('1002.4.7', { expect: true }),
+            ada: ada('234.3'), mi: { cite: '2021 MBC §1110; ' + MI + ' §1002.1', verify: true } },
+          { id: 'ar-route', label: 'Accessible route to load and unload areas', field: 'route', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('206.2.9 and 1002.2', { expect: true }), mi: mi('1002.2', { expect: true }, { verify: false }) },
+          { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.1', { expect: true, verify: true }), mi: mi('1002.3 and 304', { expect: true }, { verify: false }) },
+          { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.2', { max: 2.08, verify: true }), mi: mi('1002.3 and 304.2', { max: 2.08 }) },
+          { id: 'ar-entry', label: 'Opening into the wheelchair space (32 in min)', field: 'entry', when: { access: 'wc' }, ada: ada('1002.4.5', { min: 32 }), mi: mi('1002.4.5', { min: 32 }, { verify: false }) },
+          { id: 'ar-space', label: 'Wheelchair space size and slope', field: 'space', when: { access: 'wc' }, ada: ada('1002.4.2 and 1002.4.4', { expect: true, verify: true }), mi: mi('1002.4.2 and 1002.4.4.1', { expect: true }, { verify: false }) },
+          { id: 'ar-comp', label: 'Companion seat', field: 'companion', when: { access: 'wc' }, ada: ada('1002.4.7', { expect: true }), mi: mi('1002.4.7', { expect: true }, { verify: false }),
             note: 'Required where the ride interior is wider than 53 in, seats more than one rider, and the wheelchair space is not in the center (ADA 1002.4.7). Otherwise mark N/A.' },
-          { id: 'ar-seat', label: 'Transfer seat height (14 to 24 in)', field: 'seat_height', when: { access: 'transfer' }, ada: ada('1002.5.2', { min: 14, max: 24 }), mi: mi('1002.5.2', { min: 14, max: 24 }) },
+          { id: 'ar-seat', label: 'Transfer seat height (14 to 24 in)', field: 'seat_height', when: { access: 'transfer' }, ada: ada('1002.5.2', { min: 14, max: 24 }), mi: mi('1002.5.2', { min: 14, max: 24 }, { verify: false }) },
           { id: 'ar-signs', label: 'Signs at queue entrances', field: 'signs', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('216.12', { expect: true }), mi: { cite: '2021 MBC §1111', expect: true, verify: true } }
         ]
       },
@@ -22800,13 +22800,16 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'accessible', type: 'count', label: 'Accessible firing positions of this type' },
           { id: 'route', type: 'bool', label: 'Accessible positions are on an accessible route?' },
           { id: 'turning', type: 'bool', label: '60 in turning circle at each accessible position?' },
-          { id: 'slope', type: 'slope', label: 'Steepest slope at the accessible position' }
+          { id: 'slope', type: 'slope', label: 'Steepest slope at the accessible position' },
+          { id: 'counter', type: 'len', label: 'If people fire over a counter or wall here: its height', allowNA: true }
         ],
         checks: [
-          { id: 'sh-count', label: 'Accessible firing positions (5% of each type, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('243'), mi: mi('1010') },
-          { id: 'sh-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 243', { expect: true, verify: true }), mi: mi('1010', { expect: true }) },
-          { id: 'sh-turn', label: 'Turning space', field: 'turning', ada: ada('1010.1 and 304.3.1', { expect: true }), mi: mi('1010.1', { expect: true }) },
-          { id: 'sh-slope', label: 'Slope at the position (1:48 max)', field: 'slope', ada: ada('1010.1', { max: 2.08 }), mi: mi('1010.1', { max: 2.08 }) }
+          { id: 'sh-count', label: 'Accessible firing positions (5% of each type, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('243'), mi: { cite: '2021 MBC §1110', verify: true } },
+          { id: 'sh-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 243', { expect: true, verify: true }), mi: { cite: '2021 MBC §1104', expect: true, verify: true } },
+          { id: 'sh-turn', label: 'Turning space', field: 'turning', ada: ada('1010.1 and 304.3.1', { expect: true }), mi: mi('1010.2 and 304.3.1', { expect: true }, { verify: false }) },
+          { id: 'sh-slope', label: 'Slope at the position (1:48 max)', field: 'slope', ada: ada('1010.1', { max: 2.08 }), mi: mi('1010.2', { max: 2.08 }, { verify: false }) },
+          { id: 'sh-counter', label: 'Counter or wall height where firing over it (34 in max)', field: 'counter', mi: mi('1010.3', { max: 34 }, { verify: false }),
+            note: 'Michigan (ICC A117.1) rule; the 2010 ADA Standards have no firing-counter height. Where other positions of the same type have counters, the accessible one needs an equivalent counter.' }
         ]
       },
       {
@@ -22823,14 +22826,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'door', type: 'bool', label: 'Door swings clear of that floor space?' }
         ],
         checks: [
-          { id: 'sa-turn', label: 'Turning space', field: 'turning', ada: ada('612.3', { expect: true }), mi: mi('612.3', { expect: true }),
-            note: 'A readily removable bench may overlap the turning space (ADA 612.3 Exception).' },
-          { id: 'sa-len', label: 'Bench length (42 in min)', field: 'bench_len', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 42 }), mi: mi('612.2 and 903.3', { min: 42 }) },
-          { id: 'sa-depth', label: 'Bench depth (20 to 24 in)', field: 'bench_depth', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 20, max: 24 }), mi: mi('612.2 and 903.3', { min: 20, max: 24 }) },
-          { id: 'sa-ht', label: 'Bench height (17 to 19 in)', field: 'bench_ht', when: { bench: true }, ada: ada('612.2 and 903.5', { min: 17, max: 19 }), mi: mi('612.2 and 903.5', { min: 17, max: 19 }) },
-          { id: 'sa-back', label: 'Back support', field: 'back', when: { bench: true }, ada: ada('612.2 and 903.4', { expect: true }), mi: mi('612.2 and 903.4', { expect: true }) },
-          { id: 'sa-cfs', label: 'Clear floor space at the bench', field: 'cfs', when: { bench: true }, ada: ada('612.2 and 903.2', { expect: true }), mi: mi('612.2 and 903.2', { expect: true }) },
-          { id: 'sa-door', label: 'Door does not swing into the bench clear floor space', field: 'door', when: { bench: true }, ada: ada('612.2', { expect: true }), mi: mi('612.2', { expect: true }) }
+          { id: 'sa-turn', label: 'Turning space', field: 'turning', ada: ada('612.3', { expect: true }), mi: mi('612.3', { expect: true }, { verify: false }),
+            note: 'Under the ADA a readily removable bench may overlap the turning space (ADA 612.3 Exception). ICC A117.1 has no such exception, but lets door and bench clearances overlap the turning space.' },
+          { id: 'sa-len', label: 'Bench length (42 in min)', field: 'bench_len', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 42 }), mi: mi('612.2 and 903.3', { min: 42 }, { verify: false }) },
+          { id: 'sa-depth', label: 'Bench depth (20 to 24 in)', field: 'bench_depth', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 20, max: 24 }), mi: mi('612.2 and 903.3', { min: 20, max: 24 }, { verify: false }) },
+          { id: 'sa-ht', label: 'Bench height (17 to 19 in)', field: 'bench_ht', when: { bench: true }, ada: ada('612.2 and 903.5', { min: 17, max: 19 }), mi: mi('612.2 and 903.5', { min: 17, max: 19 }, { verify: false }) },
+          { id: 'sa-back', label: 'Back support', field: 'back', when: { bench: true }, ada: ada('612.2 and 903.4', { expect: true }), mi: mi('612.2 and 903.4', { expect: true }, { verify: false }) },
+          { id: 'sa-cfs', label: 'Clear floor space at the bench', field: 'cfs', when: { bench: true }, ada: ada('612.2 and 903.2', { expect: true }), mi: mi('612.2 and 903.2', { expect: true }, { verify: false }) },
+          { id: 'sa-door', label: 'Door does not swing into the bench clear floor space', field: 'door', when: { bench: true }, ada: ada('612.2', { expect: true }), mi: mi('612.2', { expect: true }, { verify: false }),
+            note: 'Michigan (ICC A117.1 612.2 Exception): in a single-user room the door may swing over the bench space if a 30 x 48 in clear floor space is left beyond the door swing.' }
         ]
       },
       {
