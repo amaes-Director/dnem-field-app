@@ -43,7 +43,7 @@ Two tools that share one rules table.
 
 Site and building: parking and loading zones, EV charging stations, exterior lighting, curb ramps, routes, ramps, stairs, protruding objects, doors and entrance signs, restrooms, operable parts, signs, counters, work surfaces and drinking fountains.
 
-Outdoor and recreation (ADA 2010 sections 240-242 and 1003-1009; ICC A117.1-2017 Chapter 11): play areas (component counts, routes, surfacing, ramps, transfer systems, play components), pools, wading pools and spas (number of entries, lifts, sloped entries, transfer walls), bleachers and outdoor assembly seating, fishing piers, boat docks, golf and mini golf, exercise equipment, bus stops and picnic areas.
+Outdoor and recreation (ADA 2010 sections 240-242 and 1003-1009; ICC A117.1-2017 Chapter 10, which uses the same section numbers): play areas (component counts, routes, surfacing, ramps, transfer systems, play components), pools, wading pools and spas (number of entries, lifts, sloped entries, transfer walls), bleachers and outdoor assembly seating, fishing piers, boat docks, golf and mini golf, exercise equipment, bus stops and picnic areas.
 
 Trails and parks (federal ABA standards, Chapter 10): trails and wetland boardwalks, park paths (outdoor recreation access routes), beach access routes, picnic tables, fire rings and grills, benches, campsites, and overlooks. Required when federal money applies; otherwise reported as best practice.
 
@@ -51,7 +51,7 @@ Polling places (DOJ ADA Checklist for Polling Places, Help America Vote Act, Mic
 
 Festivals and events: tents, booths and vendor spaces (space inside, reach, counters), event paths and cable covers, and portable toilets.
 
-Rides, ranges and saunas (ADA 234, 241, 243, 612, 1002, 1010; ICC A117.1-2017 1102, 1110 and 612): amusement rides, shooting and archery ranges, and saunas and steam rooms.
+Rides, ranges and saunas (ADA 234, 241, 243, 612, 1002, 1010; ICC A117.1-2017 1002, 1010 and 612): amusement rides, shooting and archery ranges, and saunas and steam rooms.
 
 Best practice and safety (never counted as violations): EV charging stations (2021 MBC count rule for new installs, US Access Board 2023 recommendations for sizes and reach), exterior lighting on the accessible route, parking and entrance, and a playground safety check under Michigan's Playground Equipment Safety Act. An unmet item shows as "Best practice not met".
 
