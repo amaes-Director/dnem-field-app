@@ -18,7 +18,7 @@ Two tools that share one rules table.
    - **Federal funds** decides how trail and park items count: **Yes** means the federal ABA rules are required, **No** means they are best practice, and **Not known** flags them for review.
 3. Follow the big button at the top of each screen. It walks you in order: **Parking**, **Route to the entrance**, **Entrance**, **Rooms**, then **Outdoor and recreation areas**. On each screen, tap each item you can see (for example "Accessible parking space"), take photos, and fill in the measurements. Each field shows its requirement, and anything left blank is marked "Needs manual input". Inches are the default unit; cm, degrees and newtons are converted.
    - In **Rooms**, tap **Add a room**, pick the room type, and add a number and a name if useful (for example Meeting / conference room 2, "Board of Directors room"). The room then shows its usual items. Use **Something else** for anything not listed.
-   - When the rooms are finished, tap **Next: Outdoor and recreation areas**. Add each playground, pool or spa, park or picnic area, sports field or bleachers, fishing pier or boat dock, golf or mini golf course, outdoor fitness area, trail or wetland boardwalk, campground, beach, festival or event area, or bus stop the same way. Skip it if the site has none. **Send visit** is at the bottom of this screen and on the visit overview.
+   - When the rooms are finished, tap **Next: Outdoor and recreation areas**. Add each playground, pool or spa, park or picnic area, sports field or bleachers, fishing pier or boat dock, golf or mini golf course, outdoor fitness area, amusement ride area, shooting or archery range, trail or wetland boardwalk, campground, beach, festival or event area, or bus stop the same way. Skip it if the site has none. **Send visit** is at the bottom of this screen and on the visit overview.
 4. Everything saves on the phone, including with no signal.
 5. When you finish, tap **Send visit**. Once DNEM's upload service is set up (see `Google Drive setup.md`), the visit goes straight into the DNEM Google Drive folder. The first time, the phone asks for the team code. Until then, the phone's share sheet opens: choose **Drive**, pick the shared DNEM field-visits folder and tap Upload.
 
@@ -41,7 +41,7 @@ Two tools that share one rules table.
 
 ## What it checks
 
-Site and building: parking and loading zones, curb ramps, routes, ramps, stairs, protruding objects, doors and entrance signs, restrooms, operable parts, signs, counters, work surfaces and drinking fountains.
+Site and building: parking and loading zones, EV charging stations, exterior lighting, curb ramps, routes, ramps, stairs, protruding objects, doors and entrance signs, restrooms, operable parts, signs, counters, work surfaces and drinking fountains.
 
 Outdoor and recreation (ADA 2010 sections 240-242 and 1003-1009; ICC A117.1-2017 Chapter 11): play areas (component counts, routes, surfacing, ramps, transfer systems, play components), pools, wading pools and spas (number of entries, lifts, sloped entries, transfer walls), bleachers and outdoor assembly seating, fishing piers, boat docks, golf and mini golf, exercise equipment, bus stops and picnic areas.
 
@@ -51,6 +51,8 @@ Polling places (DOJ ADA Checklist for Polling Places, Help America Vote Act, Mic
 
 Festivals and events: tents, booths and vendor spaces (space inside, reach, counters), event paths and cable covers, and portable toilets.
 
-Not checked automatically: amusement rides, shooting facilities, saunas, EV chargers, and equipment safety under Michigan's Playground Equipment Safety Act. Record these with **Something else** and they are flagged "Needs manual input".
+Rides, ranges and saunas (ADA 234, 241, 243, 612, 1002, 1010; ICC A117.1-2017 1102, 1110 and 612): amusement rides, shooting and archery ranges, and saunas and steam rooms.
+
+Best practice and safety (never counted as violations): EV charging stations (2021 MBC count rule for new installs, US Access Board 2023 recommendations for sizes and reach), exterior lighting on the accessible route, parking and entrance, and a playground safety check under Michigan's Playground Equipment Safety Act. An unmet item shows as "Best practice not met".
 
 Every Michigan citation, the ADA sub-sections for recreation, and every ABA citation is marked † in the report until checked. Use `Rules review - Michigan citations to verify.xlsx` to confirm them.

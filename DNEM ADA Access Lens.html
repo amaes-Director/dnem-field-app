@@ -21972,15 +21972,22 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   function ada(sec, lim) { return Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); } // lim.verify = true marks an ADA section to double-check
   // Federal Architectural Barriers Act standards, outdoor developed areas (Chapter 10). Section numbers to confirm.
   function aba(sec, lim) { return Object.assign({ cite: 'ABA §' + sec, verify: true }, lim || {}); }
+  // Recommendations and safety rules that are not ADA, ABA or Michigan barrier-free requirements.
+  // An unmet item is reported as "Best practice not met", never as "Does not comply".
+  function bp(cite, lim) { return Object.assign({ cite: cite, verify: true }, lim || {}); }
+  var EV_BP = 'US Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (2023)';
+  var LIGHT_BP = 'Best practice (no ADA or Michigan accessibility rule for exterior lighting)';
+  var PLAY_SAFE = 'CPSC Public Playground Safety Handbook, adopted by Michigan\'s Playground Equipment Safety Act (1997 PA 16)';
   function mi(sec, lim, opts) {
     return Object.assign({ cite: MI + ' §' + sec, verify: true }, lim || {}, opts || {});
   }
 
   var RULES = {
-    version: '2026-10-09.3',
+    version: '2026-10-15.1',
     codes: {
       ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
       aba: { short: 'ABA', name: 'Architectural Barriers Act Accessibility Standards, Chapter 10 (outdoor developed areas)' },
+      bp: { short: 'Best practice', name: 'Recommendations and safety rules that are not accessibility requirements (US Access Board EV charging recommendations, exterior lighting practice, Michigan Playground Equipment Safety Act)' },
       mi: {
         short: 'Michigan',
         name: '2021 Michigan Building Code, Chapter 11 (adopts ICC A117.1-2017), effective April 9, 2025',
@@ -22458,6 +22465,55 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             note: 'Not required where every entrance is accessible.' }
         ]
       },
+      {
+        id: 'ev_charger', label: 'EV charging station', group: 'Site',
+        scopeNote: 'The 2010 ADA Standards have no EV charging rules. The 2021 Michigan Building Code sets how many must be accessible for chargers installed under it; the sizes and reach come from US Access Board recommendations and are reported as best practice.',
+        fields: [
+          { id: 'total', type: 'count', label: 'Total parking spaces served by EV chargers at this site' },
+          { id: 'accessible', type: 'count', label: 'Accessible EV charging spaces' },
+          { id: 'space_width', type: 'len', label: 'Accessible charging space width' },
+          { id: 'aisle_width', type: 'len', label: 'Access aisle width beside it', allowNA: true },
+          { id: 'slope', type: 'slope', label: 'Steepest slope in the space or aisle' },
+          { id: 'route', type: 'bool', label: 'Charger and space connect to an accessible route?' },
+          { id: 'cfs', type: 'bool', label: '30 x 48 in clear floor space at the charger, not blocked by curbs or wheel stops?' },
+          { id: 'reach_high', type: 'len', label: 'Highest operable part (screen, card reader, connector holster)' },
+          { id: 'reach_low', type: 'len', label: 'Lowest operable part' },
+          { id: 'cord', type: 'bool', label: 'Cord reaches the vehicle without crossing the access aisle or a curb?' },
+          { id: 'signed', type: 'bool', label: 'Accessible charging space identified, without restricting it to placard holders only?', allowNA: true }
+        ],
+        checks: [
+          { id: 'ev-count', label: 'Accessible EV charging spaces (5% min, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, newOnly: true,
+            mi: { cite: '2021 MBC §1107.2', verify: true },
+            note: 'Applies to chargers installed under the 2021 Michigan Building Code. For older installations the count is shown as best practice.' },
+          { id: 'ev-width', label: 'Space width (132 in min)', field: 'space_width', bp: bp(EV_BP, { min: 132 }) },
+          { id: 'ev-aisle', label: 'Access aisle width (60 in min)', field: 'aisle_width', bp: bp(EV_BP, { min: 60 }) },
+          { id: 'ev-slope', label: 'Space and aisle slope (1:48 max)', field: 'slope', bp: bp(EV_BP, { max: 2.08 }) },
+          { id: 'ev-route', label: 'On an accessible route', field: 'route', bp: bp(EV_BP, { expect: true }) },
+          { id: 'ev-cfs', label: 'Clear floor space at the charger', field: 'cfs', bp: bp(EV_BP, { expect: true }) },
+          { id: 'ev-high', label: 'Highest operable part (48 in max)', field: 'reach_high', bp: bp(EV_BP + '; reach range per ADA 308', { max: 48 }) },
+          { id: 'ev-low', label: 'Lowest operable part (15 in min)', field: 'reach_low', bp: bp(EV_BP + '; reach range per ADA 308', { min: 15 }) },
+          { id: 'ev-cord', label: 'Cord reach', field: 'cord', bp: bp(EV_BP, { expect: true }) },
+          { id: 'ev-sign', label: 'Accessible charging space identified', field: 'signed', bp: bp(EV_BP, { expect: true }),
+            note: 'The Access Board recommends identifying the space as accessible without reserving it only for placard holders, so the charger is not left unused.' }
+        ]
+      },
+      {
+        id: 'lighting', label: 'Exterior lighting (route, parking, entrance)', group: 'Site',
+        scopeNote: 'No ADA or Michigan accessibility rule sets exterior light levels. These are reported as best practice, never as violations.',
+        fields: [
+          { id: 'route_lit', type: 'bool', label: 'Accessible route from parking to the entrance is evenly lit after dark?' },
+          { id: 'parking_lit', type: 'bool', label: 'Accessible parking spaces and access aisles are lit?' },
+          { id: 'entrance_lit', type: 'bool', label: 'Accessible entrance, its door hardware and signs are lit?' },
+          { id: 'changes_lit', type: 'bool', label: 'Steps, ramps and curb ramps are lit without glare or deep shadows?', allowNA: true }
+        ],
+        checks: [
+          { id: 'lt-route', label: 'Route lit', field: 'route_lit', bp: bp(LIGHT_BP, { expect: true }) },
+          { id: 'lt-park', label: 'Accessible parking lit', field: 'parking_lit', bp: bp(LIGHT_BP, { expect: true }) },
+          { id: 'lt-door', label: 'Accessible entrance lit', field: 'entrance_lit', bp: bp(LIGHT_BP, { expect: true }) },
+          { id: 'lt-change', label: 'Level changes lit without glare', field: 'changes_lit', bp: bp(LIGHT_BP, { expect: true }),
+            note: 'Even light and contrast help people with low vision find steps and curb edges.' }
+        ]
+      },
       // ================================================================ Play areas (ADA 240 and 1008)
       {
         id: 'play_area', label: 'Play area (overall counts and surfaces)', group: 'Recreation',
@@ -22699,6 +22755,100 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
           { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
             note: 'The 2010 ADA Standards have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under the federal ABA rules, record "Picnic table (park or picnic area)".' }
+        ]
+      },
+      // ================================================================ Rides, shooting ranges, saunas (ADA 234, 241, 243)
+      {
+        id: 'amusement_ride', label: 'Amusement ride', group: 'Recreation',
+        fields: [
+          { id: 'access', type: 'choice', label: 'How does a wheelchair user ride?', options: [
+            { id: 'wc', label: 'Wheelchair space on the ride' },
+            { id: 'transfer', label: 'Ride seat designed for transfer' },
+            { id: 'device', label: 'Transfer device (lift or board)' },
+            { id: 'none', label: 'None of these' },
+            { id: 'exempt', label: 'Exempt: mobile or portable ride, rider-controlled ride, children\'s ride with adult help, or no seats' }] },
+          { id: 'route', type: 'bool', label: 'Accessible route to the load and unload areas?' },
+          { id: 'turning', type: 'bool', label: 'Turning space in the load and unload areas?' },
+          { id: 'load_slope', type: 'slope', label: 'Steepest slope in the load and unload areas' },
+          { id: 'entry', type: 'len', label: 'Wheelchair space rides: clear opening into the space' },
+          { id: 'space', type: 'bool', label: 'Wheelchair space rides: space at least 30 x 48 in, slope 1:48 max?' },
+          { id: 'companion', type: 'bool', label: 'Wheelchair space rides: companion seat next to the space?', allowNA: true },
+          { id: 'seat_height', type: 'len', label: 'Transfer seat rides: seat height above the load surface' },
+          { id: 'signs', type: 'bool', label: 'Sign at the queue entrance shows the type of access and where to board?' }
+        ],
+        checks: [
+          { id: 'ar-access', label: 'At least one wheelchair space, transfer seat or transfer device', kind: 'choiceOk', field: 'access', okOptions: ['wc', 'transfer', 'device'], naOptions: ['exempt'],
+            naReason: 'This kind of ride is exempt from the ride-seat requirement (ADA 234.3 Exceptions).',
+            ada: ada('234.3', { verify: true }), mi: mi('1102.1') },
+          { id: 'ar-route', label: 'Accessible route to load and unload areas', field: 'route', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('206.2.9 and 1002.2', { expect: true, verify: true }), mi: mi('1102.2', { expect: true }) },
+          { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.1', { expect: true, verify: true }), mi: mi('1102.3.1', { expect: true }) },
+          { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.2', { max: 2.08, verify: true }), mi: mi('1102.3.2', { max: 2.08 }) },
+          { id: 'ar-entry', label: 'Opening into the wheelchair space (32 in min)', field: 'entry', when: { access: 'wc' }, ada: ada('1002.4.5', { min: 32, verify: true }), mi: mi('1102.4.5', { min: 32 }) },
+          { id: 'ar-space', label: 'Wheelchair space size and slope', field: 'space', when: { access: 'wc' }, ada: ada('1002.4.2 and 1002.4.4', { expect: true, verify: true }), mi: mi('1102.4.2 and 1102.4.4', { expect: true }) },
+          { id: 'ar-comp', label: 'Companion seat', field: 'companion', when: { access: 'wc' }, ada: ada('1002.4.7', { expect: true, verify: true }), mi: mi('1102.4.7', { expect: true }),
+            note: 'Required where the ride design allows a companion seat.' },
+          { id: 'ar-seat', label: 'Transfer seat height (14 to 24 in)', field: 'seat_height', when: { access: 'transfer' }, ada: ada('1002.5.2', { min: 14, max: 24, verify: true }), mi: mi('1102.5.2', { min: 14, max: 24 }) },
+          { id: 'ar-signs', label: 'Signs at queue entrances', field: 'signs', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('216.12', { expect: true }), mi: { cite: '2021 MBC §1111', expect: true, verify: true } }
+        ]
+      },
+      {
+        id: 'shooting', label: 'Shooting range (firing positions)', group: 'Recreation',
+        scopeNote: 'Record each type of firing position (for example standing rifle stations, archery lanes, trap houses) as its own item.',
+        fields: [
+          { id: 'kind_name', type: 'choice', label: 'Type of firing position', options: [{ id: 'range', label: 'Rifle or pistol range station' }, { id: 'archery', label: 'Archery lane or stand' }, { id: 'trap', label: 'Trap, skeet or sporting clays station' }, { id: 'other', label: 'Other' }] },
+          { id: 'total', type: 'count', label: 'Firing positions of this type' },
+          { id: 'accessible', type: 'count', label: 'Accessible firing positions of this type' },
+          { id: 'route', type: 'bool', label: 'Accessible positions are on an accessible route?' },
+          { id: 'turning', type: 'bool', label: '60 in turning circle at each accessible position?' },
+          { id: 'slope', type: 'slope', label: 'Steepest slope at the accessible position' }
+        ],
+        checks: [
+          { id: 'sh-count', label: 'Accessible firing positions (5% of each type, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('243'), mi: mi('1110') },
+          { id: 'sh-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.13', { expect: true, verify: true }), mi: mi('1110', { expect: true }) },
+          { id: 'sh-turn', label: 'Turning space', field: 'turning', ada: ada('1010.1 and 304.3.1', { expect: true }), mi: mi('1110.1', { expect: true }) },
+          { id: 'sh-slope', label: 'Slope at the position (1:48 max)', field: 'slope', ada: ada('1010.1', { max: 2.08 }), mi: mi('1110.1', { max: 2.08 }) }
+        ]
+      },
+      {
+        id: 'sauna', label: 'Sauna or steam room', group: 'Recreation',
+        scopeNote: 'Where saunas or steam rooms are in a cluster, 5% (at least one) of each type must comply (ADA 241).',
+        fields: [
+          { id: 'turning', type: 'bool', label: 'Turning space inside the room?' },
+          { id: 'bench', type: 'bool', label: 'Is there seating in the room?' },
+          { id: 'bench_len', type: 'len', label: 'Accessible bench length' },
+          { id: 'bench_depth', type: 'len', label: 'Accessible bench seat depth' },
+          { id: 'bench_ht', type: 'len', label: 'Bench seat height above the floor' },
+          { id: 'back', type: 'bool', label: 'Back support or wall along the full bench length?' },
+          { id: 'cfs', type: 'bool', label: '30 x 48 in clear floor space at the end of the bench?' },
+          { id: 'door', type: 'bool', label: 'Door swings clear of that floor space?' }
+        ],
+        checks: [
+          { id: 'sa-turn', label: 'Turning space', field: 'turning', ada: ada('612.3', { expect: true }), mi: mi('612.3', { expect: true }),
+            note: 'A readily removable bench may overlap the turning space (ADA 612.3 Exception).' },
+          { id: 'sa-len', label: 'Bench length (42 in min)', field: 'bench_len', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 42 }), mi: mi('612.2 and 903.3', { min: 42 }) },
+          { id: 'sa-depth', label: 'Bench depth (20 to 24 in)', field: 'bench_depth', when: { bench: true }, ada: ada('612.2 and 903.3', { min: 20, max: 24 }), mi: mi('612.2 and 903.3', { min: 20, max: 24 }) },
+          { id: 'sa-ht', label: 'Bench height (17 to 19 in)', field: 'bench_ht', when: { bench: true }, ada: ada('612.2 and 903.5', { min: 17, max: 19 }), mi: mi('612.2 and 903.5', { min: 17, max: 19 }) },
+          { id: 'sa-back', label: 'Back support', field: 'back', when: { bench: true }, ada: ada('612.2 and 903.4', { expect: true }), mi: mi('612.2 and 903.4', { expect: true }) },
+          { id: 'sa-cfs', label: 'Clear floor space at the bench', field: 'cfs', when: { bench: true }, ada: ada('612.2 and 903.2', { expect: true }), mi: mi('612.2 and 903.2', { expect: true }) },
+          { id: 'sa-door', label: 'Door does not swing into the bench clear floor space', field: 'door', when: { bench: true }, ada: ada('612.2', { expect: true }), mi: mi('612.2', { expect: true }) }
+        ]
+      },
+      {
+        id: 'play_safety', label: 'Playground safety check (not accessibility)', group: 'Recreation',
+        scopeNote: 'Michigan\'s Playground Equipment Safety Act is a safety law, not an accessibility code. These items are reported separately as safety notes and are never counted as accessibility violations. A certified playground safety inspector (CPSI) should confirm any concern.',
+        fields: [
+          { id: 'surfacing', type: 'bool', label: 'Protective surfacing under and around equipment, filled to its marked depth?' },
+          { id: 'use_zone', type: 'bool', label: 'At least 6 ft clear use zone around equipment, with no hard objects?' },
+          { id: 'entrapment', type: 'bool', label: 'No openings between 3.5 and 9 in that could trap a child\'s head?' },
+          { id: 'repair', type: 'bool', label: 'No broken parts, sharp edges, protruding bolts, or missing hardware?' },
+          { id: 'inspected', type: 'bool', label: 'Owner has a recent inspection record from a certified inspector?', allowNA: true }
+        ],
+        checks: [
+          { id: 'ps-surf', label: 'Protective surfacing', field: 'surfacing', bp: bp(PLAY_SAFE, { expect: true }), adviceReason: 'Safety concern, not an accessibility requirement. Refer to a certified playground safety inspector.' },
+          { id: 'ps-zone', label: 'Use zones clear (6 ft min)', field: 'use_zone', bp: bp(PLAY_SAFE, { expect: true }), adviceReason: 'Safety concern, not an accessibility requirement. Refer to a certified playground safety inspector.' },
+          { id: 'ps-trap', label: 'No head entrapment openings', field: 'entrapment', bp: bp(PLAY_SAFE, { expect: true }), adviceReason: 'Safety concern, not an accessibility requirement. Refer to a certified playground safety inspector.' },
+          { id: 'ps-repair', label: 'Equipment in good repair', field: 'repair', bp: bp(PLAY_SAFE, { expect: true }), adviceReason: 'Safety concern, not an accessibility requirement. Refer to a certified playground safety inspector.' },
+          { id: 'ps-insp', label: 'Inspection record', field: 'inspected', bp: bp(PLAY_SAFE, { expect: true }), adviceReason: 'Safety concern, not an accessibility requirement. Ask the owner to have the playground inspected.' }
         ]
       },
       // ================================================================ Outdoor developed areas (ABA Chapter 10)
@@ -23058,7 +23208,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (r.na) return 'no';
       if (r.missing) { unknown = true; continue; }
       var c = when[k];
-      if (c !== null && typeof c === 'object') {
+      if (Array.isArray(c)) { if (c.indexOf(r.v) < 0) return 'no'; }
+      else if (c !== null && typeof c === 'object') {
         if (c.gt !== undefined && !(r.v > c.gt)) return 'no';
         if (c.lt !== undefined && !(r.v < c.lt)) return 'no';
       } else if (r.v !== c) return 'no';
@@ -23074,6 +23225,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     var out = [];
     if (check.ada) out.push({ key: 'ada', s: check.ada });
     if (check.aba) out.push({ key: 'aba', s: check.aba });
+    if (check.bp) out.push({ key: 'bp', s: check.bp });
     if (check.mi) {
       var s = check.mi;
       if (s.newBuilding) {
@@ -23238,6 +23390,18 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       return Object.assign(res, { status: 'fail' });
     },
+    // A choice field where some answers comply (check.okOptions), some mean the check doesn't apply
+    // (check.naOptions, with check.naReason), and anything else does not comply.
+    choiceOk: function (check, finding, visit, el) {
+      var c = rawVal(finding, el, check.field), f = fieldOf(el, check.field);
+      var sd = sides(check, visit);
+      var label = function (id) { var o = (f.options || []).filter(function (x) { return x.id === id; })[0]; return o ? o.label : id; };
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd), required: check.okOptions.map(label).join(', or ') };
+      if (c.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', reason: 'Not answered.' });
+      res.measured = label(c.v);
+      if ((check.naOptions || []).indexOf(c.v) >= 0) return Object.assign(res, { status: 'na', reason: check.naReason || 'Not required for this type.' });
+      return Object.assign(res, { status: check.okOptions.indexOf(c.v) >= 0 ? 'pass' : 'fail' });
+    },
     // ADA Table 221.2.1.1 wheelchair spaces in assembly seating
     seatCount: function (check, finding, visit, el) {
       var t = rawVal(finding, el, 'seats'), a = rawVal(finding, el, 'wc_spaces');
@@ -23278,6 +23442,16 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         var ff = (visit && visit.federalFunds) || 'unknown';
         if (ff === 'no') r = Object.assign(r, { status: 'advice', reason: 'Not met. The ABA standards are best practice here because no federal money applies.' });
         else if (ff !== 'yes') r = Object.assign(r, { status: 'manual', reason: 'Does not meet the ABA standard. Whether it is required depends on federal funding: confirm, then record it in the visit details.' });
+      }
+      // Best-practice and safety items (no ADA, ABA or Michigan side): an unmet item is advice, not a violation
+      if (check.bp && !check.ada && !check.aba && !check.mi && r.status === 'fail') {
+        r = Object.assign(r, { status: 'advice', reason: check.adviceReason || 'Not met. This is a recommendation, not an ADA or Michigan requirement.' });
+      }
+      // Michigan rules with no ADA equivalent that apply only to work permitted under the 2021 MBC
+      if (check.newOnly && r.status === 'fail') {
+        var bs = (visit && visit.buildingStatus) || 'unknown';
+        if (bs === 'existing') r = Object.assign(r, { status: 'advice', reason: 'Not met. This 2021 Michigan Building Code rule applies only to work permitted on or after April 9, 2025, so it is best practice here.' });
+        else if (bs !== 'new') r = Object.assign(r, { status: 'manual', reason: 'Not met. This 2021 Michigan Building Code rule applies only to work permitted on or after April 9, 2025: confirm when it was installed.' });
       }
       // citations still to be checked against the code text (Appendix A)
       r.verifyCites = r.status === 'na' ? [] : sd.filter(function (x) { return x.s.verify; }).map(function (x) { return x.s.cite; });
@@ -23324,8 +23498,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 (function (root) {
   var WALK = {
     stops: [
-      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'loading_zone', 'curb_ramp', 'route', 'ramp', 'protruding'] },
-      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'stairs', 'protruding'] },
+      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'loading_zone', 'ev_charger', 'curb_ramp', 'route', 'ramp', 'protruding', 'lighting'] },
+      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'stairs', 'protruding', 'lighting'] },
       { id: 'entrance', label: 'Entrance', elements: ['door', 'route', 'entrance_signs', 'operable', 'signage'] }
     ],
     // Polling places follow the DOJ ADA Checklist for Polling Places (2016): no rooms or outdoor areas.
@@ -23345,12 +23519,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       { id: 'kitchen', label: 'Break room / kitchen', elements: ['door', 'work_surface', 'lavatory', 'operable'] },
       { id: 'elevator', label: 'Elevator', elements: ['operable', 'signage'] },
       { id: 'stairway', label: 'Stairway', elements: ['stairs', 'door', 'signage'] },
-      { id: 'fitness', label: 'Fitness room / gym', elements: ['door', 'exercise', 'route', 'operable', 'signage'] },
+      { id: 'fitness', label: 'Fitness room / gym', elements: ['door', 'exercise', 'route', 'operable', 'signage', 'sauna'] },
+      { id: 'sauna', label: 'Sauna or steam room', elements: ['sauna', 'door', 'signage'] },
       { id: 'other', label: 'Other room or area', elements: ['door', 'signage', 'operable'] }
     ],
     outdoorTypes: [
-      { id: 'playground', label: 'Playground', elements: ['play_area', 'play_ramp', 'play_transfer', 'play_component', 'route'] },
-      { id: 'pool', label: 'Pool or spa', elements: ['pool', 'pool_lift', 'pool_slope', 'transfer_wall', 'route', 'door'] },
+      { id: 'playground', label: 'Playground', elements: ['play_area', 'play_ramp', 'play_transfer', 'play_component', 'route', 'play_safety'] },
+      { id: 'pool', label: 'Pool or spa', elements: ['pool', 'pool_lift', 'pool_slope', 'transfer_wall', 'sauna', 'route', 'door'] },
       { id: 'trail', label: 'Trail, nature path or wetland boardwalk', elements: ['trail', 'orar', 'viewing', 'bench_aba', 'portable_toilet'] },
       { id: 'park', label: 'Park, picnic area or courtyard', elements: ['orar', 'picnic_aba', 'fire_grill', 'bench_aba', 'route', 'picnic', 'fountain', 'protruding', 'stairs', 'ramp'] },
       { id: 'campground', label: 'Campground', elements: ['campsite', 'orar', 'picnic_aba', 'fire_grill', 'portable_toilet', 'fountain'] },
@@ -23360,6 +23535,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       { id: 'water', label: 'Fishing pier or boat dock', elements: ['fishing', 'boating', 'orar', 'viewing', 'route', 'ramp'] },
       { id: 'golf', label: 'Golf or mini golf', elements: ['golf', 'route'] },
       { id: 'fitness', label: 'Outdoor fitness area', elements: ['exercise', 'route'] },
+      { id: 'amusement', label: 'Amusement park or ride area', elements: ['amusement_ride', 'route', 'ramp', 'assembly'] },
+      { id: 'shooting', label: 'Shooting or archery range', elements: ['shooting', 'route', 'ramp', 'door'] },
       { id: 'transit', label: 'Bus stop or drop-off', elements: ['bus_stop', 'loading_zone', 'curb_ramp', 'route'] },
       { id: 'other', label: 'Other outdoor area', elements: ['route', 'ramp', 'stairs', 'operable'] }
     ]
@@ -23494,6 +23671,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     var anyPolling = visits.some(function (z) { return W.isPolling(z.data.visit); });
     var allPolling = visits.every(function (z) { return W.isPolling(z.data.visit); });
     var usesAba = items.some(function (it) { return it.ev.results.some(function (r) { return r.status !== 'na' && /^ABA /.test(r.cite || ''); }); });
+    var usesType = function (ids) { return items.some(function (it) { return ids.indexOf(it.finding.elementType) >= 0 && it.ev.status !== 'na'; }); };
+    var usesEv = usesType(['ev_charger']), usesLight = usesType(['lighting']), usesPlaySafe = usesType(['play_safety']);
     var DEFAULT_TITLE = 'Facility Accessibility Field Evaluation';
     var title = opts.title && !(allPolling && opts.title === DEFAULT_TITLE) ? opts.title : (allPolling ? 'Polling Place Accessibility Survey' : DEFAULT_TITLE);
     var ffLabel = function (id) { var m = (R.federalFunds || []).filter(function (x) { return x.id === (id || 'unknown'); })[0]; return m ? m.label : 'Not known'; };
@@ -23513,7 +23692,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       ['Building status', statuses.join('; ')],
       ['Type of visit', uniq(visits.map(function (z) { return W.isPolling(z.data.visit) ? 'Polling place (DOJ ADA Checklist for Polling Places)' : 'Building or site'; })).join('; ')],
       ['Federal funds', uniq(visits.map(function (z) { return ffLabel(z.data.visit.federalFunds); })).join('; ')],
-      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name + (usesAba ? '; ' + R.codes.aba.name : '') + (anyPolling ? '; Help America Vote Act and Michigan Election Law (voting systems)' : '')],
+      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name + (usesAba ? '; ' + R.codes.aba.name : '') + (usesEv || usesLight || usesPlaySafe ? '; ' + R.codes.bp.name : '') + (anyPolling ? '; Help America Vote Act and Michigan Election Law (voting systems)' : '')],
       ['Prepared by', opts.preparedBy || 'Disability Network Eastern Michigan (DNEM)'],
       ['Report generated', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' (rules table ' + R.version + ')']
     ]));
@@ -23542,6 +23721,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     children.push(bullet([txt('Order. ', { bold: true }), txt(allPolling ? 'Findings follow the path a voter takes: parking and drop-off, the route to the entrance, the voter entrance, the route to the voting area, then the voting area. Finding numbers follow the same order.' : 'Findings follow the order the site was walked: parking, the route to the entrance, the entrance, each room, then outdoor and recreation areas such as playgrounds, pools, trails and event areas. Finding numbers follow the same order.')]));
     if (anyPolling) children.push(bullet([txt('Polling places. ', { bold: true }), txt('Polling places are checked with the U.S. Department of Justice ADA Checklist for Polling Places (2016), which applies the 2010 ADA Standards to the path a voter takes. Temporary fixes such as cones, mats, portable ramps and propped doors count only if they are in place before the polls open and stay all day. The accessible voting system is checked against the Help America Vote Act and Michigan Election Law.')]));
     if (usesAba) children.push(bullet([txt('Trails, park paths, beaches, picnic and camping areas. ', { bold: true }), txt('The 2010 ADA Standards and the Michigan code have no technical rules for these. They are checked against the federal Architectural Barriers Act (ABA) standards, Chapter 10. These rules are required for federal agencies and where federal funds require them, for example many grant-funded DNR projects. Where the visit records no federal money, an unmet ABA item is shown as "Best practice not met" rather than "Does not comply". Where funding is not known, it is shown as "Needs manual input".')]));
+    if (usesEv) children.push(bullet([txt('EV charging stations. ', { bold: true }), txt('The 2010 ADA Standards have no rules for EV chargers. The 2021 Michigan Building Code requires at least 5% (and at least one) accessible charging spaces where chargers were installed under it. Sizes, slopes, reach and cord length are checked against the US Access Board\'s 2023 design recommendations; an unmet recommendation is shown as "Best practice not met".')]));
+    if (usesLight) children.push(bullet([txt('Exterior lighting. ', { bold: true }), txt('No ADA or Michigan accessibility rule sets outdoor light levels. Lighting along the accessible route, parking and entrance is recorded as best practice, and an unmet item is shown as "Best practice not met".')]));
+    if (usesPlaySafe) children.push(bullet([txt('Playground safety. ', { bold: true }), txt('Safety items under Michigan\'s Playground Equipment Safety Act (1997 PA 16), which adopts the CPSC Public Playground Safety Handbook, are safety notes, not accessibility findings. A concern is shown as "Best practice not met" and should be confirmed by a certified playground safety inspector.')]));
     children.push(bullet([txt('Which code governs. ', { bold: true }), txt('Each measurement is compared with the 2010 ADA Standards and with the Michigan barrier-free requirements (2021 Michigan Building Code, which adopts ICC A117.1-2017). Where both set a limit, the stricter one is used and cited. When the two match, both are cited with "(same requirement)".')]));
     children.push(bullet([txt('Results. ', { bold: true }), txt('"Does not comply" means a recorded measurement or answer falls outside the stricter requirement. "Complies" means every recorded value meets it. "Needs manual input" means the tool could not decide: a value was not recorded, the requirement depends on something not captured (such as the building\'s permit date), or the item needs a consultant\'s judgment.')]));
     children.push(bullet([txt('Citations marked †. ', { bold: true }), txt('These citations have not yet been checked against the printed code text. They are listed in Appendix A for confirmation before the report is issued.')]));
@@ -23566,7 +23748,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     });
     if (advRows.length) {
       children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Best Practice Recommendations'));
-      children.push(para(advRows.length + ' federal ABA best practice(s) for outdoor areas were not met. They are not legally required at this site because no federal money applies, but meeting them makes the trail, path or area usable by more people.'));
+      children.push(para(advRows.length + ' best practice(s) or safety item(s) were not met. They are not legal accessibility requirements at this site, but meeting them makes the site usable by more people. The reason for each is given under its finding. Playground safety items should be confirmed by a certified playground safety inspector.'));
       children.push(table([headRow(['Finding', 'Area', 'Element', 'Best practice not met', 'Measured', 'Recommended'], [9, 20, 17, 24, 15, 15])].concat(advRows.map(function (r) {
         return new d.TableRow({ cantSplit: true, children: r.map(function (c) { return cell(c); }) });
       }))));

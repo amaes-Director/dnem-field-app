@@ -65,7 +65,8 @@
       if (r.na) return 'no';
       if (r.missing) { unknown = true; continue; }
       var c = when[k];
-      if (c !== null && typeof c === 'object') {
+      if (Array.isArray(c)) { if (c.indexOf(r.v) < 0) return 'no'; }
+      else if (c !== null && typeof c === 'object') {
         if (c.gt !== undefined && !(r.v > c.gt)) return 'no';
         if (c.lt !== undefined && !(r.v < c.lt)) return 'no';
       } else if (r.v !== c) return 'no';
@@ -81,6 +82,7 @@
     var out = [];
     if (check.ada) out.push({ key: 'ada', s: check.ada });
     if (check.aba) out.push({ key: 'aba', s: check.aba });
+    if (check.bp) out.push({ key: 'bp', s: check.bp });
     if (check.mi) {
       var s = check.mi;
       if (s.newBuilding) {
@@ -245,6 +247,18 @@
       }
       return Object.assign(res, { status: 'fail' });
     },
+    // A choice field where some answers comply (check.okOptions), some mean the check doesn't apply
+    // (check.naOptions, with check.naReason), and anything else does not comply.
+    choiceOk: function (check, finding, visit, el) {
+      var c = rawVal(finding, el, check.field), f = fieldOf(el, check.field);
+      var sd = sides(check, visit);
+      var label = function (id) { var o = (f.options || []).filter(function (x) { return x.id === id; })[0]; return o ? o.label : id; };
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd), required: check.okOptions.map(label).join(', or ') };
+      if (c.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', reason: 'Not answered.' });
+      res.measured = label(c.v);
+      if ((check.naOptions || []).indexOf(c.v) >= 0) return Object.assign(res, { status: 'na', reason: check.naReason || 'Not required for this type.' });
+      return Object.assign(res, { status: check.okOptions.indexOf(c.v) >= 0 ? 'pass' : 'fail' });
+    },
     // ADA Table 221.2.1.1 wheelchair spaces in assembly seating
     seatCount: function (check, finding, visit, el) {
       var t = rawVal(finding, el, 'seats'), a = rawVal(finding, el, 'wc_spaces');
@@ -285,6 +299,16 @@
         var ff = (visit && visit.federalFunds) || 'unknown';
         if (ff === 'no') r = Object.assign(r, { status: 'advice', reason: 'Not met. The ABA standards are best practice here because no federal money applies.' });
         else if (ff !== 'yes') r = Object.assign(r, { status: 'manual', reason: 'Does not meet the ABA standard. Whether it is required depends on federal funding: confirm, then record it in the visit details.' });
+      }
+      // Best-practice and safety items (no ADA, ABA or Michigan side): an unmet item is advice, not a violation
+      if (check.bp && !check.ada && !check.aba && !check.mi && r.status === 'fail') {
+        r = Object.assign(r, { status: 'advice', reason: check.adviceReason || 'Not met. This is a recommendation, not an ADA or Michigan requirement.' });
+      }
+      // Michigan rules with no ADA equivalent that apply only to work permitted under the 2021 MBC
+      if (check.newOnly && r.status === 'fail') {
+        var bs = (visit && visit.buildingStatus) || 'unknown';
+        if (bs === 'existing') r = Object.assign(r, { status: 'advice', reason: 'Not met. This 2021 Michigan Building Code rule applies only to work permitted on or after April 9, 2025, so it is best practice here.' });
+        else if (bs !== 'new') r = Object.assign(r, { status: 'manual', reason: 'Not met. This 2021 Michigan Building Code rule applies only to work permitted on or after April 9, 2025: confirm when it was installed.' });
       }
       // citations still to be checked against the code text (Appendix A)
       r.verifyCites = r.status === 'na' ? [] : sd.filter(function (x) { return x.s.verify; }).map(function (x) { return x.s.cite; });

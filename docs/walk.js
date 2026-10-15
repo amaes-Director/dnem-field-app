@@ -7,8 +7,8 @@
 (function (root) {
   var WALK = {
     stops: [
-      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'loading_zone', 'curb_ramp', 'route', 'ramp', 'protruding'] },
-      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'stairs', 'protruding'] },
+      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'loading_zone', 'ev_charger', 'curb_ramp', 'route', 'ramp', 'protruding', 'lighting'] },
+      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'stairs', 'protruding', 'lighting'] },
       { id: 'entrance', label: 'Entrance', elements: ['door', 'route', 'entrance_signs', 'operable', 'signage'] }
     ],
     // Polling places follow the DOJ ADA Checklist for Polling Places (2016): no rooms or outdoor areas.
@@ -28,12 +28,13 @@
       { id: 'kitchen', label: 'Break room / kitchen', elements: ['door', 'work_surface', 'lavatory', 'operable'] },
       { id: 'elevator', label: 'Elevator', elements: ['operable', 'signage'] },
       { id: 'stairway', label: 'Stairway', elements: ['stairs', 'door', 'signage'] },
-      { id: 'fitness', label: 'Fitness room / gym', elements: ['door', 'exercise', 'route', 'operable', 'signage'] },
+      { id: 'fitness', label: 'Fitness room / gym', elements: ['door', 'exercise', 'route', 'operable', 'signage', 'sauna'] },
+      { id: 'sauna', label: 'Sauna or steam room', elements: ['sauna', 'door', 'signage'] },
       { id: 'other', label: 'Other room or area', elements: ['door', 'signage', 'operable'] }
     ],
     outdoorTypes: [
-      { id: 'playground', label: 'Playground', elements: ['play_area', 'play_ramp', 'play_transfer', 'play_component', 'route'] },
-      { id: 'pool', label: 'Pool or spa', elements: ['pool', 'pool_lift', 'pool_slope', 'transfer_wall', 'route', 'door'] },
+      { id: 'playground', label: 'Playground', elements: ['play_area', 'play_ramp', 'play_transfer', 'play_component', 'route', 'play_safety'] },
+      { id: 'pool', label: 'Pool or spa', elements: ['pool', 'pool_lift', 'pool_slope', 'transfer_wall', 'sauna', 'route', 'door'] },
       { id: 'trail', label: 'Trail, nature path or wetland boardwalk', elements: ['trail', 'orar', 'viewing', 'bench_aba', 'portable_toilet'] },
       { id: 'park', label: 'Park, picnic area or courtyard', elements: ['orar', 'picnic_aba', 'fire_grill', 'bench_aba', 'route', 'picnic', 'fountain', 'protruding', 'stairs', 'ramp'] },
       { id: 'campground', label: 'Campground', elements: ['campsite', 'orar', 'picnic_aba', 'fire_grill', 'portable_toilet', 'fountain'] },
@@ -43,6 +44,8 @@
       { id: 'water', label: 'Fishing pier or boat dock', elements: ['fishing', 'boating', 'orar', 'viewing', 'route', 'ramp'] },
       { id: 'golf', label: 'Golf or mini golf', elements: ['golf', 'route'] },
       { id: 'fitness', label: 'Outdoor fitness area', elements: ['exercise', 'route'] },
+      { id: 'amusement', label: 'Amusement park or ride area', elements: ['amusement_ride', 'route', 'ramp', 'assembly'] },
+      { id: 'shooting', label: 'Shooting or archery range', elements: ['shooting', 'route', 'ramp', 'door'] },
       { id: 'transit', label: 'Bus stop or drop-off', elements: ['bus_stop', 'loading_zone', 'curb_ramp', 'route'] },
       { id: 'other', label: 'Other outdoor area', elements: ['route', 'ramp', 'stairs', 'operable'] }
     ]

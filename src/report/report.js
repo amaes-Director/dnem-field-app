@@ -93,6 +93,8 @@
     var anyPolling = visits.some(function (z) { return W.isPolling(z.data.visit); });
     var allPolling = visits.every(function (z) { return W.isPolling(z.data.visit); });
     var usesAba = items.some(function (it) { return it.ev.results.some(function (r) { return r.status !== 'na' && /^ABA /.test(r.cite || ''); }); });
+    var usesType = function (ids) { return items.some(function (it) { return ids.indexOf(it.finding.elementType) >= 0 && it.ev.status !== 'na'; }); };
+    var usesEv = usesType(['ev_charger']), usesLight = usesType(['lighting']), usesPlaySafe = usesType(['play_safety']);
     var DEFAULT_TITLE = 'Facility Accessibility Field Evaluation';
     var title = opts.title && !(allPolling && opts.title === DEFAULT_TITLE) ? opts.title : (allPolling ? 'Polling Place Accessibility Survey' : DEFAULT_TITLE);
     var ffLabel = function (id) { var m = (R.federalFunds || []).filter(function (x) { return x.id === (id || 'unknown'); })[0]; return m ? m.label : 'Not known'; };
@@ -112,7 +114,7 @@
       ['Building status', statuses.join('; ')],
       ['Type of visit', uniq(visits.map(function (z) { return W.isPolling(z.data.visit) ? 'Polling place (DOJ ADA Checklist for Polling Places)' : 'Building or site'; })).join('; ')],
       ['Federal funds', uniq(visits.map(function (z) { return ffLabel(z.data.visit.federalFunds); })).join('; ')],
-      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name + (usesAba ? '; ' + R.codes.aba.name : '') + (anyPolling ? '; Help America Vote Act and Michigan Election Law (voting systems)' : '')],
+      ['Standards applied', R.codes.ada.name + '; ' + R.codes.mi.name + (usesAba ? '; ' + R.codes.aba.name : '') + (usesEv || usesLight || usesPlaySafe ? '; ' + R.codes.bp.name : '') + (anyPolling ? '; Help America Vote Act and Michigan Election Law (voting systems)' : '')],
       ['Prepared by', opts.preparedBy || 'Disability Network Eastern Michigan (DNEM)'],
       ['Report generated', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' (rules table ' + R.version + ')']
     ]));
@@ -141,6 +143,9 @@
     children.push(bullet([txt('Order. ', { bold: true }), txt(allPolling ? 'Findings follow the path a voter takes: parking and drop-off, the route to the entrance, the voter entrance, the route to the voting area, then the voting area. Finding numbers follow the same order.' : 'Findings follow the order the site was walked: parking, the route to the entrance, the entrance, each room, then outdoor and recreation areas such as playgrounds, pools, trails and event areas. Finding numbers follow the same order.')]));
     if (anyPolling) children.push(bullet([txt('Polling places. ', { bold: true }), txt('Polling places are checked with the U.S. Department of Justice ADA Checklist for Polling Places (2016), which applies the 2010 ADA Standards to the path a voter takes. Temporary fixes such as cones, mats, portable ramps and propped doors count only if they are in place before the polls open and stay all day. The accessible voting system is checked against the Help America Vote Act and Michigan Election Law.')]));
     if (usesAba) children.push(bullet([txt('Trails, park paths, beaches, picnic and camping areas. ', { bold: true }), txt('The 2010 ADA Standards and the Michigan code have no technical rules for these. They are checked against the federal Architectural Barriers Act (ABA) standards, Chapter 10. These rules are required for federal agencies and where federal funds require them, for example many grant-funded DNR projects. Where the visit records no federal money, an unmet ABA item is shown as "Best practice not met" rather than "Does not comply". Where funding is not known, it is shown as "Needs manual input".')]));
+    if (usesEv) children.push(bullet([txt('EV charging stations. ', { bold: true }), txt('The 2010 ADA Standards have no rules for EV chargers. The 2021 Michigan Building Code requires at least 5% (and at least one) accessible charging spaces where chargers were installed under it. Sizes, slopes, reach and cord length are checked against the US Access Board\'s 2023 design recommendations; an unmet recommendation is shown as "Best practice not met".')]));
+    if (usesLight) children.push(bullet([txt('Exterior lighting. ', { bold: true }), txt('No ADA or Michigan accessibility rule sets outdoor light levels. Lighting along the accessible route, parking and entrance is recorded as best practice, and an unmet item is shown as "Best practice not met".')]));
+    if (usesPlaySafe) children.push(bullet([txt('Playground safety. ', { bold: true }), txt('Safety items under Michigan\'s Playground Equipment Safety Act (1997 PA 16), which adopts the CPSC Public Playground Safety Handbook, are safety notes, not accessibility findings. A concern is shown as "Best practice not met" and should be confirmed by a certified playground safety inspector.')]));
     children.push(bullet([txt('Which code governs. ', { bold: true }), txt('Each measurement is compared with the 2010 ADA Standards and with the Michigan barrier-free requirements (2021 Michigan Building Code, which adopts ICC A117.1-2017). Where both set a limit, the stricter one is used and cited. When the two match, both are cited with "(same requirement)".')]));
     children.push(bullet([txt('Results. ', { bold: true }), txt('"Does not comply" means a recorded measurement or answer falls outside the stricter requirement. "Complies" means every recorded value meets it. "Needs manual input" means the tool could not decide: a value was not recorded, the requirement depends on something not captured (such as the building\'s permit date), or the item needs a consultant\'s judgment.')]));
     children.push(bullet([txt('Citations marked †. ', { bold: true }), txt('These citations have not yet been checked against the printed code text. They are listed in Appendix A for confirmation before the report is issued.')]));
@@ -165,7 +170,7 @@
     });
     if (advRows.length) {
       children.push(h(d.HeadingLevel.HEADING_1, (sec++) + '. Best Practice Recommendations'));
-      children.push(para(advRows.length + ' federal ABA best practice(s) for outdoor areas were not met. They are not legally required at this site because no federal money applies, but meeting them makes the trail, path or area usable by more people.'));
+      children.push(para(advRows.length + ' best practice(s) or safety item(s) were not met. They are not legal accessibility requirements at this site, but meeting them makes the site usable by more people. The reason for each is given under its finding. Playground safety items should be confirmed by a certified playground safety inspector.'));
       children.push(table([headRow(['Finding', 'Area', 'Element', 'Best practice not met', 'Measured', 'Recommended'], [9, 20, 17, 24, 15, 15])].concat(advRows.map(function (r) {
         return new d.TableRow({ cantSplit: true, children: r.map(function (c) { return cell(c); }) });
       }))));
