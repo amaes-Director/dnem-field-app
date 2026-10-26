@@ -40,8 +40,8 @@
   var RULES = {
     version: '2026-10-26.1',
     codes: {
-      ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
-      aba: { short: 'ABA', name: 'Architectural Barriers Act Accessibility Standards, Chapter 10 (outdoor developed areas)' },
+      ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
+      aba: { short: 'ABA', name: 'Architectural Barriers Act (ABA) Accessibility Guidelines, Chapter 10 (outdoor developed areas)' },
       bp: { short: 'Best practice', name: 'Recommendations and safety rules that are not accessibility requirements (US Access Board EV charging recommendations, exterior lighting practice, Michigan Playground Equipment Safety Act)' },
       mi: {
         short: 'Michigan',
@@ -50,7 +50,7 @@
       }
     },
     federalFunds: [
-      { id: 'yes', label: 'Yes: federal agency, or federal money that requires the ABA standards (for example a federal grant to DNR)' },
+      { id: 'yes', label: 'Yes: federal agency, or federal money that requires the ABA guidelines (for example a federal grant to DNR)' },
       { id: 'no', label: 'No federal money' },
       { id: 'unknown', label: 'Not known' }
     ],
@@ -569,7 +569,7 @@
       },
       {
         id: 'ev_charger', label: 'EV charging station', group: 'Site',
-        scopeNote: 'The 2010 ADA Standards have no EV charging rules. The 2021 Michigan Building Code sets how many must be accessible for chargers installed under it; the sizes and reach come from US Access Board recommendations and are reported as best practice.',
+        scopeNote: 'The ADA Accessibility Guidelines have no EV charging rules. The 2021 Michigan Building Code sets how many must be accessible for chargers installed under it; the sizes and reach come from US Access Board recommendations and are reported as best practice.',
         fields: [
           { id: 'total', type: 'count', label: 'Total parking spaces served by EV chargers at this site' },
           { id: 'accessible', type: 'count', label: 'Accessible EV charging spaces' },
@@ -856,7 +856,7 @@
           { id: 'pn-height', label: 'Table height (28 to 34 in), if treated as a dining surface', field: 'height', ada: ada('226.1 and 902.3', { min: 28, max: 34 }), mi: mi('902.3', { min: 28, max: 34 }) },
           { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
           { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
-            note: 'The 2010 ADA Standards have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under the federal ABA rules, record "Picnic table (park or picnic area)".' }
+            note: 'The ADA Accessibility Guidelines have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under the federal ABA rules, record "Picnic table (park or picnic area)".' }
         ]
       },
       // ================================================================ Rides, shooting ranges, saunas (ADA 234, 241, 243)
@@ -911,7 +911,7 @@
           { id: 'sh-turn', label: 'Turning space', field: 'turning', ada: ada('1010.1 and 304.3.1', { expect: true }), mi: mi('1010.2 and 304.3.1', { expect: true }, { verify: false }) },
           { id: 'sh-slope', label: 'Slope at the position (1:48 max)', field: 'slope', ada: ada('1010.1', { max: 2.08 }), mi: mi('1010.2', { max: 2.08 }, { verify: false }) },
           { id: 'sh-counter', label: 'Counter or wall height where firing over it (34 in max)', field: 'counter', mi: mi('1010.3', { max: 34 }, { verify: false }),
-            note: 'Michigan (ICC A117.1) rule; the 2010 ADA Standards have no firing-counter height. Where other positions of the same type have counters, the accessible one needs an equivalent counter.' }
+            note: 'Michigan (ICC A117.1) rule; the ADA Accessibility Guidelines have no firing-counter height. Where other positions of the same type have counters, the accessible one needs an equivalent counter.' }
         ]
       },
       {
