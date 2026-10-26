@@ -7,24 +7,24 @@
 (function (root) {
   var WALK = {
     stops: [
-      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'loading_zone', 'ev_charger', 'curb_ramp', 'route', 'ramp', 'protruding', 'lighting'] },
-      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'stairs', 'protruding', 'lighting'] },
-      { id: 'entrance', label: 'Entrance', elements: ['door', 'route', 'entrance_signs', 'operable', 'signage'] }
+      { id: 'parking', label: 'Parking', elements: ['parking_lot', 'parking', 'surface', 'loading_zone', 'ev_charger', 'curb_ramp', 'route', 'ramp', 'protruding', 'lighting'] },
+      { id: 'route', label: 'Route to the entrance', elements: ['route', 'surface', 'curb_ramp', 'ramp', 'stairs', 'protruding', 'lighting'] },
+      { id: 'entrance', label: 'Entrance', elements: ['door', 'surface', 'route', 'entrance_signs', 'operable', 'signage'] }
     ],
     // Polling places follow the DOJ ADA Checklist for Polling Places (2016): no rooms or outdoor areas.
     pollingStops: [
       { id: 'parking', label: 'Parking and drop-off', elements: ['parking_lot', 'parking', 'loading_zone', 'curb_ramp', 'temp_fix'] },
-      { id: 'route', label: 'Route to the entrance', elements: ['route', 'curb_ramp', 'ramp', 'temp_fix', 'protruding'] },
-      { id: 'entrance', label: 'Voter entrance', elements: ['door', 'entrance_signs', 'temp_fix', 'ramp', 'operable'] },
+      { id: 'route', label: 'Route to the entrance', elements: ['route', 'surface', 'curb_ramp', 'ramp', 'temp_fix', 'protruding'] },
+      { id: 'entrance', label: 'Voter entrance', elements: ['door', 'surface', 'entrance_signs', 'temp_fix', 'ramp', 'operable'] },
       { id: 'interior', label: 'Route to the voting area', elements: ['route', 'door', 'protruding', 'ramp', 'temp_fix', 'signage'] },
       { id: 'voting', label: 'Voting area', elements: ['voting_station', 'route', 'operable', 'protruding', 'temp_fix'] }
     ],
     roomTypes: [
       { id: 'restroom', label: 'Restroom', elements: ['door', 'signage', 'toilet_room', 'toilet', 'lavatory', 'urinal', 'operable'] },
-      { id: 'lobby', label: 'Lobby / reception', elements: ['door', 'counter', 'operable', 'protruding', 'fountain'] },
+      { id: 'lobby', label: 'Lobby / reception', elements: ['door', 'surface', 'counter', 'operable', 'protruding', 'fountain'] },
       { id: 'meeting', label: 'Meeting / conference room', elements: ['door', 'signage', 'work_surface', 'operable', 'protruding'] },
       { id: 'office', label: 'Office', elements: ['door', 'signage', 'work_surface', 'operable'] },
-      { id: 'hallway', label: 'Hallway / corridor', elements: ['route', 'protruding', 'door', 'signage', 'fountain'] },
+      { id: 'hallway', label: 'Hallway / corridor', elements: ['route', 'surface', 'protruding', 'door', 'signage', 'fountain'] },
       { id: 'kitchen', label: 'Break room / kitchen', elements: ['door', 'work_surface', 'lavatory', 'operable'] },
       { id: 'elevator', label: 'Elevator', elements: ['operable', 'signage'] },
       { id: 'stairway', label: 'Stairway', elements: ['stairs', 'door', 'signage'] },

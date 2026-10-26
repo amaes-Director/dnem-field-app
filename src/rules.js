@@ -38,7 +38,7 @@
   }
 
   var RULES = {
-    version: '2026-10-15.3',
+    version: '2026-10-26.1',
     codes: {
       ada: { short: 'ADA 2010', name: '2010 ADA Standards for Accessible Design' },
       aba: { short: 'ABA', name: 'Architectural Barriers Act Accessibility Standards, Chapter 10 (outdoor developed areas)' },
@@ -152,6 +152,51 @@
         ]
       },
       {
+        id: 'surface', label: 'Ground or floor surface (pavement, gravel, carpet, mats)', group: 'Routes',
+        scopeNote: 'Use this for the walking surface itself: parking lots, sidewalks, entrance platforms and landings, and the path of travel indoors and out. Record each problem spot separately, with a photo.',
+        fields: [
+          { id: 'where', type: 'choice', label: 'Where', options: [
+            { id: 'parking', label: 'Parking lot or access aisle' },
+            { id: 'sidewalk', label: 'Sidewalk or outdoor walkway' },
+            { id: 'entrance', label: 'Entrance platform or landing' },
+            { id: 'interior', label: 'Indoor path of travel' },
+            { id: 'other', label: 'Somewhere else' }] },
+          { id: 'material', type: 'choice', label: 'Surface', options: [
+            { id: 'asphalt', label: 'Asphalt' },
+            { id: 'concrete', label: 'Concrete' },
+            { id: 'pavers', label: 'Pavers or brick' },
+            { id: 'gravel', label: 'Gravel, loose stone or wood chips' },
+            { id: 'grass', label: 'Grass or dirt' },
+            { id: 'carpet', label: 'Carpet or carpet tile' },
+            { id: 'mat', label: 'Entrance mat or rug' },
+            { id: 'hard_floor', label: 'Tile, wood, vinyl or other hard floor' }] },
+          { id: 'firm', type: 'bool', label: 'Firm, stable and slip resistant (no loose gravel, sand, mud or wet slick spots)?' },
+          { id: 'damage', type: 'bool', label: 'Free of potholes, broken or heaved pavement and crumbling edges?' },
+          { id: 'opening', type: 'len', label: 'Widest crack, gap or hole in the path of travel', allowNA: true },
+          { id: 'level_change', type: 'len', label: 'Largest change in level (heaved slab, pothole edge, mat or carpet edge)', allowNA: true },
+          { id: 'beveled', type: 'bool', label: 'Is that change in level beveled (1:2 max)?' },
+          { id: 'pile', type: 'len', label: 'Carpet or mat pile height (to the backing)' },
+          { id: 'secure', type: 'bool', label: 'Carpet or mat securely attached, flat, with no loose, curled or worn-through spots?' },
+          { id: 'backing', type: 'bool', label: 'Firm pad or backing, or none (no thick, spongy cushion)?' },
+          { id: 'edge_trim', type: 'bool', label: 'Exposed edges fastened down with trim along the whole edge?', allowNA: true }
+        ],
+        checks: [
+          { id: 'sf-firm', label: 'Firm, stable, slip resistant', field: 'firm', ada: ada('302.1', { expect: true }), mi: mi('302.1', { expect: true }),
+            note: 'Loose gravel, sand, wood chips and grass are generally not firm and stable unless stabilized.' },
+          { id: 'sf-damage', label: 'No potholes or broken pavement', field: 'damage', ada: ada('302.1 and 303', { expect: true }), mi: mi('302.1 and 303', { expect: true }),
+            note: 'Accessible features must be kept in working order (28 CFR 35.133 and 36.211).' },
+          { id: 'sf-open', label: 'Openings: cracks and gaps (1/2 in sphere)', field: 'opening', ada: ada('302.3', { max: 0.5 }), mi: mi('302.3', { max: 0.5 }),
+            note: 'Elongated openings must also run perpendicular to the main direction of travel.' },
+          { id: 'sf-level', label: 'Change in level (1/4 in vertical, or 1/2 in beveled)', kind: 'levelChange', fields: ['level_change', 'beveled'],
+            ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
+          { id: 'sf-pile', label: 'Carpet or mat pile height (1/2 in max)', field: 'pile', when: { material: ['carpet', 'mat'] }, ada: ada('302.2', { max: 0.5 }), mi: mi('302.2', { max: 0.5 }) },
+          { id: 'sf-secure', label: 'Carpet or mat securely attached', field: 'secure', when: { material: ['carpet', 'mat'] }, ada: ada('302.2', { expect: true }), mi: mi('302.2', { expect: true }),
+            note: 'Loose, curled or worn mats are a common trip hazard. Fixing them is usually a maintenance item.' },
+          { id: 'sf-backing', label: 'Firm cushion, pad or backing, or none', field: 'backing', when: { material: ['carpet', 'mat'] }, ada: ada('302.2', { expect: true }), mi: mi('302.2', { expect: true }) },
+          { id: 'sf-edge', label: 'Exposed edges fastened with trim', field: 'edge_trim', when: { material: ['carpet', 'mat'] }, ada: ada('302.2', { expect: true }), mi: mi('302.2', { expect: true }) }
+        ]
+      },
+      {
         id: 'ramp', label: 'Ramp', group: 'Routes',
         fields: [
           { id: 'running_slope', type: 'slope', label: 'Running slope (steepest reading)' },
@@ -239,7 +284,8 @@
           { id: 'exterior', type: 'bool', label: 'Exterior door?' },
           { id: 'fire_door', type: 'bool', label: 'Fire door?' },
           { id: 'clear_width', type: 'len', label: 'Clear width (door open 90°, face of door to stop)' },
-          { id: 'threshold', type: 'len', label: 'Threshold height', allowNA: true },
+          { id: 'threshold', type: 'len', label: 'Threshold height (highest point above the floor or landing)', allowNA: true },
+          { id: 'threshold_beveled', type: 'bool', label: 'Is the threshold beveled (1:2 max) on each side?' },
           { id: 'hw_height', type: 'len', label: 'Hardware height' },
           { id: 'hw_grasp', type: 'bool', label: 'Hardware works with one hand, no tight grasping, pinching or twisting?' },
           { id: 'force', type: 'force', label: 'Opening force (interior hinged door)', allowNA: true },
@@ -253,8 +299,9 @@
         ],
         checks: [
           { id: 'dr-width', label: 'Clear opening width', field: 'clear_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
-          { id: 'dr-thresh', label: 'Threshold height', field: 'threshold', ada: ada('404.2.5', { max: 0.5 }), mi: mi('404.2.5', { max: 0.5 }),
-            note: 'Existing or altered thresholds 3/4 in high max with a bevel are allowed (ADA 404.2.5 Exception).' },
+          { id: 'dr-thresh', label: 'Threshold height and bevel (1/4 in vertical, or 1/2 in beveled 1:2)', kind: 'levelChange', fields: ['threshold', 'threshold_beveled'], existingMax: 0.75,
+            ada: ada('404.2.5, 302 and 303'), mi: mi('404.2.5, 302 and 303'),
+            note: 'Existing or altered thresholds may be 3/4 in high max if beveled 1:2 on each face (ADA 404.2.5 Exception).' },
           { id: 'dr-hw-ht', label: 'Hardware height', field: 'hw_height', ada: ada('404.2.7', { min: 34, max: 48 }), mi: mi('404.2.7', { min: 34, max: 48 }) },
           { id: 'dr-hw-type', label: 'Hardware operable without tight grasping', field: 'hw_grasp', ada: ada('404.2.7 and 309.4', { expect: true }), mi: mi('404.2.7 and 309.4', { expect: true }) },
           { id: 'dr-force', label: 'Opening force, interior hinged door (5 lbf max)', field: 'force', when: { exterior: false, fire_door: false },

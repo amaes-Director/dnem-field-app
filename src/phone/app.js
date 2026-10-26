@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 12 ADA Access Lens';
+  var APP_VERSION = 'Oct 26 Surfaces and thresholds';
   // DNEM's Google Drive upload service (Apps Script web app, see src/drive/Code.gs).
   // When empty, "Send visit" uses the phone's share sheet instead.
   var UPLOAD_URL = '';

@@ -189,15 +189,23 @@
       return Object.assign(res, { status: ok ? 'pass' : 'fail' });
     },
     levelChange: function (check, finding, visit, el) {
-      var h = rawVal(finding, el, 'level_change'), b = rawVal(finding, el, 'beveled');
+      var fl = check.fields || ['level_change', 'beveled'];
+      var h = rawVal(finding, el, fl[0]), b = rawVal(finding, el, fl[1]);
       var res = { cite: citeJoin(sides(check, visit)), verify: anyVerify(sides(check, visit)), required: '1/4 in max vertical, or 1/2 in max with 1:2 bevel' };
-      if (h.na) return Object.assign(res, { status: 'na', measured: 'N/A', reason: 'No change in level.' });
-      if (h.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', reason: 'Change in level not recorded.' });
+      if (h.na) return Object.assign(res, { status: 'na', measured: 'N/A', reason: check.existingMax ? 'No threshold.' : 'No change in level.' });
+      if (h.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', reason: (check.existingMax ? 'Threshold height' : 'Change in level') + ' not recorded.' });
       res.measured = round(h.v, 3) + ' in' + (b.v === true ? ', beveled' : b.v === false ? ', not beveled' : '');
       if (h.v <= 0.25) return Object.assign(res, { status: 'pass' });
-      if (h.v > 0.5) return Object.assign(res, { status: 'fail', reason: 'Over 1/2 in must be ramped (ADA 303.4).' });
+      // ADA 404.2.5 Exception: existing or altered thresholds up to 3/4 in with a 1:2 bevel on each face
+      if (check.existingMax && h.v > 0.5 && h.v <= check.existingMax) {
+        if (b.v === false) return Object.assign(res, { status: 'fail', reason: 'Over 1/2 in and not beveled.' });
+        var st = (visit && visit.buildingStatus) || 'unknown';
+        if (b.missing || st !== 'existing') return Object.assign(res, { status: 'manual', reason: 'Over 1/2 in. Allowed only if this is an existing or altered threshold, 3/4 in max, beveled 1:2 on each face (ADA 404.2.5 Exception): confirm the bevel and when it was installed.' });
+        return Object.assign(res, { status: 'pass', reason: 'Existing threshold, 3/4 in max and beveled (ADA 404.2.5 Exception).' });
+      }
+      if (h.v > 0.5) return Object.assign(res, { status: 'fail', reason: check.existingMax ? 'Over 1/2 in (over 3/4 in for an existing threshold).' : 'Over 1/2 in must be ramped (ADA 303.4).' });
       if (b.missing) return Object.assign(res, { status: 'manual', reason: 'Between 1/4 and 1/2 in: bevel not recorded.' });
-      return Object.assign(res, { status: b.v ? 'pass' : 'fail' });
+      return Object.assign(res, { status: b.v ? 'pass' : 'fail', reason: b.v ? undefined : 'Between 1/4 and 1/2 in must be beveled 1:2 (ADA 303.3).' });
     },
     // part / whole >= minPct (play components on a route, mini golf holes)
     ratio: function (check, finding, visit, el) {

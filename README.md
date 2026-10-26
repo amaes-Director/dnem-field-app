@@ -41,7 +41,7 @@ Two tools that share one rules table.
 
 ## What it checks
 
-Site and building: parking and loading zones, EV charging stations, exterior lighting, curb ramps, routes, ramps, stairs, protruding objects, doors and entrance signs, restrooms, operable parts, signs, counters, work surfaces and drinking fountains.
+Site and building: parking and loading zones, EV charging stations, exterior lighting, curb ramps, routes, ground and floor surfaces (pavement, gravel, potholes and cracks, carpet and entrance mats), ramps, stairs, protruding objects, doors (including threshold height and bevel) and entrance signs, restrooms, operable parts, signs, counters, work surfaces and drinking fountains.
 
 Outdoor and recreation (ADA 2010 sections 240-242 and 1003-1009; ICC A117.1-2017 Chapter 10, which uses the same section numbers): play areas (component counts, routes, surfacing, ramps, transfer systems, play components), pools, wading pools and spas (number of entries, lifts, sloped entries, transfer walls), bleachers and outdoor assembly seating, fishing piers, boat docks, golf and mini golf, exercise equipment, bus stops and picnic areas.
 
