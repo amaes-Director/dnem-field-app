@@ -21985,7 +21985,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   }
 
   var RULES = {
-    version: '2026-10-27.7',
+    version: '2026-10-27.8',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -23111,9 +23111,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'vs-height', label: 'Surface height (28 to 34 in)', field: 'height', ada: ada('902.3', { min: 28, max: 34 }), mi: mi('902.4', { min: 28, max: 34 }) },
           { id: 'vs-knee', label: 'Knee clearance (27 in min)', field: 'knee', ada: ada('306.3', { min: 27 }), mi: mi('306.3', { min: 27 }) },
           { id: 'vs-reach', label: 'Controls within reach (48 in max)', field: 'reach_high', ada: ada('308.2.1 and 308.3.1', { max: 48 }), mi: mi('308.2.1 and 308.3.1', { max: 48 }) },
-          { id: 'vs-machine', label: 'Accessible voting system available', field: 'machine', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)', expect: true, verify: true }, mi: { cite: 'MCL 168.662(7)', expect: true },
+          { id: 'vs-machine', label: 'Accessible voting system available', field: 'machine', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)(A) and (B)', expect: true }, mi: { cite: 'MCL 168.662(7)', expect: true },
             note: 'Michigan requires each polling place and early voting site to be accessible and to comply with the Voting Accessibility for the Elderly and Handicapped Act and the Help America Vote Act (MCL 168.662(7)).' },
-          { id: 'vs-priv', label: 'Private and independent voting', field: 'privacy', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)(A); DOJ ADA Checklist for Polling Places', expect: true, verify: true } }
+          { id: 'vs-priv', label: 'Private and independent voting', field: 'privacy', ada: { cite: 'Help America Vote Act, 52 U.S.C. §21081(a)(3)(A); DOJ ADA Checklist for Polling Places', expect: true } }
         ]
       },
       {
