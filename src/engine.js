@@ -165,7 +165,7 @@
   var SPECIAL = {
     parkingCount: function (check, finding, visit, el) {
       var t = rawVal(finding, el, 'total'), a = rawVal(finding, el, 'accessible'), med = rawVal(finding, el, 'medical');
-      var res = { cite: citeJoin(sides(check, visit)), verify: true };
+      var res = { cite: citeJoin(sides(check, visit)), verify: anyVerify(sides(check, visit)) };
       if (t.missing || a.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Total or accessible space count not recorded.' });
       var need = table208(t.v);
       res.measured = a.v + ' accessible of ' + t.v + ' total';
@@ -175,7 +175,7 @@
     },
     vanCount: function (check, finding, visit, el) {
       var a = rawVal(finding, el, 'accessible'), van = rawVal(finding, el, 'van');
-      var res = { cite: citeJoin(sides(check, visit)), verify: true };
+      var res = { cite: citeJoin(sides(check, visit)), verify: anyVerify(sides(check, visit)) };
       if (a.missing || van.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Accessible or van space count not recorded.' });
       var need = Math.ceil(a.v / 6);
       return Object.assign(res, { measured: van.v + ' van of ' + a.v + ' accessible', required: need + ' min', status: van.v >= need ? 'pass' : 'fail' });
@@ -267,14 +267,20 @@
       if ((check.naOptions || []).indexOf(c.v) >= 0) return Object.assign(res, { status: 'na', reason: check.naReason || 'Not required for this type.' });
       return Object.assign(res, { status: check.okOptions.indexOf(c.v) >= 0 ? 'pass' : 'fail' });
     },
-    // ADA Table 221.2.1.1 wheelchair spaces in assembly seating
+    // ADA Table 221.2.1.1 wheelchair spaces in assembly seating; MBC Table 1109.2.2.1 needs 5 for 101 to 150 seats
     seatCount: function (check, finding, visit, el) {
       var t = rawVal(finding, el, 'seats'), a = rawVal(finding, el, 'wc_spaces');
       var sd = sides(check, visit);
-      var res = { cite: citeJoin(sd), verify: true };
+      var res = { cite: citeJoin(sd), verify: anyVerify(sd) };
       if (t.missing || a.missing) return Object.assign(res, { status: 'manual', measured: 'Not recorded', required: '', reason: 'Seat or wheelchair space count not recorded.' });
-      var need = table221(t.v);
-      return Object.assign(res, { measured: a.v + ' wheelchair spaces for ' + t.v + ' seats', required: need + ' min', status: a.v >= need ? 'pass' : 'fail' });
+      var need = table221(t.v), miNeed = check.mi && t.v > 100 && t.v <= 150 ? 5 : need;
+      res.measured = a.v + ' wheelchair spaces for ' + t.v + ' seats';
+      if (miNeed > need) {
+        res.required = need + ' min (ADA), ' + miNeed + ' min (Michigan)';
+        if (a.v >= miNeed) return Object.assign(res, { status: 'pass' });
+        return Object.assign(res, { status: 'fail', reason: a.v >= need ? 'Meets the ADA count but not Michigan (MBC Table 1109.2.2.1).' : undefined });
+      }
+      return Object.assign(res, { required: need + ' min', status: a.v >= need ? 'pass' : 'fail' });
     }
   };
   function table221(n) {

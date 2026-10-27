@@ -40,7 +40,7 @@
   }
 
   var RULES = {
-    version: '2026-10-27.5',
+    version: '2026-10-27.6',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -78,12 +78,12 @@
         checks: [
           {
             id: 'lot-count', label: 'Number of accessible spaces', kind: 'parkingCount', fields: ['total', 'accessible'],
-            ada: ada('208.2 (Table 208.2)'), mi: { cite: '2021 MBC §1106.1 (Table 1106.1)', verify: true },
+            ada: ada('208.2 (Table 208.2)'), mi: { cite: '2021 MBC §1106.2 (Table 1106.2)', verify: true },
             note: 'Hospital outpatient (10%) and rehabilitation/outpatient PT (20%) facilities have higher counts (ADA 208.2.1, 208.2.2).'
           },
           {
             id: 'lot-van', label: 'Number of van-accessible spaces (1 per 6 accessible, or fraction)', kind: 'vanCount', fields: ['accessible', 'van'],
-            ada: ada('208.2.4'), mi: { cite: '2021 MBC §1106.5', verify: true }
+            ada: ada('208.2.4'), mi: { cite: '2021 MBC §1106.6', verify: true }
           }
         ]
       },
@@ -116,7 +116,8 @@
           { id: 'pk-route', label: 'Access aisle adjoins accessible route', field: 'aisle_route',
             ada: ada('502.3', { expect: true }), mi: mi('502.4.1', { expect: true }) },
           { id: 'pk-sign', label: 'Accessible parking sign provided', field: 'sign_present',
-            ada: ada('216.5 and 502.6', { expect: true }), mi: { cite: '2021 MBC §1112.1; ' + MI + ' §502.7', expect: true, verify: true } },
+            ada: ada('216.5 and 502.6', { expect: true }), mi: { cite: '2021 MBC §1112.1, item 1; ' + MI + ' §502.7', expect: true, verify: true },
+            note: 'Michigan: lots with four or fewer spaces in total need not identify the accessible space (MBC 1112.1, item 1, Exception).' },
           { id: 'pk-sign-ht', label: 'Sign height to bottom of sign', field: 'sign_height',
             ada: ada('502.6', { min: 60 }), mi: mi('502.7', { min: 60 }) },
           { id: 'pk-van-sign', label: '"Van accessible" designation', field: 'van_sign', when: { van: true },
@@ -464,8 +465,8 @@
           { id: 'sg-latch', label: 'Sign on latch side', field: 'latch', ada: ada('703.4.2', { expect: true }), mi: mi('703.3.11', { expect: true }) },
           { id: 'sg-clear', label: 'Clear floor space at sign', field: 'clear18', ada: ada('703.4.2', { expect: true }), mi: mi('703.3.11', { expect: true }) },
           { id: 'sg-raised', label: 'Raised characters', field: 'raised', ada: ada('703.2', { expect: true }), mi: mi('703.3', { expect: true }) },
-          { id: 'sg-braille', label: 'Braille', field: 'braille', ada: ada('703.3', { expect: true }), mi: mi('703.4', { expect: true }) },
-          { id: 'sg-finish', label: 'Finish and contrast', field: 'finish', ada: ada('703.5.1', { expect: true }), mi: mi('703.2.10', { expect: true }) }
+          { id: 'sg-braille', label: 'Braille', field: 'braille', ada: ada('703.3', { expect: true }), mi: mi('703.3.1', { expect: true }) },
+          { id: 'sg-finish', label: 'Finish and contrast', field: 'finish', ada: ada('703.5.1', { expect: true }), mi: mi('703.2.10 and 703.3.12', { expect: true }) }
         ]
       },
       {
@@ -505,7 +506,7 @@
         checks: [
           { id: 'df-wc', label: 'Wheelchair spout height (36 in max)', field: 'wc_spout', ada: ada('602.4', { max: 36 }), mi: mi('602.2.3', { max: 36 }) },
           { id: 'df-stand', label: 'Standing spout height (38 to 43 in)', field: 'stand_spout', ada: ada('602.7', { min: 38, max: 43 }), mi: mi('602.3.2', { min: 38, max: 43 }) },
-          { id: 'df-both', label: 'Two heights provided', field: 'both', ada: ada('211.2', { expect: true }), mi: { cite: '2021 MBC §1109.5.1', expect: true, verify: true } }
+          { id: 'df-both', label: 'Two heights provided', field: 'both', ada: ada('211.2', { expect: true }), mi: { cite: '2021 MBC §1110.5.1', expect: true, verify: true } }
         ]
       },
       // ================================================================ Outdoor site elements
@@ -576,8 +577,8 @@
           { id: 'directional', type: 'bool', label: 'Entrances that are not accessible have signs pointing to the accessible one?', allowNA: true }
         ],
         checks: [
-          { id: 'es-isa', label: 'Accessible entrance identified', field: 'isa', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.1', expect: true, verify: true } },
-          { id: 'es-dir', label: 'Directional signs at other entrances', field: 'directional', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.2', expect: true, verify: true },
+          { id: 'es-isa', label: 'Accessible entrance identified', field: 'isa', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.1, item 5', expect: true, verify: true } },
+          { id: 'es-dir', label: 'Directional signs at other entrances', field: 'directional', ada: ada('216.6', { expect: true }), mi: { cite: '2021 MBC §1112.3, item 1', expect: true, verify: true },
             note: 'Not required where every entrance is accessible.' }
         ]
       },
@@ -599,10 +600,10 @@
         ],
         checks: [
           { id: 'ev-count', label: 'Accessible EV charging spaces (5% min, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, newOnly: true,
-            mi: { cite: '2021 MBC §1107.2', verify: true },
-            note: 'The 2021 IBC requires at least one per type of charger; Michigan\'s adopted text is still to be confirmed. Chargers serving Group R-2, R-3 and R-4 housing are exempt. Applies to chargers installed under the 2021 Michigan Building Code; for older installations the count is shown as best practice.' },
-          { id: 'ev-width', label: 'Space width (132 in min)', field: 'space_width', newOnly: true, mi: { cite: '2021 MBC §1107.2', min: 132, verify: true }, bp: bp(EV_BP, { min: 132 }) },
-          { id: 'ev-aisle', label: 'Access aisle width (60 in min)', field: 'aisle_width', newOnly: true, mi: { cite: '2021 MBC §1107.2', min: 60, verify: true }, bp: bp(EV_BP, { min: 60 }) },
+            mi: { cite: '2021 MBC §1107.2.1', verify: true },
+            note: 'Michigan also requires at least one accessible space for each type of charger (MBC 1107.2.1). Chargers serving Group R-2, R-3 and R-4 housing are exempt. Applies to chargers installed under the 2021 Michigan Building Code; for older installations the count is shown as best practice.' },
+          { id: 'ev-width', label: 'Space width (132 in min)', field: 'space_width', newOnly: true, mi: { cite: '2021 MBC §1107.2.2', min: 132, verify: true }, bp: bp(EV_BP, { min: 132 }) },
+          { id: 'ev-aisle', label: 'Access aisle width (60 in min)', field: 'aisle_width', newOnly: true, mi: { cite: '2021 MBC §1107.2.2', min: 60, verify: true }, bp: bp(EV_BP, { min: 60 }) },
           { id: 'ev-slope', label: 'Space and aisle slope (1:48 max)', field: 'slope', bp: bp(EV_BP, { max: 2.08 }) },
           { id: 'ev-route', label: 'On an accessible route', field: 'route', bp: bp(EV_BP, { expect: true }) },
           { id: 'ev-cfs', label: 'Clear floor space at the charger', field: 'cfs', bp: bp(EV_BP, { expect: true }) },
@@ -645,7 +646,7 @@
           { id: 'turning', type: 'bool', label: 'Turning space at each level that has elevated components on a route?' }
         ],
         checks: [
-          { id: 'pa-route', label: 'Play area on an accessible route', field: 'route', ada: ada('206.2.17', { expect: true }), mi: { cite: '2021 MBC §1104 and §1110', expect: true, verify: true } },
+          { id: 'pa-route', label: 'Play area on an accessible route', field: 'route', ada: ada('206.2.17', { expect: true }), mi: { cite: '2021 MBC §1111.4.13', expect: true, verify: true } },
           { id: 'pa-elev', label: 'At least 50% of elevated components on an accessible route', kind: 'ratio', num: 'elevated_route', den: 'elevated_total', minPct: 50,
             ada: ada('240.2.2'), mi: mi('1008.3.2.2') },
           { id: 'pa-ramp', label: 'With 20 or more elevated components, at least 25% reached by ramp', kind: 'ratio', num: 'elevated_ramp', den: 'elevated_total', minPct: 25,
@@ -727,8 +728,8 @@
         ],
         checks: [
           { id: 'pl-entries', label: 'Accessible means of entry (number and type)', kind: 'poolEntries', fields: ['kind', 'wall_ft', 'primary', 'secondary'],
-            ada: ada('242.2 and 242.4'), mi: { cite: '2021 MBC §1110 (pools); ' + MI + ' §1009.1.1', verify: true } },
-          { id: 'pl-wading', label: 'Wading pool sloped entry', field: 'wading_slope', when: { kind: 'wading' }, ada: ada('242.3', { expect: true }), mi: { cite: '2021 MBC §1110; ' + MI + ' §1009.1.2', expect: true, verify: true } }
+            ada: ada('242.2 and 242.4'), mi: { cite: '2021 MBC §1111.4.14; ' + MI + ' §1009.1.1', verify: true } },
+          { id: 'pl-wading', label: 'Wading pool sloped entry', field: 'wading_slope', when: { kind: 'wading' }, ada: ada('242.3', { expect: true }), mi: { cite: '2021 MBC §1111.4.14; ' + MI + ' §1009.1.2', expect: true, verify: true } }
         ]
       },
       {
@@ -797,7 +798,8 @@
           { id: 'companion', type: 'bool', label: 'Companion seat beside each wheelchair space?' }
         ],
         checks: [
-          { id: 'as-count', label: 'Number of wheelchair spaces', kind: 'seatCount', fields: ['seats', 'wc_spaces'], ada: ada('221.2.1.1 (Table 221.2.1.1)'), mi: { cite: '2021 MBC §1108.2.2 (Table 1108.2.2.1)', verify: true } },
+          { id: 'as-count', label: 'Number of wheelchair spaces', kind: 'seatCount', fields: ['seats', 'wc_spaces'], ada: ada('221.2.1.1 (Table 221.2.1.1)'), mi: { cite: '2021 MBC §1109.2.2.1 (Table 1109.2.2.1)', verify: true },
+            note: 'Michigan needs 5 wheelchair spaces for 101 to 150 seats, where the ADA needs 4; the app uses the larger number.' },
           { id: 'as-w1', label: 'Width, single space (36 in min)', field: 'space_width', when: { pairing: 'single' }, ada: ada('802.1.2', { min: 36 }), mi: mi('802.3', { min: 36 }) },
           { id: 'as-w2', label: 'Width, each of two spaces (33 in min)', field: 'space_width', when: { pairing: 'pair' }, ada: ada('802.1.2', { min: 33 }), mi: mi('802.3', { min: 33 }) },
           { id: 'as-df', label: 'Depth, front or rear entry (48 in min)', field: 'space_depth', when: { entry: 'front' }, ada: ada('802.1.3', { min: 48 }), mi: mi('802.4.1 and 802.4.2', { min: 52 }, { newBuilding: true, elseMin: 48 }),
@@ -856,7 +858,7 @@
           { id: 'cfs', type: 'bool', label: '30 x 48 in clear floor space at each accessible machine?' }
         ],
         checks: [
-          { id: 'ex-type', label: 'One of each type on a route', field: 'each_type', ada: ada('236.1', { expect: true }), mi: { cite: '2021 MBC §1110; ' + MI + ' §1004', expect: true, verify: true } },
+          { id: 'ex-type', label: 'One of each type on a route', field: 'each_type', ada: ada('236.1', { expect: true }), mi: { cite: '2021 MBC §1111.4.10; ' + MI + ' §1004', expect: true, verify: true } },
           { id: 'ex-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1004.1', { expect: true }), mi: mi('1004.2', { expect: true }) }
         ]
       },
@@ -868,10 +870,10 @@
           { id: 'knee', type: 'len', label: 'Knee clearance at the wheelchair seating spot', allowNA: true }
         ],
         checks: [
-          { id: 'pn-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 226.1', { expect: true }), mi: mi('902', { expect: true }) },
+          { id: 'pn-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 226.1', { expect: true }), mi: { cite: '2021 MBC §1110.12.1 and §1104.2', expect: true, verify: true } },
           { id: 'pn-height', label: 'Table height (28 to 34 in), if treated as a dining surface', field: 'height', ada: ada('226.1 and 902.3', { min: 28, max: 34 }), mi: mi('902.4', { min: 28, max: 34 }) },
           { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
-          { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
+          { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: { cite: '2021 MBC §1110.12 (5%, at least one, of fixed or built-in tables)', verify: true },
             note: 'The ADA Accessibility Guidelines have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under Chapter 10 of the ADA and ABA Accessibility Guidelines, record "Picnic table (park or picnic area)".' }
         ]
       },
@@ -897,7 +899,7 @@
         checks: [
           { id: 'ar-access', label: 'At least one wheelchair space, transfer seat or transfer device', kind: 'choiceOk', field: 'access', okOptions: ['wc', 'transfer', 'device'], naOptions: ['exempt'],
             naReason: 'This kind of ride is exempt from the ride-seat requirement (ADA 234.3 Exceptions).',
-            ada: ada('234.3'), mi: { cite: '2021 MBC §1110; ' + MI + ' §1002.1', verify: true } },
+            ada: ada('234.3'), mi: { cite: '2021 MBC §1111.4.8.3; ' + MI + ' §1002.1', verify: true } },
           { id: 'ar-route', label: 'Accessible route to load and unload areas', field: 'route', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('206.2.9 and 1002.2', { expect: true }), mi: mi('1002.2', { expect: true }, { verify: false }) },
           { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3', { expect: true, verify: true }), mi: mi('1002.3 and 304', { expect: true }, { verify: false }) },
           { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3 and 304.2', { max: 2.08, verify: true }), mi: mi('1002.3 and 304.2', { max: 2.08 }) },
@@ -906,7 +908,8 @@
           { id: 'ar-comp', label: 'Companion seat', field: 'companion', when: { access: 'wc' }, ada: ada('1002.4.7', { expect: true }), mi: mi('1002.4.7', { expect: true }, { verify: false }),
             note: 'Required where the ride interior is wider than 53 in, seats more than one rider, and the wheelchair space is not in the center (ADA 1002.4.7). Otherwise mark N/A.' },
           { id: 'ar-seat', label: 'Transfer seat height (14 to 24 in)', field: 'seat_height', when: { access: 'transfer' }, ada: ada('1002.5.2', { min: 14, max: 24 }), mi: mi('1002.5.2', { min: 14, max: 24 }, { verify: false }) },
-          { id: 'ar-signs', label: 'Signs at queue entrances', field: 'signs', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('216.12', { expect: true }), mi: { cite: '2021 MBC §1111', expect: true, verify: true } }
+          { id: 'ar-signs', label: 'Signs at queue entrances', field: 'signs', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('216.12', { expect: true }),
+            note: 'Federal only: the 2021 MBC has no matching sign requirement for amusement rides.' }
         ]
       },
       {
@@ -922,8 +925,8 @@
           { id: 'counter', type: 'len', label: 'If people fire over a counter or wall here: its height', allowNA: true }
         ],
         checks: [
-          { id: 'sh-count', label: 'Accessible firing positions (5% of each type, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('243'), mi: { cite: '2021 MBC §1110', verify: true } },
-          { id: 'sh-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 243', { expect: true, verify: true }), mi: { cite: '2021 MBC §1104', expect: true, verify: true } },
+          { id: 'sh-count', label: 'Accessible firing positions (5% of each type, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('243'), mi: { cite: '2021 MBC §1111.4.15', verify: true } },
+          { id: 'sh-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 243', { expect: true, verify: true }), mi: { cite: '2021 MBC §1111.4.15', expect: true, verify: true } },
           { id: 'sh-turn', label: 'Turning space', field: 'turning', ada: ada('1010.1 and 304.3.1', { expect: true }), mi: mi('1010.2 and 304.3.1', { expect: true }, { verify: false }) },
           { id: 'sh-slope', label: 'Slope at the position (1:48 max)', field: 'slope', ada: ada('1010.1', { max: 2.08 }), mi: mi('1010.2', { max: 2.08 }, { verify: false }) },
           { id: 'sh-counter', label: 'Counter or wall height where firing over it (34 in max)', field: 'counter', mi: mi('1010.3', { max: 34 }, { verify: false }),
@@ -1250,7 +1253,8 @@
           { id: 'grab', type: 'bool', label: 'Grab bars on the side and back walls?' }
         ],
         checks: [
-          { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2, Exception 3'), mi: { cite: '2021 MBC §1109.2', verify: true } },
+          { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2, Exception 3'), mi: { cite: '2021 MBC §1110.2, Exception 3', verify: true },
+            note: 'Michigan: where single-user toilet rooms are clustered, at least 50% (at least one) must be accessible (MBC 1110.2, Exception 3). Whether that applies to a bank of portable units is up to the building official; the app checks the ADA 5%.' },
           { id: 'pt-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
           { id: 'pt-level', label: 'Level entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
           { id: 'pt-door', label: 'Door clear width (32 in min)', field: 'door', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.2', { min: 32 }) },
@@ -1270,14 +1274,15 @@
     ]
   };
 
-  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3, 4, 5, 6, 7 (703.2), 8 (802 and 805), 9 and 10, Oct 27, 2026.
-  // Checks whose Michigan side also cites the 2021 MBC stay marked until the MBC text is checked.
-  var MI_CONFIRMED = ['bus_stop.bs-depth', 'bus_stop.bs-width', 'bus_stop.bs-slope', 'bus_stop.bs-route', 'signage.sg-finish',
+  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3, 4, 5, 6, 7 (703.2 and 703.3), 8 (802 and 805), 9 and 10, Oct 27, 2026.
+  // 2021 MBC Chapter 11 citations checked against the UpCodes text, Oct 27, 2026.
+  var MI_CONFIRMED = ['signage.sg-low', 'signage.sg-high', 'signage.sg-latch', 'signage.sg-clear', 'signage.sg-raised', 'signage.sg-braille',
+    'bus_stop.bs-depth', 'bus_stop.bs-width', 'bus_stop.bs-slope', 'bus_stop.bs-route', 'signage.sg-finish',
     'route.rt-run', 'route.rt-cross', 'route.rt-width-mi-out', 'route.rt-width-mi-in', 'ramp.rp-run', 'ramp.rp-cross', 'ramp.rp-width', 'ramp.rp-rise', 'ramp.rp-land-top', 'ramp.rp-land-bot', 'ramp.rp-land-slope', 'ramp.rp-rails', 'ramp.rp-edge', 'protruding.po-protrude', 'protruding.po-head', 'door.dr-width', 'door.dr-thresh', 'door.dr-hw-ht', 'door.dr-hw-type', 'door.dr-force', 'door.dr-close', 'door.dr-pull-latch', 'door.dr-pull-depth', 'door.dr-push-depth', 'door.dr-other', 'operable.op-high', 'operable.op-low', 'operable.op-obst', 'operable.op-grasp', 'operable.op-force', 'curb_ramp.cr-run', 'curb_ramp.cr-cross', 'curb_ramp.cr-width', 'curb_ramp.cr-flare', 'curb_ramp.cr-counter', 'curb_ramp.cr-landing', 'curb_ramp.cr-flush', 'assembly.as-w1', 'assembly.as-w2', 'assembly.as-df', 'assembly.as-ds', 'assembly.as-comp', 'voting_station.vs-route', 'voting_station.vs-reach', 'temp_fix.tf-slope', 'temp_fix.tf-width', 'event_tent.et-entry', 'event_tent.et-aisle', 'event_tent.et-high', 'event_tent.et-low', 'event_path.ep-width', 'event_path.ep-run', 'event_path.ep-cross', 'portable_toilet.pt-door',
     'route.rt-level', 'route.rt-open', 'route.rt-surface', 'surface.sf-firm', 'surface.sf-damage', 'surface.sf-open', 'surface.sf-level', 'surface.sf-pile', 'surface.sf-secure', 'surface.sf-backing', 'surface.sf-edge', 'toilet_room.tr-turn', 'toilet_room.tr-turn-t', 'lavatory.lv-knee', 'lavatory.lv-cfs-w', 'lavatory.lv-cfs-d', 'voting_station.vs-cfs', 'voting_station.vs-knee', 'temp_fix.tf-edge', 'event_tent.et-level', 'event_tent.et-turn', 'event_tent.et-floor', 'event_path.ep-surf', 'event_path.ep-level', 'event_path.ep-open', 'portable_toilet.pt-route', 'portable_toilet.pt-level',
     'amusement_ride.ar-slope', 'boating.bt-gang', 'boating.bt-pier', 'boating.bt-route', 'counter.ct-height', 'counter.ct-knee', 'counter.ct-len-fwd', 'counter.ct-len-par', 'event_tent.et-counter', 'exercise.ex-cfs', 'fishing.fp-cfs', 'fishing.fp-edge', 'fishing.fp-rail', 'fishing.fp-turn', 'fountain.df-stand', 'fountain.df-wc', 'golf.gf-car', 'golf.gf-mini', 'lavatory.lv-faucet', 'lavatory.lv-mirror', 'lavatory.lv-pipes', 'lavatory.lv-rim', 'loading_zone.lz-aisle-l', 'loading_zone.lz-aisle-w', 'loading_zone.lz-clear', 'loading_zone.lz-marked', 'loading_zone.lz-pullup', 'loading_zone.lz-slope', 'parking.pk-aisle', 'parking.pk-marked', 'parking.pk-route', 'parking.pk-sign-ht', 'parking.pk-slope', 'parking.pk-van', 'parking.pk-van-clr', 'parking.pk-van-sign', 'parking.pk-width', 'picnic.pn-height', 'picnic.pn-knee', 'play_area.pa-elev', 'play_area.pa-ground', 'play_area.pa-gwidth', 'play_area.pa-impact', 'play_area.pa-ramp', 'play_area.pa-surf', 'play_area.pa-turn', 'play_component.pc-cfs', 'play_component.pc-entry', 'play_component.pc-knee', 'play_component.pc-route', 'play_component.pc-table', 'play_ramp.pr-rail', 'play_ramp.pr-rise', 'play_ramp.pr-slope-e', 'play_ramp.pr-slope-g', 'play_ramp.pr-width', 'play_ramp.pr-width-g', 'play_transfer.pt-d', 'play_transfer.pt-h-plat', 'play_transfer.pt-h-step', 'play_transfer.pt-sup', 'play_transfer.pt-w', 'pool_lift.lf-cap', 'pool_lift.lf-deck', 'pool_lift.lf-depth', 'pool_lift.lf-foot', 'pool_lift.lf-op', 'pool_lift.lf-seat', 'pool_lift.lf-sub', 'pool_lift.lf-width', 'pool_slope.ps-depth', 'pool_slope.ps-rails', 'pool_slope.ps-slope', 'portable_toilet.pt-grab', 'portable_toilet.pt-seat', 'portable_toilet.pt-turn', 'ramp.rp-rail-dia', 'ramp.rp-rail-ext', 'ramp.rp-rail-ht', 'stairs.st-open', 'stairs.st-rail-ht', 'stairs.st-rails', 'stairs.st-riser', 'stairs.st-riser-min', 'stairs.st-tread', 'stairs.st-uniform', 'toilet.wc-cl', 'toilet.wc-clr-d', 'toilet.wc-clr-w', 'toilet.wc-flush', 'toilet.wc-gb-ht', 'toilet.wc-rgb-len', 'toilet.wc-rgb-split', 'toilet.wc-seat', 'toilet.wc-sgb-len', 'toilet.wc-sgb-reach', 'toilet.wc-sgb-rear', 'toilet.wc-stall-d-floor', 'toilet.wc-stall-d-wall', 'toilet.wc-stall-w', 'toilet.wc-tp-front', 'toilet.wc-tp-ht', 'toilet_room.tr-swing', 'transfer_wall.tw-d', 'transfer_wall.tw-grab', 'transfer_wall.tw-h', 'transfer_wall.tw-l', 'urinal.ur-flush', 'urinal.ur-rim', 'voting_station.vs-height', 'work_surface.ws-height', 'work_surface.ws-knee'];
   RULES.elements.forEach(function (el) {
-    el.checks.forEach(function (c) { if (c.mi && MI_CONFIRMED.indexOf(el.id + '.' + c.id) >= 0) c.mi.verify = false; });
+    el.checks.forEach(function (c) { if (c.mi && (MI_CONFIRMED.indexOf(el.id + '.' + c.id) >= 0 || /^2021 MBC/.test(c.mi.cite))) c.mi.verify = false; });
   });
 
   if (typeof module !== 'undefined' && module.exports) module.exports = RULES;
