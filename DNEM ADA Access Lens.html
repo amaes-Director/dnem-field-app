@@ -21985,7 +21985,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   }
 
   var RULES = {
-    version: '2026-10-27.2',
+    version: '2026-10-27.3',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -22323,10 +22323,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         ],
         checks: [
           { id: 'tr-turn', label: 'Turning space (circle)', field: 'turn_dia', when: { turn_shape: 'circle' },
-            ada: ada('304.3.1', { min: 60 }), mi: mi('304.3.1', { min: 67 }, { newBuilding: true, elseMin: 60 }),
+            ada: ada('304.3.1', { min: 60 }), mi: mi('304.3.1.1 and 304.3.1.2', { min: 67 }, { newBuilding: true, elseMin: 60 }),
             note: 'A117.1-2017 raised the circle to 67 in for new buildings; existing buildings keep 60 in.' },
           { id: 'tr-turn-t', label: 'Turning space (T-shaped)', kind: 'manual', when: { turn_shape: 't' },
-            ada: ada('304.3.2'), mi: mi('304.3.2'), note: 'Check the T dimensions against the photos; A117.1-2017 enlarged the T for new buildings.' },
+            ada: ada('304.3.2'), mi: mi('304.3.2.1 and 304.3.2.2'), note: 'Check the T dimensions against the photos; A117.1-2017 enlarged the T for new buildings.' },
           { id: 'tr-swing', label: 'Door does not swing into fixture clear floor space', field: 'door_swing',
             ada: ada('603.2.3', { expect: false }), mi: mi('603.2.2', { expect: false }),
             note: 'Allowed in single-user rooms where a clear floor space is provided beyond the door swing (ADA 603.2.3 Exception 2).' }
@@ -22345,13 +22345,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         ],
         checks: [
           { id: 'lv-rim', label: 'Rim / counter height', field: 'rim', ada: ada('606.3', { max: 34 }), mi: mi('606.3', { max: 34 }) },
-          { id: 'lv-knee', label: 'Knee clearance height', field: 'knee', ada: ada('606.2 and 306.3.1', { min: 27 }), mi: mi('306.3.3', { min: 27 }) },
+          { id: 'lv-knee', label: 'Knee clearance height', field: 'knee', ada: ada('606.2 and 306.3.1', { min: 27 }), mi: mi('306.3.1', { min: 27 }) },
           { id: 'lv-pipes', label: 'Exposed pipes protected', field: 'pipes', ada: ada('606.5', { expect: true }), mi: mi('606.6', { expect: true }) },
           { id: 'lv-faucet', label: 'Faucet operable parts', field: 'faucet', ada: ada('606.4 and 309.4', { expect: true }), mi: mi('606.4 and 309.4', { expect: true }) },
           { id: 'lv-mirror', label: 'Mirror above lavatory, bottom of reflecting surface', field: 'mirror', ada: ada('603.3', { max: 40 }), mi: mi('603.3', { max: 40 }) },
           { id: 'lv-cfs-w', label: 'Clear floor space width', field: 'cfs_width', ada: ada('305.3', { min: 30 }), mi: mi('305.3', { min: 30 }) },
           { id: 'lv-cfs-d', label: 'Clear floor space depth', field: 'cfs_depth',
-            ada: ada('305.3', { min: 48 }), mi: mi('305.3', { min: 52 }, { newBuilding: true, elseMin: 48 }),
+            ada: ada('305.3', { min: 48 }), mi: mi('305.3.1 and 305.3.2', { min: 52 }, { newBuilding: true, elseMin: 48 }),
             note: 'A117.1-2017 raised clear floor space to 30 x 52 in for new buildings; existing buildings keep 30 x 48 in.' }
         ]
       },
@@ -23203,9 +23203,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     ]
   };
 
-  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 5, 6, 9 and 10, Oct 27, 2026.
+  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3 (301-306), 5, 6, 9 and 10, Oct 27, 2026.
   // Checks whose Michigan side also cites the 2021 MBC stay marked until the MBC text is checked.
-  var MI_CONFIRMED = ['amusement_ride.ar-slope', 'boating.bt-gang', 'boating.bt-pier', 'boating.bt-route', 'counter.ct-height', 'counter.ct-knee', 'counter.ct-len-fwd', 'counter.ct-len-par', 'event_tent.et-counter', 'exercise.ex-cfs', 'fishing.fp-cfs', 'fishing.fp-edge', 'fishing.fp-rail', 'fishing.fp-turn', 'fountain.df-stand', 'fountain.df-wc', 'golf.gf-car', 'golf.gf-mini', 'lavatory.lv-faucet', 'lavatory.lv-mirror', 'lavatory.lv-pipes', 'lavatory.lv-rim', 'loading_zone.lz-aisle-l', 'loading_zone.lz-aisle-w', 'loading_zone.lz-clear', 'loading_zone.lz-marked', 'loading_zone.lz-pullup', 'loading_zone.lz-slope', 'parking.pk-aisle', 'parking.pk-marked', 'parking.pk-route', 'parking.pk-sign-ht', 'parking.pk-slope', 'parking.pk-van', 'parking.pk-van-clr', 'parking.pk-van-sign', 'parking.pk-width', 'picnic.pn-height', 'picnic.pn-knee', 'play_area.pa-elev', 'play_area.pa-ground', 'play_area.pa-gwidth', 'play_area.pa-impact', 'play_area.pa-ramp', 'play_area.pa-surf', 'play_area.pa-turn', 'play_component.pc-cfs', 'play_component.pc-entry', 'play_component.pc-knee', 'play_component.pc-route', 'play_component.pc-table', 'play_ramp.pr-rail', 'play_ramp.pr-rise', 'play_ramp.pr-slope-e', 'play_ramp.pr-slope-g', 'play_ramp.pr-width', 'play_ramp.pr-width-g', 'play_transfer.pt-d', 'play_transfer.pt-h-plat', 'play_transfer.pt-h-step', 'play_transfer.pt-sup', 'play_transfer.pt-w', 'pool_lift.lf-cap', 'pool_lift.lf-deck', 'pool_lift.lf-depth', 'pool_lift.lf-foot', 'pool_lift.lf-op', 'pool_lift.lf-seat', 'pool_lift.lf-sub', 'pool_lift.lf-width', 'pool_slope.ps-depth', 'pool_slope.ps-rails', 'pool_slope.ps-slope', 'portable_toilet.pt-grab', 'portable_toilet.pt-seat', 'portable_toilet.pt-turn', 'ramp.rp-rail-dia', 'ramp.rp-rail-ext', 'ramp.rp-rail-ht', 'stairs.st-open', 'stairs.st-rail-ht', 'stairs.st-rails', 'stairs.st-riser', 'stairs.st-riser-min', 'stairs.st-tread', 'stairs.st-uniform', 'toilet.wc-cl', 'toilet.wc-clr-d', 'toilet.wc-clr-w', 'toilet.wc-flush', 'toilet.wc-gb-ht', 'toilet.wc-rgb-len', 'toilet.wc-rgb-split', 'toilet.wc-seat', 'toilet.wc-sgb-len', 'toilet.wc-sgb-reach', 'toilet.wc-sgb-rear', 'toilet.wc-stall-d-floor', 'toilet.wc-stall-d-wall', 'toilet.wc-stall-w', 'toilet.wc-tp-front', 'toilet.wc-tp-ht', 'toilet_room.tr-swing', 'transfer_wall.tw-d', 'transfer_wall.tw-grab', 'transfer_wall.tw-h', 'transfer_wall.tw-l', 'urinal.ur-flush', 'urinal.ur-rim', 'voting_station.vs-height', 'work_surface.ws-height', 'work_surface.ws-knee'];
+  var MI_CONFIRMED = ['route.rt-level', 'route.rt-open', 'route.rt-surface', 'surface.sf-firm', 'surface.sf-damage', 'surface.sf-open', 'surface.sf-level', 'surface.sf-pile', 'surface.sf-secure', 'surface.sf-backing', 'surface.sf-edge', 'toilet_room.tr-turn', 'toilet_room.tr-turn-t', 'lavatory.lv-knee', 'lavatory.lv-cfs-w', 'lavatory.lv-cfs-d', 'voting_station.vs-cfs', 'voting_station.vs-knee', 'temp_fix.tf-edge', 'event_tent.et-level', 'event_tent.et-turn', 'event_tent.et-floor', 'event_path.ep-surf', 'event_path.ep-level', 'event_path.ep-open', 'portable_toilet.pt-route', 'portable_toilet.pt-level',
+    'amusement_ride.ar-slope', 'boating.bt-gang', 'boating.bt-pier', 'boating.bt-route', 'counter.ct-height', 'counter.ct-knee', 'counter.ct-len-fwd', 'counter.ct-len-par', 'event_tent.et-counter', 'exercise.ex-cfs', 'fishing.fp-cfs', 'fishing.fp-edge', 'fishing.fp-rail', 'fishing.fp-turn', 'fountain.df-stand', 'fountain.df-wc', 'golf.gf-car', 'golf.gf-mini', 'lavatory.lv-faucet', 'lavatory.lv-mirror', 'lavatory.lv-pipes', 'lavatory.lv-rim', 'loading_zone.lz-aisle-l', 'loading_zone.lz-aisle-w', 'loading_zone.lz-clear', 'loading_zone.lz-marked', 'loading_zone.lz-pullup', 'loading_zone.lz-slope', 'parking.pk-aisle', 'parking.pk-marked', 'parking.pk-route', 'parking.pk-sign-ht', 'parking.pk-slope', 'parking.pk-van', 'parking.pk-van-clr', 'parking.pk-van-sign', 'parking.pk-width', 'picnic.pn-height', 'picnic.pn-knee', 'play_area.pa-elev', 'play_area.pa-ground', 'play_area.pa-gwidth', 'play_area.pa-impact', 'play_area.pa-ramp', 'play_area.pa-surf', 'play_area.pa-turn', 'play_component.pc-cfs', 'play_component.pc-entry', 'play_component.pc-knee', 'play_component.pc-route', 'play_component.pc-table', 'play_ramp.pr-rail', 'play_ramp.pr-rise', 'play_ramp.pr-slope-e', 'play_ramp.pr-slope-g', 'play_ramp.pr-width', 'play_ramp.pr-width-g', 'play_transfer.pt-d', 'play_transfer.pt-h-plat', 'play_transfer.pt-h-step', 'play_transfer.pt-sup', 'play_transfer.pt-w', 'pool_lift.lf-cap', 'pool_lift.lf-deck', 'pool_lift.lf-depth', 'pool_lift.lf-foot', 'pool_lift.lf-op', 'pool_lift.lf-seat', 'pool_lift.lf-sub', 'pool_lift.lf-width', 'pool_slope.ps-depth', 'pool_slope.ps-rails', 'pool_slope.ps-slope', 'portable_toilet.pt-grab', 'portable_toilet.pt-seat', 'portable_toilet.pt-turn', 'ramp.rp-rail-dia', 'ramp.rp-rail-ext', 'ramp.rp-rail-ht', 'stairs.st-open', 'stairs.st-rail-ht', 'stairs.st-rails', 'stairs.st-riser', 'stairs.st-riser-min', 'stairs.st-tread', 'stairs.st-uniform', 'toilet.wc-cl', 'toilet.wc-clr-d', 'toilet.wc-clr-w', 'toilet.wc-flush', 'toilet.wc-gb-ht', 'toilet.wc-rgb-len', 'toilet.wc-rgb-split', 'toilet.wc-seat', 'toilet.wc-sgb-len', 'toilet.wc-sgb-reach', 'toilet.wc-sgb-rear', 'toilet.wc-stall-d-floor', 'toilet.wc-stall-d-wall', 'toilet.wc-stall-w', 'toilet.wc-tp-front', 'toilet.wc-tp-ht', 'toilet_room.tr-swing', 'transfer_wall.tw-d', 'transfer_wall.tw-grab', 'transfer_wall.tw-h', 'transfer_wall.tw-l', 'urinal.ur-flush', 'urinal.ur-rim', 'voting_station.vs-height', 'work_surface.ws-height', 'work_surface.ws-knee'];
   RULES.elements.forEach(function (el) {
     el.checks.forEach(function (c) { if (c.mi && MI_CONFIRMED.indexOf(el.id + '.' + c.id) >= 0) c.mi.verify = false; });
   });
