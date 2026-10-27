@@ -40,7 +40,7 @@
   }
 
   var RULES = {
-    version: '2026-10-27.3',
+    version: '2026-10-27.4',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -132,6 +132,7 @@
           { id: 'running_slope', type: 'slope', label: 'Running slope (direction of travel)' },
           { id: 'cross_slope', type: 'slope', label: 'Cross slope' },
           { id: 'clear_width', type: 'len', label: 'Clear width' },
+          { id: 'setting', type: 'choice', label: 'Route location', options: [ { id: 'outdoor', label: 'Outdoors' }, { id: 'indoor', label: 'Indoors, or an outdoor route within a seating area' } ] },
           { id: 'level_change', type: 'len', label: 'Largest change in level (vertical)', allowNA: true },
           { id: 'beveled', type: 'bool', label: 'Is that change in level beveled (1:2 max)?' },
           { id: 'opening', type: 'len', label: 'Largest opening in grate or gap', allowNA: true },
@@ -143,8 +144,12 @@
           { id: 'rt-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope',
             ada: ada('403.3', { max: 2.08 }), mi: mi('403.3', { max: 2.08 }) },
           { id: 'rt-width', label: 'Clear width', field: 'clear_width',
-            ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }),
+            ada: ada('403.5.1', { min: 36 }),
             note: 'May narrow to 32 in for 24 in max length at intervals of 48 in min.' },
+          { id: 'rt-width-mi-out', label: 'Clear width, outdoor route (Michigan 48 in min)', field: 'clear_width', when: { setting: 'outdoor' },
+            mi: mi('403.5.1', { min: 48 }), note: 'A117.1-2017 requires 48 in for exterior routes; 36 in within seating areas. Exterior ramps follow 405.5.' },
+          { id: 'rt-width-mi-in', label: 'Clear width, indoor route (Michigan 36 in min)', field: 'clear_width', when: { setting: 'indoor' },
+            mi: mi('403.5.1', { min: 36 }), note: 'May narrow to 32 in for 24 in max length; the wider segments between must be 52 in long in new buildings, 48 in in existing.' },
           { id: 'rt-level', label: 'Change in level (1/4 in vertical, or 1/2 in beveled)', kind: 'levelChange',
             fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
           { id: 'rt-open', label: 'Openings in floor or ground (1/2 in sphere)', field: 'opening',
@@ -300,25 +305,25 @@
           { id: 'maneuver_depth', type: 'len', label: 'Maneuvering depth (perpendicular to door)' }
         ],
         checks: [
-          { id: 'dr-width', label: 'Clear opening width', field: 'clear_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
+          { id: 'dr-width', label: 'Clear opening width', field: 'clear_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.2', { min: 32 }) },
           { id: 'dr-thresh', label: 'Threshold height and bevel (1/4 in vertical, or 1/2 in beveled 1:2)', kind: 'levelChange', fields: ['threshold', 'threshold_beveled'], existingMax: 0.75,
-            ada: ada('404.2.5, 302 and 303'), mi: mi('404.2.5, 302 and 303'),
+            ada: ada('404.2.5, 302 and 303'), mi: mi('404.2.4, 302 and 303'),
             note: 'Existing or altered thresholds may be 3/4 in high max if beveled 1:2 on each face (ADA 404.2.5 Exception).' },
-          { id: 'dr-hw-ht', label: 'Hardware height', field: 'hw_height', ada: ada('404.2.7', { min: 34, max: 48 }), mi: mi('404.2.7', { min: 34, max: 48 }) },
-          { id: 'dr-hw-type', label: 'Hardware operable without tight grasping', field: 'hw_grasp', ada: ada('404.2.7 and 309.4', { expect: true }), mi: mi('404.2.7 and 309.4', { expect: true }) },
+          { id: 'dr-hw-ht', label: 'Hardware height', field: 'hw_height', ada: ada('404.2.7', { min: 34, max: 48 }), mi: mi('404.2.6.1', { min: 34, max: 48 }) },
+          { id: 'dr-hw-type', label: 'Hardware operable without tight grasping', field: 'hw_grasp', ada: ada('404.2.7 and 309.4', { expect: true }), mi: mi('404.2.6 and 309.4', { expect: true }) },
           { id: 'dr-force', label: 'Opening force, interior hinged door (5 lbf max)', field: 'force', when: { exterior: false, fire_door: false },
-            ada: ada('404.2.9', { max: 5 }), mi: mi('404.2.9', { max: 5 }),
+            ada: ada('404.2.9', { max: 5 }), mi: mi('404.2.8', { max: 5 }),
             note: 'Fire doors: minimum force allowed by the authority having jurisdiction. Exterior doors: no maximum set.' },
-          { id: 'dr-close', label: 'Door closer speed (5 seconds min, 90° to 12°)', field: 'close_time', ada: ada('404.2.8.1', { min: 5 }), mi: mi('404.2.8.1', { min: 5 }) },
+          { id: 'dr-close', label: 'Door closer speed (5 seconds min, 90° to 12°)', field: 'close_time', ada: ada('404.2.8.1', { min: 5 }), mi: mi('404.2.7.1', { min: 5 }) },
           { id: 'dr-pull-latch', label: 'Pull side: latch-side clearance', field: 'latch_clear', when: { approach: 'front_pull' },
-            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 18 }), mi: mi('404.2.4.1 (Table 404.2.4.1)', { min: 18 }) },
+            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 18 }), mi: mi('404.2.3.2 (Table 404.2.3.2)', { min: 18 }) },
           { id: 'dr-pull-depth', label: 'Pull side: maneuvering depth', field: 'maneuver_depth', when: { approach: 'front_pull' },
-            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 60 }), mi: mi('404.2.4.1 (Table 404.2.4.1)', { min: 60 }) },
+            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 60 }), mi: mi('404.2.3.2 (Table 404.2.3.2)', { min: 60 }) },
           { id: 'dr-push-depth', label: 'Push side: maneuvering depth', field: 'maneuver_depth', when: { approach: 'front_push' },
-            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 48 }), mi: mi('404.2.4.1 (Table 404.2.4.1)', { min: 48 }),
-            note: 'Add 12 in latch-side clearance when the door has both a closer and a latch.' },
+            ada: ada('404.2.4.1 (Table 404.2.4.1)', { min: 48 }), mi: mi('404.2.3.2 (Table 404.2.3.2)', { min: 52 }, { newBuilding: true, elseMin: 48 }),
+            note: 'Add 12 in latch-side clearance when the door has both a closer and a latch. Michigan: 52 in for new buildings, 48 in for existing.' },
           { id: 'dr-other', label: 'Maneuvering clearance (hinge side, latch side or sliding)', kind: 'manual', when: { approach: 'other' },
-            ada: ada('404.2.4.1 (Table 404.2.4.1)'), mi: mi('404.2.4.1 (Table 404.2.4.1)'),
+            ada: ada('404.2.4.1 (Table 404.2.4.1)'), mi: mi('404.2.3.2 and 404.2.3.3 (Tables 404.2.3.2 and 404.2.3.3)'),
             note: 'Compare the photos and notes with the table for this approach.' }
         ]
       },
@@ -516,14 +521,16 @@
           { id: 'flush', type: 'bool', label: 'Ramp meets walk, gutter and street flush (no lip)?' }
         ],
         checks: [
-          { id: 'cr-run', label: 'Running slope (1:12 max)', field: 'running_slope', ada: ada('406.1 and 405.2', { max: 8.33 }), mi: mi('406.1 and 405.2', { max: 8.33 }) },
-          { id: 'cr-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope', ada: ada('406.1 and 405.3', { max: 2.08 }), mi: mi('406.1 and 405.3', { max: 2.08 }) },
-          { id: 'cr-width', label: 'Clear width', field: 'width', ada: ada('406.1 and 405.5', { min: 36 }), mi: mi('406.1 and 405.5', { min: 36 }) },
-          { id: 'cr-flare', label: 'Flared sides (1:10 max)', field: 'flare_slope', ada: ada('406.3', { max: 10 }), mi: mi('406.3', { max: 10 }),
+          { id: 'cr-run', label: 'Running slope (1:12 max)', field: 'running_slope', ada: ada('406.1 and 405.2', { max: 8.33 }), mi: mi('406.2.2 and 406.3.2', { max: 8.33 }) },
+          { id: 'cr-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope', ada: ada('406.1 and 405.3', { max: 2.08 }), mi: mi('406.5.3', { max: 2.08 }),
+            note: 'Michigan: at crossings without a stop or yield and at midblock crossings, cross slope may match the street grade (A117.1 406.5.3).' },
+          { id: 'cr-width', label: 'Clear width', field: 'width', ada: ada('406.1 and 405.5', { min: 36 }), mi: mi('406.5.1', { min: 48 }) },
+          { id: 'cr-flare', label: 'Flared sides (1:10 max)', field: 'flare_slope', ada: ada('406.3', { max: 10 }), mi: mi('406.2.3', { max: 10 }),
             note: 'Applies where the flares are part of a pedestrian route; returned curbs are allowed where pedestrians would not cross the sides.' },
-          { id: 'cr-counter', label: 'Counter slope (1:20 max)', field: 'counter_slope', ada: ada('406.2', { max: 5 }), mi: mi('406.2', { max: 5 }) },
-          { id: 'cr-landing', label: 'Top landing length', field: 'landing', ada: ada('406.4', { min: 36 }), mi: mi('406.4', { min: 36 }) },
-          { id: 'cr-flush', label: 'Flush transitions', field: 'flush', ada: ada('406.2', { expect: true }), mi: mi('406.2', { expect: true }) }
+          { id: 'cr-counter', label: 'Counter slope (1:20 max)', field: 'counter_slope', ada: ada('406.2', { max: 5 }), mi: mi('406.5.4', { max: 5 }) },
+          { id: 'cr-landing', label: 'Top landing length', field: 'landing', ada: ada('406.4', { min: 36 }), mi: mi('406.2.1', { min: 48 }),
+            note: 'Michigan: 48 by 48 in landing at the top, 48 by 60 in where constrained at the back of sidewalk (A117.1 406.2.1).' },
+          { id: 'cr-flush', label: 'Flush transitions', field: 'flush', ada: ada('406.2', { expect: true }), mi: mi('406.5.2', { expect: true }) }
         ]
       },
       {
@@ -793,8 +800,9 @@
           { id: 'as-count', label: 'Number of wheelchair spaces', kind: 'seatCount', fields: ['seats', 'wc_spaces'], ada: ada('221.2.1.1 (Table 221.2.1.1)'), mi: { cite: '2021 MBC §1108.2.2 (Table 1108.2.2.1)', verify: true } },
           { id: 'as-w1', label: 'Width, single space (36 in min)', field: 'space_width', when: { pairing: 'single' }, ada: ada('802.1.2', { min: 36 }), mi: mi('802.3', { min: 36 }) },
           { id: 'as-w2', label: 'Width, each of two spaces (33 in min)', field: 'space_width', when: { pairing: 'pair' }, ada: ada('802.1.2', { min: 33 }), mi: mi('802.3', { min: 33 }) },
-          { id: 'as-df', label: 'Depth, front or rear entry (48 in min)', field: 'space_depth', when: { entry: 'front' }, ada: ada('802.1.3', { min: 48 }), mi: mi('802.4', { min: 48 }) },
-          { id: 'as-ds', label: 'Depth, side entry (60 in min)', field: 'space_depth', when: { entry: 'side' }, ada: ada('802.1.3', { min: 60 }), mi: mi('802.4', { min: 60 }) },
+          { id: 'as-df', label: 'Depth, front or rear entry (48 in min)', field: 'space_depth', when: { entry: 'front' }, ada: ada('802.1.3', { min: 48 }), mi: mi('802.4.1 and 802.4.2', { min: 52 }, { newBuilding: true, elseMin: 48 }),
+            note: 'Michigan: 52 in for new buildings, 48 in for existing.' },
+          { id: 'as-ds', label: 'Depth, side entry (60 in min)', field: 'space_depth', when: { entry: 'side' }, ada: ada('802.1.3', { min: 60 }), mi: mi('802.4.1 and 802.4.2', { min: 60 }) },
           { id: 'as-comp', label: 'Companion seats', field: 'companion', ada: ada('221.3 and 802.3', { expect: true }), mi: mi('802.7', { expect: true }) }
         ]
       },
@@ -1149,7 +1157,8 @@
           { id: 'privacy', type: 'bool', label: 'Positioned so the voter has privacy?' }
         ],
         checks: [
-          { id: 'vs-route', label: 'Route to the station (36 in min)', field: 'route_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'vs-route', label: 'Route to the station (36 in min)', field: 'route_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }),
+            note: 'Michigan: an outdoor route to the polling place needs 48 in (A117.1 403.5.1).' },
           { id: 'vs-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('305.3', { expect: true }), mi: mi('305.3', { expect: true }) },
           { id: 'vs-height', label: 'Surface height (28 to 34 in)', field: 'height', ada: ada('902.3', { min: 28, max: 34 }), mi: mi('902.4', { min: 28, max: 34 }) },
           { id: 'vs-knee', label: 'Knee clearance (27 in min)', field: 'knee', ada: ada('306.3', { min: 27 }), mi: mi('306.3', { min: 27 }) },
@@ -1174,7 +1183,8 @@
           { id: 'tf-secure', label: 'Secured, no tripping edges', field: 'secure', ada: ada('302.1', { expect: true }) },
           { id: 'tf-edge', label: 'Edge height (1/2 in max, beveled)', field: 'edge', ada: ada('303.3', { max: 0.5 }), mi: mi('303.3', { max: 0.5 }) },
           { id: 'tf-slope', label: 'Portable ramp slope (1:12 max)', field: 'slope', when: { kind: 'ramp' }, ada: ada('405.2', { max: 8.33 }), mi: mi('405.2', { max: 8.33 }) },
-          { id: 'tf-width', label: 'Clear width (36 in min)', field: 'width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) }
+          { id: 'tf-width', label: 'Clear width (36 in min)', field: 'width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }),
+            note: 'Michigan: outdoors the route needs 48 in, except a portable ramp, which needs 36 in (A117.1 403.5.1 and 405.5).' }
         ]
       },
       // ================================================================ Festivals and temporary events
@@ -1194,8 +1204,9 @@
         ],
         checks: [
           { id: 'et-level', label: 'Change in level at the entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
-          { id: 'et-entry', label: 'Entry width (32 in min at openings)', field: 'entry_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
-          { id: 'et-aisle', label: 'Aisle width (36 in min)', field: 'aisle', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'et-entry', label: 'Entry width (32 in min at openings)', field: 'entry_width', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.2', { min: 32 }) },
+          { id: 'et-aisle', label: 'Aisle width (36 in min)', field: 'aisle', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }),
+            note: 'Michigan: an exterior route leading to the tent needs 48 in (A117.1 403.5.1).' },
           { id: 'et-turn', label: 'Turning space', field: 'turning', ada: ada('304.3', { expect: true }), mi: mi('304.3', { expect: true }) },
           { id: 'et-floor', label: 'Floor surface', field: 'floor', ada: ada('302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
           { id: 'et-counter', label: 'Service counter or table (36 in max)', field: 'counter', ada: ada('904.4.1', { max: 36 }), mi: mi('904.3.2', { max: 36 }) },
@@ -1216,7 +1227,8 @@
         ],
         checks: [
           { id: 'ep-surf', label: 'Firm, stable path', field: 'surface', ada: ada('302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
-          { id: 'ep-width', label: 'Clear width (36 in min)', field: 'clear_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 36 }) },
+          { id: 'ep-width', label: 'Clear width (36 in min; Michigan 48 in outdoors)', field: 'clear_width', ada: ada('403.5.1', { min: 36 }), mi: mi('403.5.1', { min: 48 }),
+            note: 'A117.1-2017 requires 48 in for exterior routes; 36 in within seating areas.' },
           { id: 'ep-run', label: 'Running slope (1:20 max; steeper needs a ramp)', field: 'running_slope', ada: ada('403.3', { max: 5 }), mi: mi('403.3', { max: 5 }) },
           { id: 'ep-cross', label: 'Cross slope (1:48 max)', field: 'cross_slope', ada: ada('403.3', { max: 2.08 }), mi: mi('403.3', { max: 2.08 }) },
           { id: 'ep-level', label: 'Cable covers and edges', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2, 303.3 and 303.4'), mi: mi('303.2, 303.3 and 303.4'),
@@ -1241,7 +1253,7 @@
           { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2, Exception 3'), mi: { cite: '2021 MBC §1109.2', verify: true } },
           { id: 'pt-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
           { id: 'pt-level', label: 'Level entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
-          { id: 'pt-door', label: 'Door clear width (32 in min)', field: 'door', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
+          { id: 'pt-door', label: 'Door clear width (32 in min)', field: 'door', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.2', { min: 32 }) },
           { id: 'pt-turn', label: 'Turning space inside', field: 'turning', ada: ada('603.2.1', { expect: true }), mi: mi('603.2.1', { expect: true }) },
           { id: 'pt-seat', label: 'Seat height (17 to 19 in)', field: 'seat', ada: ada('604.4', { min: 17, max: 19 }), mi: mi('604.4', { min: 17, max: 19 }) },
           { id: 'pt-grab', label: 'Grab bars', field: 'grab', ada: ada('604.5', { expect: true }), mi: mi('604.5', { expect: true }) }
@@ -1258,9 +1270,10 @@
     ]
   };
 
-  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3 (301-306), 5, 6, 9 and 10, Oct 27, 2026.
+  // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3, 4, 5, 6, 8 (802), 9 and 10, Oct 27, 2026.
   // Checks whose Michigan side also cites the 2021 MBC stay marked until the MBC text is checked.
-  var MI_CONFIRMED = ['route.rt-level', 'route.rt-open', 'route.rt-surface', 'surface.sf-firm', 'surface.sf-damage', 'surface.sf-open', 'surface.sf-level', 'surface.sf-pile', 'surface.sf-secure', 'surface.sf-backing', 'surface.sf-edge', 'toilet_room.tr-turn', 'toilet_room.tr-turn-t', 'lavatory.lv-knee', 'lavatory.lv-cfs-w', 'lavatory.lv-cfs-d', 'voting_station.vs-cfs', 'voting_station.vs-knee', 'temp_fix.tf-edge', 'event_tent.et-level', 'event_tent.et-turn', 'event_tent.et-floor', 'event_path.ep-surf', 'event_path.ep-level', 'event_path.ep-open', 'portable_toilet.pt-route', 'portable_toilet.pt-level',
+  var MI_CONFIRMED = ['route.rt-run', 'route.rt-cross', 'route.rt-width-mi-out', 'route.rt-width-mi-in', 'ramp.rp-run', 'ramp.rp-cross', 'ramp.rp-width', 'ramp.rp-rise', 'ramp.rp-land-top', 'ramp.rp-land-bot', 'ramp.rp-land-slope', 'ramp.rp-rails', 'ramp.rp-edge', 'protruding.po-protrude', 'protruding.po-head', 'door.dr-width', 'door.dr-thresh', 'door.dr-hw-ht', 'door.dr-hw-type', 'door.dr-force', 'door.dr-close', 'door.dr-pull-latch', 'door.dr-pull-depth', 'door.dr-push-depth', 'door.dr-other', 'operable.op-high', 'operable.op-low', 'operable.op-obst', 'operable.op-grasp', 'operable.op-force', 'curb_ramp.cr-run', 'curb_ramp.cr-cross', 'curb_ramp.cr-width', 'curb_ramp.cr-flare', 'curb_ramp.cr-counter', 'curb_ramp.cr-landing', 'curb_ramp.cr-flush', 'assembly.as-w1', 'assembly.as-w2', 'assembly.as-df', 'assembly.as-ds', 'assembly.as-comp', 'voting_station.vs-route', 'voting_station.vs-reach', 'temp_fix.tf-slope', 'temp_fix.tf-width', 'event_tent.et-entry', 'event_tent.et-aisle', 'event_tent.et-high', 'event_tent.et-low', 'event_path.ep-width', 'event_path.ep-run', 'event_path.ep-cross', 'portable_toilet.pt-door',
+    'route.rt-level', 'route.rt-open', 'route.rt-surface', 'surface.sf-firm', 'surface.sf-damage', 'surface.sf-open', 'surface.sf-level', 'surface.sf-pile', 'surface.sf-secure', 'surface.sf-backing', 'surface.sf-edge', 'toilet_room.tr-turn', 'toilet_room.tr-turn-t', 'lavatory.lv-knee', 'lavatory.lv-cfs-w', 'lavatory.lv-cfs-d', 'voting_station.vs-cfs', 'voting_station.vs-knee', 'temp_fix.tf-edge', 'event_tent.et-level', 'event_tent.et-turn', 'event_tent.et-floor', 'event_path.ep-surf', 'event_path.ep-level', 'event_path.ep-open', 'portable_toilet.pt-route', 'portable_toilet.pt-level',
     'amusement_ride.ar-slope', 'boating.bt-gang', 'boating.bt-pier', 'boating.bt-route', 'counter.ct-height', 'counter.ct-knee', 'counter.ct-len-fwd', 'counter.ct-len-par', 'event_tent.et-counter', 'exercise.ex-cfs', 'fishing.fp-cfs', 'fishing.fp-edge', 'fishing.fp-rail', 'fishing.fp-turn', 'fountain.df-stand', 'fountain.df-wc', 'golf.gf-car', 'golf.gf-mini', 'lavatory.lv-faucet', 'lavatory.lv-mirror', 'lavatory.lv-pipes', 'lavatory.lv-rim', 'loading_zone.lz-aisle-l', 'loading_zone.lz-aisle-w', 'loading_zone.lz-clear', 'loading_zone.lz-marked', 'loading_zone.lz-pullup', 'loading_zone.lz-slope', 'parking.pk-aisle', 'parking.pk-marked', 'parking.pk-route', 'parking.pk-sign-ht', 'parking.pk-slope', 'parking.pk-van', 'parking.pk-van-clr', 'parking.pk-van-sign', 'parking.pk-width', 'picnic.pn-height', 'picnic.pn-knee', 'play_area.pa-elev', 'play_area.pa-ground', 'play_area.pa-gwidth', 'play_area.pa-impact', 'play_area.pa-ramp', 'play_area.pa-surf', 'play_area.pa-turn', 'play_component.pc-cfs', 'play_component.pc-entry', 'play_component.pc-knee', 'play_component.pc-route', 'play_component.pc-table', 'play_ramp.pr-rail', 'play_ramp.pr-rise', 'play_ramp.pr-slope-e', 'play_ramp.pr-slope-g', 'play_ramp.pr-width', 'play_ramp.pr-width-g', 'play_transfer.pt-d', 'play_transfer.pt-h-plat', 'play_transfer.pt-h-step', 'play_transfer.pt-sup', 'play_transfer.pt-w', 'pool_lift.lf-cap', 'pool_lift.lf-deck', 'pool_lift.lf-depth', 'pool_lift.lf-foot', 'pool_lift.lf-op', 'pool_lift.lf-seat', 'pool_lift.lf-sub', 'pool_lift.lf-width', 'pool_slope.ps-depth', 'pool_slope.ps-rails', 'pool_slope.ps-slope', 'portable_toilet.pt-grab', 'portable_toilet.pt-seat', 'portable_toilet.pt-turn', 'ramp.rp-rail-dia', 'ramp.rp-rail-ext', 'ramp.rp-rail-ht', 'stairs.st-open', 'stairs.st-rail-ht', 'stairs.st-rails', 'stairs.st-riser', 'stairs.st-riser-min', 'stairs.st-tread', 'stairs.st-uniform', 'toilet.wc-cl', 'toilet.wc-clr-d', 'toilet.wc-clr-w', 'toilet.wc-flush', 'toilet.wc-gb-ht', 'toilet.wc-rgb-len', 'toilet.wc-rgb-split', 'toilet.wc-seat', 'toilet.wc-sgb-len', 'toilet.wc-sgb-reach', 'toilet.wc-sgb-rear', 'toilet.wc-stall-d-floor', 'toilet.wc-stall-d-wall', 'toilet.wc-stall-w', 'toilet.wc-tp-front', 'toilet.wc-tp-ht', 'toilet_room.tr-swing', 'transfer_wall.tw-d', 'transfer_wall.tw-grab', 'transfer_wall.tw-h', 'transfer_wall.tw-l', 'urinal.ur-flush', 'urinal.ur-rim', 'voting_station.vs-height', 'work_surface.ws-height', 'work_surface.ws-knee'];
   RULES.elements.forEach(function (el) {
     el.checks.forEach(function (c) { if (c.mi && MI_CONFIRMED.indexOf(el.id + '.' + c.id) >= 0) c.mi.verify = false; });
