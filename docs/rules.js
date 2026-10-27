@@ -34,13 +34,13 @@
   function bp(cite, lim) { return Object.assign({ cite: cite, verify: true }, lim || {}); }
   var EV_BP = 'US Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (2023)';
   var LIGHT_BP = 'Best practice (no ADA or Michigan accessibility rule for exterior lighting)';
-  var PLAY_SAFE = 'CPSC Public Playground Safety Handbook, adopted by Michigan\'s Playground Equipment Safety Act (1997 PA 16)';
+  var PLAY_SAFE = 'CPSC Public Playground Safety Handbook, incorporated by Michigan\'s Playground Equipment Safety Act (1997 PA 16, MCL 408.684 and 408.686)';
   function mi(sec, lim, opts) {
     return Object.assign({ cite: MI + ' §' + sec, verify: true }, lim || {}, opts || {});
   }
 
   var RULES = {
-    version: '2026-10-27.9',
+    version: '2026-10-27.10',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -963,7 +963,7 @@
       },
       {
         id: 'play_safety', label: 'Playground safety check (not accessibility)', group: 'Recreation',
-        scopeNote: 'Michigan\'s Playground Equipment Safety Act is a safety law, not an accessibility code. These items are reported separately as safety notes and are never counted as accessibility violations. A certified playground safety inspector (CPSI) should confirm any concern.',
+        scopeNote: 'Michigan\'s Playground Equipment Safety Act is a safety law, not an accessibility code. It covers playground equipment owned and operated by a local government, school district or other public body, which must maintain it to the CPSC handbook and ASTM F1487 (MCL 408.686); equipment that predates May 1, 1998 must meet them only where possible without substantial alteration or replacement. These items are reported separately as safety notes and are never counted as accessibility violations. A certified playground safety inspector (CPSI) should confirm any concern.',
         fields: [
           { id: 'surfacing', type: 'bool', label: 'Protective surfacing under and around equipment, filled to its marked depth?' },
           { id: 'use_zone', type: 'bool', label: 'At least 6 ft clear use zone around equipment, with no hard objects?' },
@@ -1280,6 +1280,10 @@
 
   // Michigan (ICC A117.1-2017) citations checked against the ICC Digital Codes text of Chapters 3, 4, 5, 6, 7 (703.2 and 703.3), 8 (802 and 805), 9 and 10, Oct 27, 2026.
   // 2021 MBC Chapter 11 citations checked against the UpCodes text, Oct 27, 2026.
+  // Best-practice sources checked Oct 27, 2026: Access Board EV recommendations, CPSC handbook and 1997 PA 16.
+  RULES.elements.forEach(function (el) {
+    el.checks.forEach(function (c) { if (c.bp && (c.bp.cite === EV_BP || c.bp.cite === PLAY_SAFE)) c.bp.verify = false; });
+  });
   var MI_CONFIRMED = ['signage.sg-low', 'signage.sg-high', 'signage.sg-latch', 'signage.sg-clear', 'signage.sg-raised', 'signage.sg-braille',
     'bus_stop.bs-depth', 'bus_stop.bs-width', 'bus_stop.bs-slope', 'bus_stop.bs-route', 'signage.sg-finish',
     'route.rt-run', 'route.rt-cross', 'route.rt-width-mi-out', 'route.rt-width-mi-in', 'ramp.rp-run', 'ramp.rp-cross', 'ramp.rp-width', 'ramp.rp-rise', 'ramp.rp-land-top', 'ramp.rp-land-bot', 'ramp.rp-land-slope', 'ramp.rp-rails', 'ramp.rp-edge', 'protruding.po-protrude', 'protruding.po-head', 'door.dr-width', 'door.dr-thresh', 'door.dr-hw-ht', 'door.dr-hw-type', 'door.dr-force', 'door.dr-close', 'door.dr-pull-latch', 'door.dr-pull-depth', 'door.dr-push-depth', 'door.dr-other', 'operable.op-high', 'operable.op-low', 'operable.op-obst', 'operable.op-grasp', 'operable.op-force', 'curb_ramp.cr-run', 'curb_ramp.cr-cross', 'curb_ramp.cr-width', 'curb_ramp.cr-flare', 'curb_ramp.cr-counter', 'curb_ramp.cr-landing', 'curb_ramp.cr-flush', 'assembly.as-w1', 'assembly.as-w2', 'assembly.as-df', 'assembly.as-ds', 'assembly.as-comp', 'voting_station.vs-route', 'voting_station.vs-reach', 'temp_fix.tf-slope', 'temp_fix.tf-width', 'event_tent.et-entry', 'event_tent.et-aisle', 'event_tent.et-high', 'event_tent.et-low', 'event_path.ep-width', 'event_path.ep-run', 'event_path.ep-cross', 'portable_toilet.pt-door',
