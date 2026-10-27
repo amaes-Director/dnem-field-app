@@ -21969,9 +21969,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   var MI = 'ICC A117.1-2017';
 
   // Shorthand: side(cite, limits) builds one code side.
-  function ada(sec, lim) { return Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); } // lim.verify = true marks an ADA section to double-check
-  // Federal Architectural Barriers Act standards, outdoor developed areas (Chapter 10). Section numbers to confirm.
-  function aba(sec, lim) { return Object.assign({ cite: 'ABA §' + sec, verify: true }, lim || {}); }
+  // Section numbers and limits confirmed against the 2010 ADA Standards text, Oct 27, 2026.
+  function ada(sec, lim) { var o = Object.assign({ cite: 'ADA 2010 §' + sec }, lim || {}); delete o.verify; return o; }
+  // Federal Architectural Barriers Act standards, outdoor developed areas (Chapter 10).
+  // Section numbers and limits confirmed against the ABA Chapter 10 text, Oct 27, 2026.
+  function aba(sec, lim) { return Object.assign({ cite: 'ABA §' + sec }, lim || {}); }
   // Recommendations and safety rules that are not ADA, ABA or Michigan barrier-free requirements.
   // An unmet item is reported as "Best practice not met", never as "Does not comply".
   function bp(cite, lim) { return Object.assign({ cite: cite, verify: true }, lim || {}); }
@@ -21983,7 +21985,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   }
 
   var RULES = {
-    version: '2026-10-26.1',
+    version: '2026-10-27.1',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -22340,7 +22342,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         ],
         checks: [
           { id: 'lv-rim', label: 'Rim / counter height', field: 'rim', ada: ada('606.3', { max: 34 }), mi: mi('606.3', { max: 34 }) },
-          { id: 'lv-knee', label: 'Knee clearance height', field: 'knee', ada: ada('306.3.3', { min: 27 }), mi: mi('306.3.3', { min: 27 }) },
+          { id: 'lv-knee', label: 'Knee clearance height', field: 'knee', ada: ada('606.2 and 306.3.1', { min: 27 }), mi: mi('306.3.3', { min: 27 }) },
           { id: 'lv-pipes', label: 'Exposed pipes protected', field: 'pipes', ada: ada('606.5', { expect: true }), mi: mi('606.6', { expect: true }) },
           { id: 'lv-faucet', label: 'Faucet operable parts', field: 'faucet', ada: ada('606.4 and 309.4', { expect: true }), mi: mi('606.4 and 309.4', { expect: true }) },
           { id: 'lv-mirror', label: 'Mirror above lavatory, bottom of reflecting surface', field: 'mirror', ada: ada('603.3', { max: 40 }), mi: mi('603.3', { max: 40 }) },
@@ -22580,7 +22582,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'pa-elev', label: 'At least 50% of elevated components on an accessible route', kind: 'ratio', num: 'elevated_route', den: 'elevated_total', minPct: 50,
             ada: ada('240.2.2'), mi: mi('1008 (play areas)') },
           { id: 'pa-ramp', label: 'With 20 or more elevated components, at least 25% reached by ramp', kind: 'ratio', num: 'elevated_ramp', den: 'elevated_total', minPct: 25,
-            when: { elevated_total: { gt: 19 } }, ada: ada('240.2.2.1'), mi: mi('1008 (play areas)') },
+            when: { elevated_total: { gt: 19 } }, ada: ada('1008.2.1, Exception 1'), mi: mi('1008 (play areas)') },
           { id: 'pa-ground', label: 'Ground-level components: number and types', kind: 'manual', ada: ada('240.2.1 (Table 240.2.1.2)'), mi: mi('1008 (play areas)'),
             note: 'At least one of each type of ground-level component must be on a route; Table 240.2.1.2 adds more based on the number of elevated components. Compare with the counts recorded.' },
           { id: 'pa-gwidth', label: 'Ground-level route width', field: 'ground_width', ada: ada('1008.2.4.1', { min: 60, verify: true }), mi: mi('1008.2.4.1', { min: 60 }),
@@ -22606,7 +22608,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'pr-rise', label: 'Rise per run, elevated (12 in max)', field: 'rise', when: { level: 'elevated' }, ada: ada('1008.2.5.2', { max: 12, verify: true }), mi: mi('1008.2.5.2', { max: 12 }) },
           { id: 'pr-width', label: 'Elevated route width', field: 'width', when: { level: 'elevated' }, ada: ada('1008.2.4.2', { min: 36, verify: true }), mi: mi('1008.2.4.2', { min: 36 }) },
           { id: 'pr-width-g', label: 'Ground-level route width', field: 'width', when: { level: 'ground' }, ada: ada('1008.2.4.1', { min: 60, verify: true }), mi: mi('1008.2.4.1', { min: 60 }) },
-          { id: 'pr-rail', label: 'Handrail height (20 to 28 in)', field: 'handrail_height', ada: ada('1008.2.5.3', { min: 20, max: 28, verify: true }), mi: mi('1008.2.5.3', { min: 20, max: 28 }),
+          { id: 'pr-rail', label: 'Handrail height (20 to 28 in)', field: 'handrail_height', ada: ada('1008.2.5.3.2', { min: 20, max: 28, verify: true }), mi: mi('1008.2.5.3.2', { min: 20, max: 28 }),
             note: 'Handrails are not required on ramps inside ground-level use zones (ADA 1008.2.5.3 Exception).' }
         ]
       },
@@ -22620,10 +22622,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'supports', type: 'bool', label: 'Transfer supports (handholds) provided?' }
         ],
         checks: [
-          { id: 'pt-h-plat', label: 'Transfer platform height (11 to 18 in)', field: 'height', when: { kind: 'platform' }, ada: ada('1008.3.1.1', { min: 11, max: 18, verify: true }), mi: mi('1008.3.1.1', { min: 11, max: 18 }) },
-          { id: 'pt-h-step', label: 'Transfer step height (8 in max)', field: 'height', when: { kind: 'step' }, ada: ada('1008.3.2.1', { max: 8, verify: true }), mi: mi('1008.3.2.1', { max: 8 }) },
-          { id: 'pt-w', label: 'Clear width (24 in min)', field: 'width', ada: ada('1008.3.1.2 and 1008.3.2.2', { min: 24, verify: true }), mi: mi('1008.3.1.2 and 1008.3.2.2', { min: 24 }) },
-          { id: 'pt-d', label: 'Clear depth (14 in min)', field: 'depth', ada: ada('1008.3.1.2 and 1008.3.2.2', { min: 14, verify: true }), mi: mi('1008.3.1.2 and 1008.3.2.2', { min: 14 }) },
+          { id: 'pt-h-plat', label: 'Transfer platform height (11 to 18 in)', field: 'height', when: { kind: 'platform' }, ada: ada('1008.3.1.2', { min: 11, max: 18, verify: true }), mi: mi('1008.3.1.2', { min: 11, max: 18 }) },
+          { id: 'pt-h-step', label: 'Transfer step height (8 in max)', field: 'height', when: { kind: 'step' }, ada: ada('1008.3.2.2', { max: 8, verify: true }), mi: mi('1008.3.2.2', { max: 8 }) },
+          { id: 'pt-w', label: 'Clear width (24 in min)', field: 'width', ada: ada('1008.3.1.1 and 1008.3.2.1', { min: 24, verify: true }), mi: mi('1008.3.1.1 and 1008.3.2.1', { min: 24 }) },
+          { id: 'pt-d', label: 'Clear depth (14 in min)', field: 'depth', ada: ada('1008.3.1.1 and 1008.3.2.1', { min: 14, verify: true }), mi: mi('1008.3.1.1 and 1008.3.2.1', { min: 14 }) },
           { id: 'pt-sup', label: 'Transfer supports', field: 'supports', ada: ada('1008.3.1.4 and 1008.3.2.3', { expect: true, verify: true }), mi: mi('1008.3.1.4 and 1008.3.2.3', { expect: true }) }
         ]
       },
@@ -22677,13 +22679,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         checks: [
           { id: 'lf-depth', label: 'Located where water is 48 in deep max', field: 'water_depth', ada: ada('1009.2.1', { max: 48 }), mi: mi('1009.2.1', { max: 48 }),
             note: 'Exception where the entire pool is deeper than 48 in.' },
-          { id: 'lf-seat', label: 'Seat height (16 to 19 in)', field: 'seat_height', ada: ada('1009.2.3', { min: 16, max: 19, verify: true }), mi: mi('1009.2.3', { min: 16, max: 19 }) },
-          { id: 'lf-width', label: 'Seat width (16 in min)', field: 'seat_width', ada: ada('1009.2.4', { min: 16, verify: true }), mi: mi('1009.2.4', { min: 16 }) },
+          { id: 'lf-seat', label: 'Seat height (16 to 19 in)', field: 'seat_height', ada: ada('1009.2.4', { min: 16, max: 19, verify: true }), mi: mi('1009.2.4', { min: 16, max: 19 }) },
+          { id: 'lf-width', label: 'Seat width (16 in min)', field: 'seat_width', ada: ada('1009.2.5', { min: 16, verify: true }), mi: mi('1009.2.5', { min: 16 }) },
           { id: 'lf-sub', label: 'Submerged depth (18 in min)', field: 'submerge', ada: ada('1009.2.8', { min: 18, verify: true }), mi: mi('1009.2.8', { min: 18 }) },
-          { id: 'lf-foot', label: 'Footrest', field: 'footrest', ada: ada('1009.2.5', { expect: true, verify: true }), mi: mi('1009.2.5', { expect: true }) },
+          { id: 'lf-foot', label: 'Footrest', field: 'footrest', ada: ada('1009.2.6', { expect: true, verify: true }), mi: mi('1009.2.6', { expect: true }) },
           { id: 'lf-op', label: 'Independent operation', field: 'operable', ada: ada('1009.2.7', { expect: true, verify: true }), mi: mi('1009.2.7', { expect: true }) },
           { id: 'lf-cap', label: 'Lifting capacity (300 lb min)', field: 'capacity', ada: ada('1009.2.9', { min: 300, verify: true }), mi: mi('1009.2.9', { min: 300 }) },
-          { id: 'lf-deck', label: 'Clear deck space', field: 'deck', ada: ada('1009.2.2', { expect: true, verify: true }), mi: mi('1009.2.2', { expect: true }) }
+          { id: 'lf-deck', label: 'Clear deck space', field: 'deck', ada: ada('1009.2.3', { expect: true, verify: true }), mi: mi('1009.2.3', { expect: true }) }
         ]
       },
       {
@@ -22745,9 +22747,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         ],
         checks: [
           { id: 'fp-rail', label: 'Lowered railings', field: 'rail_pct', ada: ada('1005.2.1', { expect: true }), mi: mi('1005.2.1', { expect: true }) },
-          { id: 'fp-edge', label: 'Edge protection (2 in min)', field: 'edge', ada: ada('1005.2.2', { min: 2, verify: true }), mi: mi('1005.2.2', { min: 2 }) },
-          { id: 'fp-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1005.3', { expect: true }), mi: mi('1005.3', { expect: true }) },
-          { id: 'fp-turn', label: 'Turning space', field: 'turning', ada: ada('1005.4', { expect: true }), mi: mi('1005.4', { expect: true }) }
+          { id: 'fp-edge', label: 'Edge protection (2 in min)', field: 'edge', ada: ada('1005.3.1', { min: 2, verify: true }), mi: mi('1005.3.1', { min: 2 }) },
+          { id: 'fp-cfs', label: 'Clear floor space', field: 'cfs', ada: ada('1005.4', { expect: true }), mi: mi('1005.4', { expect: true }) },
+          { id: 'fp-turn', label: 'Turning space', field: 'turning', ada: ada('1005.5', { expect: true }), mi: mi('1005.5', { expect: true }) }
         ]
       },
       {
@@ -22773,7 +22775,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'holes_route', type: 'count', label: 'Mini golf: holes on an accessible route' }
         ],
         checks: [
-          { id: 'gf-car', label: 'Golf car passage width (48 in min)', field: 'car_passage', when: { kind: 'golf' }, ada: ada('1006.3.2', { min: 48, verify: true }), mi: mi('1006.3.2', { min: 48 }) },
+          { id: 'gf-car', label: 'Golf car passage width (48 in min)', field: 'car_passage', when: { kind: 'golf' }, ada: ada('1006.3.1', { min: 48, verify: true }), mi: mi('1006.3.1', { min: 48 }) },
           { id: 'gf-mini', label: 'At least 50% of mini golf holes on an accessible route', kind: 'ratio', num: 'holes_route', den: 'holes', minPct: 50, when: { kind: 'mini' },
             ada: ada('239.2 and 1007.2'), mi: mi('1007.2') }
         ]
@@ -22828,8 +22830,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             naReason: 'This kind of ride is exempt from the ride-seat requirement (ADA 234.3 Exceptions).',
             ada: ada('234.3'), mi: { cite: '2021 MBC §1110; ' + MI + ' §1002.1', verify: true } },
           { id: 'ar-route', label: 'Accessible route to load and unload areas', field: 'route', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('206.2.9 and 1002.2', { expect: true }), mi: mi('1002.2', { expect: true }, { verify: false }) },
-          { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.1', { expect: true, verify: true }), mi: mi('1002.3 and 304', { expect: true }, { verify: false }) },
-          { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3.2', { max: 2.08, verify: true }), mi: mi('1002.3 and 304.2', { max: 2.08 }) },
+          { id: 'ar-turn', label: 'Turning space at load and unload areas', field: 'turning', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3', { expect: true, verify: true }), mi: mi('1002.3 and 304', { expect: true }, { verify: false }) },
+          { id: 'ar-slope', label: 'Load and unload area slope (1:48 max)', field: 'load_slope', when: { access: ['wc', 'transfer', 'device'] }, ada: ada('1002.3 and 304.2', { max: 2.08, verify: true }), mi: mi('1002.3 and 304.2', { max: 2.08 }) },
           { id: 'ar-entry', label: 'Opening into the wheelchair space (32 in min)', field: 'entry', when: { access: 'wc' }, ada: ada('1002.4.5', { min: 32 }), mi: mi('1002.4.5', { min: 32 }, { verify: false }) },
           { id: 'ar-space', label: 'Wheelchair space size and slope', field: 'space', when: { access: 'wc' }, ada: ada('1002.4.2 and 1002.4.4', { expect: true, verify: true }), mi: mi('1002.4.2 and 1002.4.4.1', { expect: true }, { verify: false }) },
           { id: 'ar-comp', label: 'Companion seat', field: 'companion', when: { access: 'wc' }, ada: ada('1002.4.7', { expect: true }), mi: mi('1002.4.7', { expect: true }, { verify: false }),
@@ -22909,6 +22911,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required for federal agencies and when federal funds apply; otherwise reported as best practice. Use this for trails and boardwalks; use "Outdoor recreation access route" for paths linking parking, picnic, camping and viewing areas.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Tread surface firm and stable?' },
+          { id: 'tread', type: 'choice', label: 'Surface material', options: [ { id: 'paved', label: 'Asphalt, concrete or boards' }, { id: 'other', label: 'Other (crushed stone, soil, mulch, etc.)' } ] },
           { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
           { id: 'passing', type: 'bool', label: 'Where narrower than 60 in: 60 x 60 in passing spaces at least every 1,000 ft?', allowNA: true },
           { id: 'obstacle', type: 'len', label: 'Tallest tread obstacle (root, rock, plank edge)', allowNA: true },
@@ -22922,17 +22925,19 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'sign', type: 'bool', label: 'Trailhead sign gives length, surface, width and steepest slopes?' }
         ],
         checks: [
-          { id: 'tr-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1017.3', { expect: true }) },
-          { id: 'tr-width', label: 'Clear tread width (36 in min)', field: 'width', aba: aba('1017.4', { min: 36 }), note: 'May narrow to 32 in where there is a physical constraint.' },
-          { id: 'tr-pass', label: 'Passing spaces', field: 'passing', aba: aba('1017.5', { expect: true }) },
-          { id: 'tr-obst', label: 'Tread obstacles (2 in max)', field: 'obstacle', aba: aba('1017.6', { max: 2 }), note: 'Up to 3 in is allowed where running and cross slopes are 1:20 or less.' },
-          { id: 'tr-open', label: 'Openings (1/2 in max)', field: 'opening', aba: aba('1017.7', { max: 0.5 }) },
-          { id: 'tr-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 200], [10, 30], [12.5, 10]], aba: aba('1017.8.1') },
-          { id: 'tr-30', label: 'No more than 30% of the trail steeper than 1:12', field: 'pct_12', aba: aba('1017.8.1', { expect: true }) },
-          { id: 'tr-cross', label: 'Cross slope (1:20 max)', field: 'cross_slope', aba: aba('1017.8.2', { max: 5 }) },
-          { id: 'tr-rest', label: 'Resting intervals', field: 'resting', aba: aba('1017.9', { expect: true }) },
-          { id: 'tr-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1017.10', { min: 80 }) },
-          { id: 'tr-sign', label: 'Trailhead signs', field: 'sign', aba: aba('1017.11', { expect: true }) }
+          { id: 'tr-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1017.2', { expect: true }) },
+          { id: 'tr-width', label: 'Clear tread width (36 in min)', field: 'width', aba: aba('1017.3', { min: 36 }), note: 'Narrower is allowed only where a condition in ABA 1019 (such as terrain or protected resources) prevents full compliance (1017.1, Exception 1).' },
+          { id: 'tr-pass', label: 'Passing spaces', field: 'passing', aba: aba('1017.4', { expect: true }) },
+          { id: 'tr-obst-p', label: 'Tread obstacles, paved or boards (1/2 in max)', field: 'obstacle', when: { tread: 'paved' }, aba: aba('1017.5', { max: 0.5 }) },
+          { id: 'tr-obst', label: 'Tread obstacles, other surfaces (2 in max)', field: 'obstacle', when: { tread: 'other' }, aba: aba('1017.5, Exception', { max: 2 }) },
+          { id: 'tr-open', label: 'Openings (1/2 in max)', field: 'opening', aba: aba('1017.6', { max: 0.5 }) },
+          { id: 'tr-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 200], [10, 30], [12, 10]], aba: aba('1017.7.1') },
+          { id: 'tr-30', label: 'No more than 30% of the trail steeper than 1:12', field: 'pct_12', aba: aba('1017.7.1', { expect: true }) },
+          { id: 'tr-cross-p', label: 'Cross slope, paved or boards (1:48 max)', field: 'cross_slope', when: { tread: 'paved' }, aba: aba('1017.7.2', { max: 2.08 }) },
+          { id: 'tr-cross', label: 'Cross slope, other surfaces (1:20 max)', field: 'cross_slope', when: { tread: 'other' }, aba: aba('1017.7.2, Exception', { max: 5 }), note: '1:20 is allowed on these surfaces only where needed for drainage; otherwise 1:48.' },
+          { id: 'tr-rest', label: 'Resting intervals', field: 'resting', aba: aba('1017.8', { expect: true }) },
+          { id: 'tr-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1017.9 and 307', { min: 80 }) },
+          { id: 'tr-sign', label: 'Trailhead signs', field: 'sign', aba: aba('F216.13 and 1017.10', { expect: true }) }
         ]
       },
       {
@@ -22940,6 +22945,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10 for paths that connect parking, picnic, camping, viewing and toilet areas in a park. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Surface firm and stable?' },
+          { id: 'tread', type: 'choice', label: 'Surface material', options: [ { id: 'paved', label: 'Asphalt, concrete or boards' }, { id: 'other', label: 'Other (crushed stone, soil, mulch, etc.)' } ] },
           { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
           { id: 'passing', type: 'bool', label: 'Where narrower than 60 in: passing spaces at least every 200 ft?', allowNA: true },
           { id: 'obstacle', type: 'len', label: 'Tallest tread obstacle', allowNA: true },
@@ -22954,12 +22960,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'or-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1016.2', { expect: true }) },
           { id: 'or-width', label: 'Clear tread width (36 in min)', field: 'width', aba: aba('1016.3', { min: 36 }) },
           { id: 'or-pass', label: 'Passing spaces', field: 'passing', aba: aba('1016.4', { expect: true }) },
-          { id: 'or-obst', label: 'Tread obstacles (1/2 in max)', field: 'obstacle', aba: aba('1016.5', { max: 0.5 }) },
+          { id: 'or-obst', label: 'Tread obstacles, paved or boards (1/2 in max)', field: 'obstacle', when: { tread: 'paved' }, aba: aba('1016.5', { max: 0.5 }) },
+          { id: 'or-obst-o', label: 'Tread obstacles, other surfaces (1 in max)', field: 'obstacle', when: { tread: 'other' }, aba: aba('1016.5, Exception', { max: 1 }) },
           { id: 'or-open', label: 'Openings (1/2 in max)', field: 'opening', aba: aba('1016.6', { max: 0.5 }) },
           { id: 'or-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 50], [10, 30]], aba: aba('1016.7.1') },
-          { id: 'or-cross', label: 'Cross slope (1:33 max)', field: 'cross_slope', aba: aba('1016.7.2', { max: 3.03 }), note: 'Up to 1:20 is allowed on surfaces other than asphalt, concrete and boards where needed for drainage.' },
+          { id: 'or-cross', label: 'Cross slope, paved or boards (1:48 max)', field: 'cross_slope', when: { tread: 'paved' }, aba: aba('1016.7.2', { max: 2.08 }) },
+          { id: 'or-cross-o', label: 'Cross slope, other surfaces (1:20 max)', field: 'cross_slope', when: { tread: 'other' }, aba: aba('1016.7.2, Exception', { max: 5 }), note: '1:20 is allowed on these surfaces only where needed for drainage; otherwise 1:48.' },
           { id: 'or-rest', label: 'Resting intervals', field: 'resting', aba: aba('1016.8', { expect: true }) },
-          { id: 'or-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1016.9', { min: 80 }) }
+          { id: 'or-head', label: 'Headroom (80 in min)', field: 'headroom', aba: aba('1016.9 and 307', { min: 80 }) }
         ]
       },
       {
@@ -22967,6 +22975,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Surface firm and stable (mat, boardwalk or hardened path)?' },
+          { id: 'tread', type: 'choice', label: 'Surface material', options: [ { id: 'paved', label: 'Asphalt, concrete or boards' }, { id: 'other', label: 'Other (mat, crushed stone, etc.)' } ] },
           { id: 'width', type: 'len', label: 'Narrowest clear width' },
           { id: 'running_slope', type: 'slope', label: 'Steepest running slope' },
           { id: 'steep_length', type: 'count', label: 'Length of that steep segment (feet)' },
@@ -22978,8 +22987,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'br-surf', label: 'Firm and stable surface', field: 'surface', aba: aba('1018.3', { expect: true }) },
           { id: 'br-width', label: 'Clear width (60 in min)', field: 'width', aba: aba('1018.4', { min: 60 }) },
           { id: 'br-run', label: 'Running slope and segment length', kind: 'abaSlope', segments: [[5, Infinity], [8.33, 50], [10, 30]], aba: aba('1018.7.1') },
-          { id: 'br-cross', label: 'Cross slope (1:50 max)', field: 'cross_slope', aba: aba('1018.7.2', { max: 2 }) },
-          { id: 'br-obst', label: 'Obstacles (1/2 in max)', field: 'obstacle', aba: aba('1018.5', { max: 0.5 }) },
+          { id: 'br-cross', label: 'Cross slope, paved or boards (1:48 max)', field: 'cross_slope', when: { tread: 'paved' }, aba: aba('1018.7.2', { max: 2.08 }) },
+          { id: 'br-cross-o', label: 'Cross slope, other surfaces (1:20 max)', field: 'cross_slope', when: { tread: 'other' }, aba: aba('1018.7.2, Exception', { max: 5 }), note: '1:20 is allowed on these surfaces only where needed for drainage; otherwise 1:48.' },
+          { id: 'br-obst', label: 'Obstacles, paved or boards (1/2 in max)', field: 'obstacle', when: { tread: 'paved' }, aba: aba('1018.5', { max: 0.5 }) },
+          { id: 'br-obst-o', label: 'Obstacles, other surfaces (1 in max)', field: 'obstacle', when: { tread: 'other' }, aba: aba('1018.5, Exception', { max: 1 }) },
           { id: 'br-water', label: 'Reaches the water', field: 'reach_water', aba: aba('1018.2', { expect: true }) }
         ]
       },
@@ -22991,17 +23002,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'tables_ok', type: 'count', label: 'Tables with a wheelchair space and on an outdoor recreation access route' },
           { id: 'height', type: 'len', label: 'Table top height' },
           { id: 'knee', type: 'len', label: 'Knee clearance height at the wheelchair space' },
-          { id: 'knee_depth', type: 'len', label: 'Knee clearance depth under the table' },
+          { id: 'knee_depth', type: 'len', label: 'Knee clearance depth under the table, at knee height (27 in)' },
           { id: 'cgs', type: 'len', label: 'Clear ground space around the usable sides' },
           { id: 'surface', type: 'bool', label: 'Ground around the table firm and stable, nearly level?' }
         ],
         checks: [
-          { id: 'pk-count', label: 'At least 20% of tables accessible', kind: 'ratio', num: 'tables_ok', den: 'tables', minPct: 20, aba: aba('F245.2.1') },
-          { id: 'pk-height', label: 'Table top height (28 to 34 in)', field: 'height', aba: aba('1011.3.1', { min: 28, max: 34 }) },
-          { id: 'pk-knee', label: 'Knee clearance height (27 in min)', field: 'knee', aba: aba('1011.3.2', { min: 27 }) },
-          { id: 'pk-kdepth', label: 'Knee clearance depth (19 in min)', field: 'knee_depth', aba: aba('1011.3.2', { min: 19 }) },
-          { id: 'pk-cgs', label: 'Clear ground space around usable sides (36 in min)', field: 'cgs', aba: aba('1011.3.3', { min: 36 }) },
-          { id: 'pk-surf', label: 'Ground surface', field: 'surface', aba: aba('1011.2', { expect: true }) }
+          { id: 'pk-count', label: 'At least 20% of tables accessible', kind: 'ratio', num: 'tables_ok', den: 'tables', minPct: 20, aba: aba('F245.3, F246.3, F247.3.1 and F247.5') },
+          { id: 'pk-height', label: 'Table top height (28 to 34 in)', field: 'height', aba: aba('1011.4.1 and 902.3', { min: 28, max: 34 }) },
+          { id: 'pk-knee', label: 'Knee clearance height (27 in min)', field: 'knee', aba: aba('1011.4.2 and 306.3.1', { min: 27 }) },
+          { id: 'pk-kdepth', label: 'Knee clearance depth at 27 in high (8 in min)', field: 'knee_depth', aba: aba('1011.4.2 and 306.3.3', { min: 8 }), note: 'Also 11 in deep at 9 in high, and toe space 17 in deep (306.2 and 306.3).' },
+          { id: 'pk-cgs', label: 'Clear ground space around usable sides (36 in min)', field: 'cgs', aba: aba('1011.2.1 (Table 1011.2.1)', { min: 36 }) },
+          { id: 'pk-surf', label: 'Ground surface', field: 'surface', aba: aba('1011.2.2 and 1011.2.3', { expect: true }) }
         ]
       },
       {
@@ -23013,9 +23024,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'route', type: 'bool', label: 'On an outdoor recreation access route?' }
         ],
         checks: [
-          { id: 'fg-height', label: 'Cooking surface height (15 to 34 in)', field: 'height', aba: aba('1011.5 and 1011.6', { min: 15, max: 34 }) },
-          { id: 'fg-cgs', label: 'Clear ground space', field: 'cgs', aba: aba('1011.5 and 1011.6', { expect: true }) },
-          { id: 'fg-route', label: 'On an access route', field: 'route', aba: aba('F247.1', { expect: true }) }
+          { id: 'fg-height', label: 'Cooking surface height (15 to 34 in)', field: 'height', aba: aba('1011.5.2', { min: 15, max: 34 }) },
+          { id: 'fg-cgs', label: 'Clear ground space', field: 'cgs', aba: aba('1011.2.1 (Table 1011.2.1)', { expect: true }) },
+          { id: 'fg-route', label: 'On an access route', field: 'route', aba: aba('F244.5 and F245.4', { expect: true }) }
         ]
       },
       {
@@ -23027,9 +23038,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'cgs', type: 'bool', label: '36 x 48 in clear ground space beside one end?' }
         ],
         checks: [
-          { id: 'bn-seat', label: 'Seat height (17 to 19 in)', field: 'seat', aba: aba('1011.13', { min: 17, max: 19 }) },
-          { id: 'bn-back', label: 'Back support', field: 'back', aba: aba('1011.13', { expect: true }) },
-          { id: 'bn-cgs', label: 'Clear ground space beside the bench', field: 'cgs', aba: aba('1011.13', { expect: true }) }
+          { id: 'bn-seat', label: 'Seat height (17 to 19 in)', field: 'seat', bp: bp('Best practice (the ADA and ABA Guidelines have no seat height or back rule for outdoor benches; 903 covers locker room benches)', { min: 17, max: 19, verify: false }) },
+          { id: 'bn-back', label: 'Back support', field: 'back', bp: bp('Best practice (the ADA and ABA Guidelines have no seat height or back rule for outdoor benches; 903 covers locker room benches)', { expect: true, verify: false }) },
+          { id: 'bn-cgs', label: 'Clear ground space beside the bench', field: 'cgs', aba: aba('1011.2.1 (Table 1011.2.1)', { expect: true }) }
         ]
       },
       {
@@ -23042,10 +23053,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'route', type: 'bool', label: 'Connected to parking, toilets and water by an outdoor recreation access route?' }
         ],
         checks: [
-          { id: 'cs-surf', label: 'Firm and stable tent pad', field: 'surface', aba: aba('1013.2', { expect: true }) },
-          { id: 'cs-slope', label: 'Tent pad slope (1:48 max)', field: 'slope', aba: aba('1013.3', { max: 2.08 }), note: '1:33 is allowed on surfaces other than asphalt, concrete and boards where needed for drainage.' },
-          { id: 'cs-cgs', label: 'Clear ground space around the pad (48 in min)', field: 'cgs', aba: aba('1013.4', { min: 48 }) },
-          { id: 'cs-route', label: 'On an access route', field: 'route', aba: aba('F244', { expect: true }) }
+          { id: 'cs-surf', label: 'Firm and stable tent pad', field: 'surface', aba: aba('1013.2.2', { expect: true }) },
+          { id: 'cs-slope', label: 'Tent pad slope (1:48 max)', field: 'slope', aba: aba('1013.3', { max: 2.08 }), note: '1:20 is allowed on surfaces other than asphalt, concrete and boards where needed for drainage (1013.3, Exception).' },
+          { id: 'cs-cgs', label: 'Clear ground space around the pad (48 in min)', field: 'cgs', aba: aba('1013.2.1', { min: 48 }) },
+          { id: 'cs-route', label: 'On an access route', field: 'route', aba: aba('F244.2.3.3 and F244.5.1', { expect: true }) }
         ]
       },
       {
@@ -23058,10 +23069,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'route', type: 'bool', label: 'On an outdoor recreation access route?' }
         ],
         checks: [
-          { id: 'vw-cgs', label: 'Clear ground space at viewing spots', field: 'cgs', aba: aba('1011.14', { expect: true }) },
-          { id: 'vw-view', label: 'Clear view at seated eye level', field: 'view_height', kind: 'manual', aba: aba('1011.14'), note: 'Check that a seated person can see over or through the railing (about 32 in and above).' },
-          { id: 'vw-scope', label: 'Viewing scope eyepiece (43 to 51 in)', field: 'scope', aba: aba('1011.15', { min: 43, max: 51 }) },
-          { id: 'vw-route', label: 'On an access route', field: 'route', aba: aba('F246', { expect: true }) }
+          { id: 'vw-cgs', label: 'Clear ground space at viewing spots', field: 'cgs', aba: aba('1015.2', { expect: true }) },
+          { id: 'vw-view', label: 'Clear view at seated eye level', field: 'view_height', kind: 'manual', aba: aba('1015.3'), note: 'The view must be clear between 32 and 51 in above the ground, across the full width of the clear ground space.' },
+          { id: 'vw-scope', label: 'Viewing scope eyepiece (43 to 51 in)', field: 'scope', aba: aba('1011.8', { min: 43, max: 51 }) },
+          { id: 'vw-route', label: 'On an access route', field: 'route', aba: aba('F246.4', { expect: true }) }
         ]
       },
       // ================================================================ Polling places (DOJ ADA Checklist for Polling Places, 2016)
@@ -23166,7 +23177,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           { id: 'grab', type: 'bool', label: 'Grab bars on the side and back walls?' }
         ],
         checks: [
-          { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2'), mi: { cite: '2021 MBC §1109.2', verify: true } },
+          { id: 'pt-count', label: 'At least 5% accessible (at least one)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, ada: ada('213.2, Exception 3'), mi: { cite: '2021 MBC §1109.2', verify: true } },
           { id: 'pt-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 302.1', { expect: true }), mi: mi('302.1', { expect: true }) },
           { id: 'pt-level', label: 'Level entry', kind: 'levelChange', fields: ['level_change', 'beveled'], ada: ada('303.2 and 303.3'), mi: mi('303.2 and 303.3') },
           { id: 'pt-door', label: 'Door clear width (32 in min)', field: 'door', ada: ada('404.2.3', { min: 32 }), mi: mi('404.2.3', { min: 32 }) },
