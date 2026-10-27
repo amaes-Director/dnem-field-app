@@ -41,7 +41,7 @@
     version: '2026-10-26.1',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
-      aba: { short: 'ABA', name: 'Architectural Barriers Act (ABA) Accessibility Guidelines, Chapter 10 (outdoor developed areas)' },
+      aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
       bp: { short: 'Best practice', name: 'Recommendations and safety rules that are not accessibility requirements (US Access Board EV charging recommendations, exterior lighting practice, Michigan Playground Equipment Safety Act)' },
       mi: {
         short: 'Michigan',
@@ -50,7 +50,7 @@
       }
     },
     federalFunds: [
-      { id: 'yes', label: 'Yes: federal agency, or federal money that requires the ABA guidelines (for example a federal grant to DNR)' },
+      { id: 'yes', label: 'Yes: federal agency, or federal money that requires the ADA and ABA Accessibility Guidelines, Chapter 10 (for example a federal grant to DNR)' },
       { id: 'no', label: 'No federal money' },
       { id: 'unknown', label: 'Not known' }
     ],
@@ -856,7 +856,7 @@
           { id: 'pn-height', label: 'Table height (28 to 34 in), if treated as a dining surface', field: 'height', ada: ada('226.1 and 902.3', { min: 28, max: 34 }), mi: mi('902.3', { min: 28, max: 34 }) },
           { id: 'pn-knee', label: 'Knee clearance (27 in min), if treated as a dining surface', field: 'knee', ada: ada('902.2 and 306.3', { min: 27 }), mi: mi('902.2 and 306.3', { min: 27 }) },
           { id: 'pn-scope', label: 'Whether picnic tables and outdoor benches are covered at this site', kind: 'manual', ada: ada('226.1'), mi: mi('902'),
-            note: 'The ADA Accessibility Guidelines have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under the federal ABA rules, record "Picnic table (park or picnic area)".' }
+            note: 'The ADA Accessibility Guidelines have no picnic-table or park-bench rules; dining-surface rules (5% accessible) are applied here by practice. For park picnic tables under Chapter 10 of the ADA and ABA Accessibility Guidelines, record "Picnic table (park or picnic area)".' }
         ]
       },
       // ================================================================ Rides, shooting ranges, saunas (ADA 234, 241, 243)
@@ -960,8 +960,8 @@
       // ================================================================ Outdoor developed areas (ABA Chapter 10)
       // ABA-only checks: required when the visit says federal funds apply, best practice when not.
       {
-        id: 'trail', label: 'Trail, nature path or wetland boardwalk', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required for federal agencies and when federal funds apply; otherwise reported as best practice. Use this for trails and boardwalks; use "Outdoor recreation access route" for paths linking parking, picnic, camping and viewing areas.',
+        id: 'trail', label: 'Trail, nature path or wetland boardwalk', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required for federal agencies and when federal funds apply; otherwise reported as best practice. Use this for trails and boardwalks; use "Outdoor recreation access route" for paths linking parking, picnic, camping and viewing areas.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Tread surface firm and stable?' },
           { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
@@ -991,8 +991,8 @@
         ]
       },
       {
-        id: 'orar', label: 'Outdoor recreation access route (park path)', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10) for paths that connect parking, picnic, camping, viewing and toilet areas in a park. Required when federal funds apply; otherwise best practice.',
+        id: 'orar', label: 'Outdoor recreation access route (park path)', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10 for paths that connect parking, picnic, camping, viewing and toilet areas in a park. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Surface firm and stable?' },
           { id: 'width', type: 'len', label: 'Narrowest clear tread width' },
@@ -1018,8 +1018,8 @@
         ]
       },
       {
-        id: 'beach_route', label: 'Beach access route', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        id: 'beach_route', label: 'Beach access route', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Surface firm and stable (mat, boardwalk or hardened path)?' },
           { id: 'width', type: 'len', label: 'Narrowest clear width' },
@@ -1039,8 +1039,8 @@
         ]
       },
       {
-        id: 'picnic_aba', label: 'Picnic table (park or picnic area)', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice. For tables at a building\'s dining area use "Picnic table, bench or outdoor seating".',
+        id: 'picnic_aba', label: 'Picnic table (park or picnic area)', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice. For tables at a building\'s dining area use "Picnic table, bench or outdoor seating".',
         fields: [
           { id: 'tables', type: 'count', label: 'Picnic tables in this area' },
           { id: 'tables_ok', type: 'count', label: 'Tables with a wheelchair space and on an outdoor recreation access route' },
@@ -1060,8 +1060,8 @@
         ]
       },
       {
-        id: 'fire_grill', label: 'Fire ring, grill or cooking surface', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        id: 'fire_grill', label: 'Fire ring, grill or cooking surface', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'height', type: 'len', label: 'Cooking surface height' },
           { id: 'cgs', type: 'bool', label: 'Clear, firm and nearly level ground space around it (48 x 48 in at fire rings, 30 x 48 in at grills)?' },
@@ -1074,8 +1074,8 @@
         ]
       },
       {
-        id: 'bench_aba', label: 'Park bench', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        id: 'bench_aba', label: 'Park bench', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'seat', type: 'len', label: 'Seat height' },
           { id: 'back', type: 'bool', label: 'Back support provided?' },
@@ -1088,8 +1088,8 @@
         ]
       },
       {
-        id: 'campsite', label: 'Campsite or tent pad', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        id: 'campsite', label: 'Campsite or tent pad', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'surface', type: 'bool', label: 'Tent pad surface firm and stable (allows tent stakes)?' },
           { id: 'slope', type: 'slope', label: 'Steepest slope on the tent pad' },
@@ -1104,8 +1104,8 @@
         ]
       },
       {
-        id: 'viewing', label: 'Overlook, viewing area or viewing scope', group: 'Trails and parks (ABA)',
-        scopeNote: 'Federal ABA rules (Chapter 10). Required when federal funds apply; otherwise best practice.',
+        id: 'viewing', label: 'Overlook, viewing area or viewing scope', group: 'Trails and parks (ADA and ABA Guidelines, Ch. 10)',
+        scopeNote: 'ADA and ABA Accessibility Guidelines, Chapter 10. Required when federal funds apply; otherwise best practice.',
         fields: [
           { id: 'cgs', type: 'bool', label: '30 x 48 in clear ground space at each distinct viewing spot?' },
           { id: 'view_height', type: 'len', label: 'Railing or wall height in front of the seated view', allowNA: true },

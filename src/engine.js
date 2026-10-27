@@ -305,8 +305,8 @@
       // ABA-only checks depend on whether federal money requires the ABA guidelines at this site
       if (check.aba && !check.ada && !check.mi && r.status === 'fail') {
         var ff = (visit && visit.federalFunds) || 'unknown';
-        if (ff === 'no') r = Object.assign(r, { status: 'advice', reason: 'Not met. The ABA guidelines are best practice here because no federal money applies.' });
-        else if (ff !== 'yes') r = Object.assign(r, { status: 'manual', reason: 'Does not meet the ABA guideline. Whether it is required depends on federal funding: confirm, then record it in the visit details.' });
+        if (ff === 'no') r = Object.assign(r, { status: 'advice', reason: 'Not met. These outdoor rules (ADA and ABA Accessibility Guidelines, Chapter 10) are best practice here because no federal money applies.' });
+        else if (ff !== 'yes') r = Object.assign(r, { status: 'manual', reason: 'Does not meet the ADA and ABA Accessibility Guidelines, Chapter 10. Whether it is required depends on federal funding: confirm, then record it in the visit details.' });
       }
       // Best-practice and safety items (no ADA, ABA or Michigan side): an unmet item is advice, not a violation
       if (check.bp && !check.ada && !check.aba && !check.mi && r.status === 'fail') {
