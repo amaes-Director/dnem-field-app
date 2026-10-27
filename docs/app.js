@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var APP_VERSION = 'Oct 27 All code citations confirmed';
+  var APP_VERSION = 'Oct 27 EV charging citations checked';
   // DNEM's Google Drive upload service (Apps Script web app, see src/drive/Code.gs).
   // When empty, "Send visit" uses the phone's share sheet instead.
   var UPLOAD_URL = '';

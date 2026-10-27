@@ -40,7 +40,7 @@
   }
 
   var RULES = {
-    version: '2026-10-27.8',
+    version: '2026-10-27.9',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -596,22 +596,25 @@
           { id: 'reach_high', type: 'len', label: 'Highest operable part (screen, card reader, connector holster)' },
           { id: 'reach_low', type: 'len', label: 'Lowest operable part' },
           { id: 'cord', type: 'bool', label: 'Cord reaches the vehicle without crossing the access aisle or a curb?' },
-          { id: 'signed', type: 'bool', label: 'Accessible charging space identified, without restricting it to placard holders only?', allowNA: true }
+          { id: 'signed', type: 'bool', label: 'Accessible charging space open to all drivers (not reserved for placard holders only)?', allowNA: true }
         ],
         checks: [
           { id: 'ev-count', label: 'Accessible EV charging spaces (5% min, at least 1)', kind: 'ratio', num: 'accessible', den: 'total', minPct: 5, newOnly: true,
             mi: { cite: '2021 MBC §1107.2.1', verify: true },
-            note: 'Michigan also requires at least one accessible space for each type of charger (MBC 1107.2.1). Chargers serving Group R-2, R-3 and R-4 housing are exempt. Applies to chargers installed under the 2021 Michigan Building Code; for older installations the count is shown as best practice.' },
+            note: 'Federal rules set no number; the ADA requires a "reasonable number" and the Access Board recommends at least two accessible charging spaces. Michigan also requires at least one accessible space for each type of charger (MBC 1107.2.1). Chargers serving Group R-2, R-3 and R-4 housing are exempt. Applies to chargers installed under the 2021 Michigan Building Code; for older installations the count is shown as best practice.' },
           { id: 'ev-width', label: 'Space width (132 in min)', field: 'space_width', newOnly: true, mi: { cite: '2021 MBC §1107.2.2', min: 132, verify: true }, bp: bp(EV_BP, { min: 132 }) },
           { id: 'ev-aisle', label: 'Access aisle width (60 in min)', field: 'aisle_width', newOnly: true, mi: { cite: '2021 MBC §1107.2.2', min: 60, verify: true }, bp: bp(EV_BP, { min: 60 }) },
           { id: 'ev-slope', label: 'Space and aisle slope (1:48 max)', field: 'slope', bp: bp(EV_BP, { max: 2.08 }) },
-          { id: 'ev-route', label: 'On an accessible route', field: 'route', bp: bp(EV_BP, { expect: true }) },
-          { id: 'ev-cfs', label: 'Clear floor space at the charger', field: 'cfs', bp: bp(EV_BP, { expect: true }) },
-          { id: 'ev-high', label: 'Highest operable part (48 in max)', field: 'reach_high', bp: bp(EV_BP + '; reach range per ADA 308', { max: 48 }) },
-          { id: 'ev-low', label: 'Lowest operable part (15 in min)', field: 'reach_low', bp: bp(EV_BP + '; reach range per ADA 308', { min: 15 }) },
+          { id: 'ev-route', label: 'On an accessible route', field: 'route', ada: ada('206.2.2 and 402', { expect: true }),
+            note: 'The Access Board confirms accessible EV chargers must be on an accessible route (Design Recommendations for Accessible EV Charging Stations).' },
+          { id: 'ev-cfs', label: 'Clear floor space at the charger (30 x 48 in)', field: 'cfs', ada: ada('305', { expect: true }),
+            note: 'Required for a reasonable number of chargers. The Access Board recommends a parallel approach centered on the operable parts, with no curbs, wheel stops or bollards in the space.' },
+          { id: 'ev-high', label: 'Highest operable part (48 in max)', field: 'reach_high', ada: ada('309.3 and 308', { max: 48 }),
+            note: 'The Access Board recommends an unobstructed side reach (308.3.1): 48 in max, within 10 in of the clear floor space.' },
+          { id: 'ev-low', label: 'Lowest operable part (15 in min)', field: 'reach_low', ada: ada('309.3 and 308', { min: 15 }) },
           { id: 'ev-cord', label: 'Cord reach', field: 'cord', bp: bp(EV_BP, { expect: true }) },
-          { id: 'ev-sign', label: 'Accessible charging space identified', field: 'signed', bp: bp(EV_BP, { expect: true }),
-            note: 'The Access Board recommends identifying the space as accessible without reserving it only for placard holders, so the charger is not left unused.' }
+          { id: 'ev-sign', label: 'Not reserved for placard holders only', field: 'signed', bp: bp(EV_BP, { expect: true }),
+            note: 'The Access Board does not recommend ISA signs at accessible EV charging spaces unless a state or local code requires them (the 2021 MBC does not list EV spaces in 1112.1). It suggests a "use last" approach so the charger is not left unused.' }
         ]
       },
       {
