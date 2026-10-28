@@ -14,6 +14,9 @@ fs.writeFileSync(path.join(phoneOut, '.nojekyll'), '');
 fs.copyFileSync(path.join(SRC, 'rules.js'), path.join(phoneOut, 'rules.js'));
 fs.copyFileSync(path.join(SRC, 'engine.js'), path.join(phoneOut, 'engine.js'));
 fs.copyFileSync(path.join(SRC, 'walk.js'), path.join(phoneOut, 'walk.js'));
+// Put the logo inside app.js so it still shows when the app files are copied without dnem_logo.png.
+const phoneJs = path.join(phoneOut, 'app.js');
+fs.writeFileSync(phoneJs, fs.readFileSync(phoneJs, 'utf8').replace('src="dnem_logo.png"', 'src="data:image/png;base64,' + fs.readFileSync(path.join(SRC, 'phone/dnem_logo.png')).toString('base64') + '"'));
 
 // report builder (single file)
 const inline = js => '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n</script>';
