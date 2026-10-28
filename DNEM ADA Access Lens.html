@@ -21985,7 +21985,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   }
 
   var RULES = {
-    version: '2026-10-27.10',
+    version: '2026-10-28.1',
     codes: {
       ada: { short: 'ADA 2010', name: 'ADA Accessibility Guidelines (2010 ADA Standards for Accessible Design)' },
       aba: { short: 'ABA', name: 'ADA and ABA Accessibility Guidelines, Chapter 10: outdoor developed areas (Architectural Barriers Act scoping)' },
@@ -23238,6 +23238,528 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     el.checks.forEach(function (c) { if (c.mi && (MI_CONFIRMED.indexOf(el.id + '.' + c.id) >= 0 || /^2021 MBC/.test(c.mi.cite))) c.mi.verify = false; });
   });
 
+  // Citation and wording updates from Amy's review of the rules workbook, Oct 28, 2026
+  // (Rules_review_citations_corrected.xlsx). fed replaces the federal or best-practice cite, mi the Michigan cite.
+  var REVIEW_OCT28 = {
+   "parking_lot.lot-count": {
+    "mi": "2021 MBC §1106.2 and Table 1106.2"
+   },
+   "route.rt-width": {
+    "note": "ADA permits 32 in minimum width for a segment no longer than 24 in, with intervening segments at least 48 in long and 36 in wide. ICC uses 52 in intervening length in new buildings/facilities and 48 in in existing buildings/facilities."
+   },
+   "ramp.rp-edge": {
+    "note": "ADA §405.9 exceptions apply to: ramps without required handrails whose sides meet §406.3; landing sides serving an adjoining ramp run or stairway; and landing sides with no more than a 1/2 in drop within 10 in horizontally of the minimum landing area. A compliant curb or barrier is an edge-protection method under §405.9.2."
+   },
+   "protruding.po-protrude": {
+    "label": "Protrusion (4 in max when leading edge is more than 27 in and up to 80 in high)"
+   },
+   "door.dr-thresh": {
+    "note": "Existing or altered thresholds 3/4 in high max with a bevel are allowed (ADA 404.2.5 Exception).",
+    "fed": "ADA 2010 §404.2.5"
+   },
+   "door.dr-force": {
+    "note": "The 5 lbf limit applies to interior hinged doors and to sliding/folding doors. ADA and this ICC provision do not set that maximum for exterior hinged doors. Fire doors and other safety-related exceptions must satisfy the applicable authority's permitted force."
+   },
+   "door.dr-pull-latch": {
+    "label": "Front approach, pull side: latch-side clearance"
+   },
+   "door.dr-pull-depth": {
+    "label": "Front approach, pull side: maneuvering depth"
+   },
+   "door.dr-push-depth": {
+    "label": "Front approach, push side: maneuvering depth",
+    "note": "Add 12 in latch-side clearance when the door has both a closer and a latch.",
+    "mi": "ICC A117.1-2017 §404.2.3.2 (Table 404.2.3.2, including footnote 5)"
+   },
+   "door.dr-other": {
+    "fed": "ADA 2010 §404.2.4.1 and 404.2.4.2 (Tables 404.2.4.1 and 404.2.4.2)"
+   },
+   "toilet.wc-sgb-len": {
+    "label": "Horizontal side grab bar length"
+   },
+   "toilet.wc-sgb-rear": {
+    "label": "Horizontal side grab bar distance from rear wall"
+   },
+   "toilet.wc-sgb-reach": {
+    "label": "Horizontal side grab bar extends from rear wall"
+   },
+   "toilet.wc-gb-ht": {
+    "label": "Horizontal grab bar height (adult use)"
+   },
+   "toilet.wc-tp-front": {
+    "label": "Paper dispenser location",
+    "mi": "ICC A117.1-2017 §604.7.1, including Exception (see publisher errata)"
+   },
+   "toilet.wc-tp-ht": {
+    "mi": "ICC A117.1-2017 §604.7.1, including Exception (see publisher errata)",
+    "note": "A117.1-2017 (as corrected by ICC errata): outlet 18 to 48 in above the floor; 15 in minimum only for dispensers holding no more than two rolls of 5 in diameter or less, mounted 7 to 9 in in front of the water closet (604.7.1 Exception)."
+   },
+   "toilet_room.tr-swing": {
+    "note": "Generally prohibited, subject to the exceptions in ADA §603.2.3 and ICC §603.2.2. ADA permits the single-user-room exception where the required clear floor space is available beyond the swing."
+   },
+   "lavatory.lv-knee": {
+    "mi": "ICC A117.1-2017 §606.2 and 306.3.1"
+   },
+   "operable.op-high": {
+    "label": "Unobstructed high reach (48 in max)"
+   },
+   "operable.op-low": {
+    "label": "Unobstructed low reach (15 in min)"
+   },
+   "signage.sg-braille": {
+    "mi": "ICC A117.1-2017 §703.3.1 and 703.4"
+   },
+   "curb_ramp.cr-landing": {
+    "label": "Top landing length (perpendicular curb ramp)"
+   },
+   "play_area.pa-route": {
+    "mi": "2021 MBC §§1104 and 1111.4.13"
+   },
+   "play_area.pa-ramp": {
+    "fed": "ADA 2010 §240.2.2 and §1008.2.1 Exception 1"
+   },
+   "play_area.pa-gwidth": {
+    "note": "ADA §1008.2.4.1 has two separate exceptions: in play areas smaller than 1,000 sq ft, a 44 in route is permitted with a turning space where the restricted route exceeds 30 ft; independently, 36 in-wide segments are permitted for no more than 60 in, separated by segments at least 60 by 60 in."
+   },
+   "play_component.pc-route": {
+    "label": "Required accessible play component on an accessible route",
+    "note": "Apply the ground-level type/count requirements and the elevated-component percentage in ADA §240.2; not every individual component must be accessible."
+   },
+   "play_component.pc-entry": {
+    "note": "Applies where transfer to a play-component entry point or seat is required; slide entry points have an exception under ADA §1008.4.4."
+   },
+   "play_component.pc-table": {
+    "label": "Play table rim, curb or other obstruction height (31 in max)"
+   },
+   "play_component.pc-knee": {
+    "note": "Under ADA §1008.4.3 Exception, play tables designed primarily for children 5 years and younger may omit knee clearance where the required clear floor or ground space is arranged for a parallel approach."
+   },
+   "pool.pl-entries": {
+    "fed": "ADA 2010 §242.2, §242.3 and §242.4"
+   },
+   "pool_lift.lf-foot": {
+    "note": "Under ADA §1009.2.6, footrests move with the seat; footrests are not required for lifts provided in spas."
+   },
+   "pool_slope.ps-depth": {
+    "label": "Swimming-pool sloped-entry submerged depth (24 to 30 in)",
+    "note": "ADA §1009.3.2 applies the 24–30 in depth to swimming-pool sloped entries and required landings. For a wading pool, the sloped entry extends to its deepest part."
+   },
+   "pool_slope.ps-rails": {
+    "note": "ADA §1009.3.3 requires at least two handrails; its exceptions address handrail clear width in certain pools and omit handrails at wading-pool sloped entries."
+   },
+   "assembly.as-count": {
+    "note": "For 101–150 seats, the federal table requires 4 wheelchair spaces and the MBC table requires 5. Apply each applicable table, including its other seating bands.",
+    "mi": "2021 MBC §1109.2.2.1 and Table 1109.2.2.1"
+   },
+   "assembly.as-df": {
+    "label": "Wheelchair-space depth, front or rear entry"
+   },
+   "fishing.fp-edge": {
+    "label": "Edge protection: curb or barrier option (2 in min)",
+    "note": "ADA edge protection is required where qualifying railings, guards or handrails are provided. A complying extended ground/deck surface under §1005.3.2 is an alternative to the 2 in curb/barrier.",
+    "fed": "ADA 2010 §1005.3 and §1005.3.1"
+   },
+   "boating.bt-gang": {
+    "fed": "ADA 2010 §1003.2, §1003.2.1 and §405.2",
+    "mi": "ICC A117.1-2017 §1003.2.1 and 405.2"
+   },
+   "boating.bt-pier": {
+    "fed": "ADA 2010 §1003.3.1 and §1003.3.2"
+   },
+   "golf.gf-mini": {
+    "mi": "2021 MBC §§1111.4.12.1 and 1111.4.12.3"
+   },
+   "exercise.ex-type": {
+    "fed": "ADA 2010 §236.1 and §206.2.13"
+   },
+   "picnic.pn-route": {
+    "label": "Required accessible dining surface on an accessible route",
+    "mi": "2021 MBC §§1104.2 and 1110.12.1; ICC A117.1-2017 §902"
+   },
+   "picnic.pn-scope": {
+    "label": "Determine accessible dining-surface count and site applicability",
+    "note": "ADA §226.1 applies to dining surfaces provided for consumption of food or drink: at least 5% of the seating and standing spaces must comply with §902, subject to its exceptions. It is not merely an optional practice for picnic tables used as dining surfaces. This section does not establish a general accessible-park-bench count. Federal ABA outdoor-developed-area rules have separate applicability.",
+    "mi": "2021 MBC §1110.12; ICC A117.1-2017 §902"
+   },
+   "trail.tr-surf": {
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. Where scoped, trail tread must be firm and stable."
+   },
+   "trail.tr-width": {
+    "note": "Minimum clear tread width is 36 in. There is no general 32-in physical-constraint exception; departures require the applicable §1017.1/§1019 exception."
+   },
+   "trail.tr-pass": {
+    "note": "Where tread width is under 60 in, passing spaces are required at intervals no greater than 1,000 ft. Use a 60-by-60-in space or the specified T intersection."
+   },
+   "trail.tr-obst": {
+    "note": "Maximum obstacle height is 1/2 in on asphalt, concrete or boards, and 2 in on other surfaces. The cited provision has no 3-in allowance.",
+    "fed": "ABA §1017.5"
+   },
+   "trail.tr-open": {
+    "note": "Openings must not admit a sphere greater than 1/2 in in diameter. The advisory recommends orienting elongated openings perpendicular, or as nearly perpendicular as possible, to the dominant travel direction."
+   },
+   "trail.tr-run": {
+    "note": "Maximum running slope is 1:8. Segments steeper than 1:20 through 1:12: 200 ft max; steeper than 1:12 through 1:10: 30 ft max; steeper than 1:10 through 1:8: 10 ft max. Provide resting intervals at the top and bottom of segments steeper than 1:20.",
+    "fed": "ABA §1017.7.1 and Table 1017.7.1"
+   },
+   "trail.tr-30": {
+    "note": "No more than 30% of the total trail length may have a running slope steeper than 1:12."
+   },
+   "trail.tr-cross": {
+    "note": "Cross slope is limited to 1:48. On surfaces other than asphalt, concrete or boards, up to 1:20 is allowed where necessary for drainage.",
+    "fed": "ABA §1017.7.2"
+   },
+   "trail.tr-rest": {
+    "note": "Provide resting intervals at the top and bottom of segments steeper than 1:20. Length is 60 in minimum; width depends on whether the interval is within or adjacent to the trail. Slope is 1:48 maximum, with the specified 1:20 drainage exception."
+   },
+   "trail.tr-head": {
+    "note": "Constructed elements on trails must comply with §307, including the 80-in minimum vertical clearance and barrier provisions.",
+    "fed": "ABA §§1017.9 and 307.4"
+   },
+   "trail.tr-sign": {
+    "label": "Trail information signs (where provided)",
+    "note": "Where new trail information signs are provided at trailheads on newly constructed or altered hiking/pedestrian trails, include trail length, surface, typical/minimum tread width, and typical/maximum running and cross slopes. This is conditional sign content, not a blanket requirement to install a sign."
+   },
+   "orar.or-surf": {
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. Where scoped, outdoor recreation access route surfaces must be firm and stable."
+   },
+   "orar.or-width": {
+    "note": "Minimum clear tread width is 36 in. Apply only the exceptions available under the outdoor recreation access route provisions."
+   },
+   "orar.or-pass": {
+    "note": "Where tread width is under 60 in, passing spaces are required at intervals no greater than 200 ft; use a 60-by-60-in space or the specified T intersection."
+   },
+   "orar.or-obst": {
+    "note": "Maximum tread obstacle height is 1/2 in. The exception allows 1 in on surfaces other than asphalt, concrete or boards."
+   },
+   "orar.or-open": {
+    "note": "Openings must not admit a sphere greater than 1/2 in. The 1-in exception in §1016.5 concerns tread obstacles, not openings."
+   },
+   "orar.or-run": {
+    "note": "Maximum running slope is 1:10. Segments steeper than 1:20 through 1:12: 50 ft maximum; steeper than 1:12 through 1:10: 30 ft maximum. Resting intervals are required at the top and bottom of segments steeper than 1:20.",
+    "fed": "ABA §1016.7.1 and Table 1016.7.1"
+   },
+   "orar.or-cross": {
+    "note": "Cross slope is limited to 1:48. On surfaces other than asphalt, concrete or boards, up to 1:20 is allowed where necessary for drainage."
+   },
+   "orar.or-rest": {
+    "note": "Resting intervals are 60 in long minimum and at least as wide as the widest adjoining route segment. Slope is 1:48 maximum, with the specified 1:20 drainage exception."
+   },
+   "orar.or-head": {
+    "note": "Constructed elements on outdoor recreation access routes must comply with §307, including the 80-in minimum vertical clearance and barrier provisions.",
+    "fed": "ABA §§1016.9 and 307.4"
+   },
+   "beach_route.br-surf": {
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. Where scoped, beach access route surfaces must be firm and stable."
+   },
+   "beach_route.br-width": {
+    "note": "Clear width is 60 in minimum. The exception permits 48 in for non-removable routes crossing dunes."
+   },
+   "beach_route.br-run": {
+    "note": "Maximum running slope is 1:10. Segments steeper than 1:20 through 1:12: 50 ft maximum; steeper than 1:12 through 1:10: 30 ft maximum. Resting intervals are required at the top and bottom of segments steeper than 1:20. Removable beach access routes are exempt from §1018.7 under §1018.1 Exception 3.",
+    "fed": "ABA §1018.7.1 and Table 1018.7.1"
+   },
+   "beach_route.br-cross": {
+    "note": "Cross slope is limited to 1:48. On surfaces other than asphalt, concrete or boards, up to 1:20 is allowed where necessary for drainage. Removable beach access routes are exempt from §1018.7 under §1018.1 Exception 3."
+   },
+   "beach_route.br-obst": {
+    "note": "Maximum tread obstacle height is 1/2 in. The exception allows 1 in on surfaces other than asphalt, concrete or boards."
+   },
+   "beach_route.br-water": {
+    "label": "Connects beach entry to the required water level",
+    "note": "Connect the beach entry point to high tide level at tidal beaches, mean high water level at river beaches, or normal recreation water level at lakes, ponds and reservoirs."
+   },
+   "picnic_aba.pk-count": {
+    "label": "Accessible picnic tables (count depends on location)",
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. In common/public-use areas serving picnic units with mobility features, at least 20%, but not less than one, of each feature type at each location must comply. Within each picnic unit with mobility features, at least one of each type must comply, or at least two when more than one of that type is provided. Picnic-unit counts are separately scoped by §§F245.2.1–F245.2.2.",
+    "fed": "ABA §§F245.2.5.1 and F245.3"
+   },
+   "picnic_aba.pk-height": {
+    "note": "Accessible picnic-table tops must be 28–34 in above the finish ground."
+   },
+   "picnic_aba.pk-knee": {
+    "note": "Wheelchair spaces at picnic tables require knee and toe clearance under §306. Knee clearance reaches at least 27 in high; depth and width are separate requirements.",
+    "fed": "ABA §§1011.4.2 and 306.3"
+   },
+   "picnic_aba.pk-kdepth": {
+    "note": "Required knee clearance is at least 8 in deep at 27 in high and 11 in deep at 9 in high. Required toe clearance extends at least 17 in under the element. There is no 19-in minimum knee-depth requirement in these sections.",
+    "fed": "ABA §§1011.4.2, 306.3.3 and 306.2.3"
+   },
+   "picnic_aba.pk-cgs": {
+    "note": "Provide 36 in of clear ground space on all usable sides, measured from the back edge of picnic-table benches.",
+    "fed": "ABA §1011.2.1 and Table 1011.2.1"
+   },
+   "picnic_aba.pk-surf": {
+    "label": "Firm, stable clear ground space and compliant slope",
+    "note": "Clear ground surfaces must be firm and stable. Slope is 1:48 maximum; up to 1:20 is allowed on surfaces other than asphalt, concrete or boards where necessary for drainage."
+   },
+   "fire_grill.fg-height": {
+    "note": "Cooking surfaces must be 15–34 in above the finish ground. Section 1011.6 concerns water spouts."
+   },
+   "fire_grill.fg-cgs": {
+    "note": "Provide 48-by-48-in clear ground space on all usable sides of grills, fire rings, fireplaces and wood stoves; the table gives positioning and permitted overlap details.",
+    "fed": "ABA §1011.2.1 and Table 1011.2.1"
+   },
+   "fire_grill.fg-route": {
+    "note": "Outdoor recreation access route requirements depend on the camping or picnic setting. For outdoor constructed features along trails, the connection requirement is §F247.4.4; do not apply camping/picnic route scoping indiscriminately."
+   },
+   "bench_aba.bn-seat": {
+    "label": "Recommended outdoor bench seat height (17 to 19 in)",
+    "note": "The 17–19-in seat-height benchmark is from §903.5. Outdoor bench provisions in §1011 do not impose that height; record this as a recommendation unless another applicable scoping rule requires §903.",
+    "fed": "Best practice benchmark: ABA §903.5; no outdoor-bench seat-height requirement in §1011"
+   },
+   "bench_aba.bn-back": {
+    "label": "Recommended outdoor bench back support",
+    "note": "Back support is recommended for this outdoor bench check. Section 1011 does not impose §903.4 on outdoor benches merely because they are benches.",
+    "fed": "Best practice benchmark: ABA §903.4; no outdoor-bench back-support requirement in §1011"
+   },
+   "bench_aba.bn-cgs": {
+    "note": "Provide clear ground space 36 by 48 in near the bench. One side must adjoin an outdoor recreation access route or trail. It must not overlap that route/trail or another clear ground space.",
+    "fed": "ABA §1011.2.1 and Table 1011.2.1"
+   },
+   "campsite.cs-surf": {
+    "label": "Firm and stable clear ground space around tent pad",
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. Firm and stable surface requirements in this subsection apply to the clear ground space surrounding tent pads/platforms. Surfaces must accommodate tent stakes and other securing devices."
+   },
+   "campsite.cs-slope": {
+    "note": "Tent-pad/platform slope is 1:48 maximum. The exception permits 1:20, not 1:33, on surfaces other than asphalt, concrete or boards where necessary for drainage."
+   },
+   "campsite.cs-cgs": {
+    "note": "Provide clear ground space 48 in wide minimum on all usable sides of tent pads and tent platforms. Section 1013.4 instead addresses platform height."
+   },
+   "campsite.cs-route": {
+    "note": "Accessible tent pads/platforms in camping units must be connected by the scoped outdoor recreation access route. Trail-side facilities have separate connection requirements in §F247.4.4."
+   },
+   "viewing.vw-cgs": {
+    "note": "ABA outdoor provisions have the limited federal scope in §F201.4; they are not a general ADA mandate for all Michigan parks. Provide clear ground space 36 by 48 in minimum at each distinct viewing location, positioned for forward or parallel approach to the view."
+   },
+   "viewing.vw-view": {
+    "label": "Clear viewing space (bottom ≤32 in; top ≥51 in)",
+    "note": "The viewing space must extend across the full width of the clear ground space, with its bottom no higher than 32 in and its top at least 51 in above ground. The exception permits safety barriers to the extent necessary for safety."
+   },
+   "viewing.vw-scope": {
+    "note": "The eyepiece of an accessible viewing scope must be 43–51 in above the finish ground."
+   },
+   "viewing.vw-route": {
+    "note": "Outdoor recreation access routes connect accessible parking/other arrival points with accessible elements and spaces within a viewing area. Viewing areas along trails use the applicable trail connection provisions, including §F247.4.4."
+   },
+   "voting_station.vs-route": {
+    "label": "Route to the station (minimum depends on applicable standard)"
+   },
+   "voting_station.vs-cfs": {
+    "note": "ADA minimum clear floor space is 30 by 48 in. ICC A117.1-2017 requires 30 by 52 in for new buildings/facilities and permits 30 by 48 in in existing buildings/facilities."
+   },
+   "voting_station.vs-reach": {
+    "label": "Unobstructed high reach to controls (48 in max)",
+    "note": "48 in is the unobstructed high reach maximum. Apply §308.2.2 or §308.3.2 where an obstruction affects reach."
+   },
+   "voting_station.vs-machine": {
+    "fed": "Help America Vote Act, 52 U.S.C. §21081(a)(3)(A)–(B)",
+    "mi": "MCL 168.795(1)(n) and (3)"
+   },
+   "temp_fix.tf-edge": {
+    "note": "Vertical changes up to 1/4 in are allowed under §303.2. Changes over 1/4 in through 1/2 in must be beveled no steeper than 1:2; larger changes require a compliant ramp."
+   },
+   "temp_fix.tf-width": {
+    "label": "Clear width (minimum depends on applicable standard)"
+   },
+   "event_tent.et-level": {
+    "note": "Up to 1/4 in may be vertical; over 1/4 through 1/2 in requires a bevel no steeper than 1:2. Changes over 1/2 in must meet the applicable ramp or curb-ramp provisions.",
+    "fed": "ADA 2010 §§303.2–303.4",
+    "mi": "ICC A117.1-2017 §§303.2–303.4"
+   },
+   "event_tent.et-entry": {
+    "note": "32 in minimum clear opening; openings deeper than 24 in require 36 in clear width. Door maneuvering clearances are separate requirements."
+   },
+   "event_tent.et-aisle": {
+    "label": "Aisle width (minimum depends on applicable standard)"
+   },
+   "event_tent.et-turn": {
+    "note": "Where turning space is required, ADA permits a 60-in-diameter circle or its specified T shape. ICC A117.1-2017 generally requires a 67-in circle in new facilities, permits a 60-in circle in existing facilities, and provides specified T-shaped alternatives."
+   },
+   "event_tent.et-counter": {
+    "label": "Sales or service counter, parallel approach (36 in max)",
+    "note": "This row covers the accessible sales/service counter with parallel approach. Dining or work tables instead use the 28–34-in height range in ADA §902.3 / ICC §902.",
+    "mi": "ICC A117.1-2017 §904.3.2 and Figure 904.3(B), as corrected by ICC errata"
+   },
+   "event_tent.et-high": {
+    "label": "Unobstructed high reach (48 in max)",
+    "note": "Apply the lower permitted high reach where an obstruction triggers §308.2.2 or §308.3.2."
+   },
+   "event_tent.et-low": {
+    "label": "Unobstructed low reach (15 in min)"
+   },
+   "event_path.ep-surf": {
+    "label": "Firm, stable and slip-resistant path"
+   },
+   "event_path.ep-level": {
+    "note": "Changes over 1/2 in must comply with the applicable ramp provisions, including slope and other applicable dimensions. A ramped cable-cover edge alone does not establish compliance. The ordinary ramp running-slope maximum is 1:12.",
+    "fed": "ADA 2010 §§303.2–303.4 and 405",
+    "mi": "ICC A117.1-2017 §§303.2–303.4 and 405"
+   },
+   "event_path.ep-open": {
+    "note": "Openings must not admit a sphere greater than 1/2 in; elongated openings must be perpendicular to the dominant direction of travel."
+   },
+   "portable_toilet.pt-count": {
+    "label": "Accessible units in each portable-toilet cluster",
+    "note": "The ADA portable-unit exception applies to each cluster; round required fractions up and identify compliant units with the International Symbol of Accessibility. Evaluate Michigan building-code scoping separately.",
+    "fed": "ADA 2010 §213.2 Exception 3; §§104.1.1 and 216.8",
+    "mi": "2021 MBC §1110.2 (general toilet-room scoping)"
+   },
+   "portable_toilet.pt-route": {
+    "note": "Section 302.1 addresses only surface characteristics. An accessible route also requires compliant width, slopes, changes in level and any other route components. Michigan scoping must be read with the applicable MBC accessibility provisions.",
+    "fed": "ADA 2010 §§206.2.2, 402 and 403",
+    "mi": "ICC A117.1-2017 §§402 and 403"
+   },
+   "portable_toilet.pt-level": {
+    "note": "Up to 1/4 in may be vertical; over 1/4 through 1/2 in requires a bevel no steeper than 1:2. Changes over 1/2 in must meet the applicable ramp or curb-ramp provisions.",
+    "fed": "ADA 2010 §§303.2–303.4",
+    "mi": "ICC A117.1-2017 §§303.2–303.4"
+   },
+   "portable_toilet.pt-door": {
+    "note": "32 in minimum clear opening; openings deeper than 24 in require 36 in clear width. Door maneuvering clearances are separate requirements."
+   },
+   "portable_toilet.pt-turn": {
+    "note": "Where turning space is required, ADA permits a 60-in-diameter circle or its specified T shape. ICC A117.1-2017 generally requires a 67-in circle in new facilities, permits a 60-in circle in existing facilities, and provides specified T-shaped alternatives."
+   },
+   "ev_charger.ev-count": {
+    "label": "Accessible EV charging spaces (5% min; at least 1 per charger type under MBC)",
+    "note": "The MBC count applies where the 2021 MBC governs the work. Section 1107.2 exempts charging stations serving Group R-2, R-3 and R-4 occupancies. The applicable code for older installations depends on the work and permitting history."
+   },
+   "ev_charger.ev-width": {
+    "note": "Applies only to work permitted under the 2021 MBC.",
+    "fed": "U.S. Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (updated July 17, 2023) — Electric Vehicle Charging Space and Access Aisle"
+   },
+   "ev_charger.ev-aisle": {
+    "note": "Applies only to work permitted under the 2021 MBC.",
+    "fed": "U.S. Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (updated July 17, 2023) — Electric Vehicle Charging Space and Access Aisle"
+   },
+   "ev_charger.ev-slope": {
+    "note": "The guide recommends a 1:48 maximum for vehicle charging spaces and aisles. Required clear floor space at accessible charger controls separately has a binding 1:48 limit under ADA §305.2.",
+    "fed": "U.S. Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (updated July 17, 2023) — Electric Vehicle Charging Space and Access Aisle"
+   },
+   "ev_charger.ev-route": {
+    "note": "Accessible chargers must connect to an accessible route. The Access Board guidance explains existing ADA route obligations; it does not newly create them."
+   },
+   "ev_charger.ev-cfs": {
+    "note": "Required accessible charger operable parts need clear floor space at least 30 by 48 in, with no changes in level and slope no steeper than 1:48. The guidance explains existing ADA requirements.",
+    "fed": "ADA 2010 §§205, 309.2 and 305"
+   },
+   "ev_charger.ev-high": {
+    "label": "Highest operable part, unobstructed reach (48 in max)",
+    "note": "Reach ranges are existing ADA requirements at accessible charger controls. The Access Board recommends an unobstructed side reach. Apply §§308.2.2/308.3.2 where obstructions affect the permitted high reach.",
+    "fed": "ADA 2010 §§309.3, 308.2.1 and 308.3.1"
+   },
+   "ev_charger.ev-low": {
+    "label": "Lowest operable part, unobstructed reach (15 in min)",
+    "note": "Reach ranges are existing ADA requirements at accessible charger controls. The Access Board recommends an unobstructed side reach. Apply §§308.2.2/308.3.2 where obstructions affect the permitted high reach.",
+    "fed": "ADA 2010 §§309.3, 308.2.1 and 308.3.1"
+   },
+   "ev_charger.ev-cord": {
+    "note": "The guide recommends sufficient cable length for different vehicle inlet locations. Cable placement must also preserve required accessible routes and clear spaces.",
+    "fed": "U.S. Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (updated July 17, 2023) — Charging Cables"
+   },
+   "ev_charger.ev-sign": {
+    "note": "The guide encourages identification such as use-last signage. It does not recommend the International Symbol of Accessibility unless state or local code requires it. Follow applicable state/local designation and reservation rules.",
+    "fed": "U.S. Access Board, Design Recommendations for Accessible Electric Vehicle Charging Stations (updated July 17, 2023) — Number of Accessible Chargers and Use Last Approach"
+   },
+   "lighting.lt-route": {
+    "label": "Recommended: route lit",
+    "note": "This row is a lighting recommendation. Check applicable building, egress and site-lighting requirements separately; absence of a citation here does not establish that Michigan has no applicable requirement.",
+    "fed": "Best-practice check; no specific illumination criterion cited"
+   },
+   "lighting.lt-park": {
+    "label": "Recommended: accessible parking lit",
+    "note": "This row is a lighting recommendation. Check applicable building, egress and site-lighting requirements separately; absence of a citation here does not establish that Michigan has no applicable requirement.",
+    "fed": "Best-practice check; no specific illumination criterion cited"
+   },
+   "lighting.lt-door": {
+    "label": "Recommended: accessible entrance lit",
+    "note": "This row is a lighting recommendation. Check applicable building, egress and site-lighting requirements separately; absence of a citation here does not establish that Michigan has no applicable requirement.",
+    "fed": "Best-practice check; no specific illumination criterion cited"
+   },
+   "lighting.lt-change": {
+    "label": "Recommended: level changes lit without glare",
+    "note": "This row is a lighting recommendation. Check applicable building, egress and site-lighting requirements separately; absence of a citation here does not establish that Michigan has no applicable requirement.",
+    "fed": "Best-practice check; no specific illumination criterion cited"
+   },
+   "amusement_ride.ar-slope": {
+    "label": "Slope of required turning space at load/unload areas (1:48 max)"
+   },
+   "amusement_ride.ar-signs": {
+    "mi": "2021 MBC §1112.4, item 7",
+    "note": "Michigan: signs identifying the type of access are required at entries to queues and waiting lines, plus signs to the accessible load and unload areas where those also serve as unload areas (MBC 1112.4, item 7)."
+   },
+   "shooting.sh-count": {
+    "fed": "ADA 2010 §243.1"
+   },
+   "shooting.sh-route": {
+    "fed": "ADA 2010 §206.2.2 and §243.1",
+    "mi": "2021 MBC §§1104 and 1111.4.15"
+   },
+   "shooting.sh-slope": {
+    "label": "Slope of required circular turning space at firing position (1:48 max)"
+   },
+   "shooting.sh-counter": {
+    "note": "Michigan (ICC A117.1) rule; the 2010 ADA Standards have no firing-counter height. Where other positions of the same type have counters, the accessible one needs an equivalent counter."
+   },
+   "sauna.sa-turn": {
+    "note": "ADA §612.2 Exception permits a readily removable bench to obstruct the required turning space and bench clear floor/ground space. ICC A117.1-2017 §612.3 requires a turning space; the indexed §612.2 bench provision has a separate individual-use door-swing exception."
+   },
+   "sauna.sa-door": {
+    "note": "ICC A117.1-2017 §612.2 Exception permits the door to overlap the bench space in an individual-use room when a clear floor space complying with §305.3 is provided beyond the door-swing arc. Use the applicable new/existing-building clear-space dimensions; do not assume 30 by 48 in for every project."
+   },
+   "play_safety.ps-surf": {
+    "note": "Playground safety check. The July 2025 CPSC handbook is current federal guidance; do not assume that edition is automatically incorporated by Michigan law. Match protective surfacing to the equipment fall height and use-zone requirements.",
+    "fed": "CPSC Public Playground Safety Handbook, Publication 325 (July 2025), §2.4; Michigan Playground Equipment Safety Act, MCL 408.684 and 408.686"
+   },
+   "play_safety.ps-zone": {
+    "label": "Use zones clear and sized for the equipment type",
+    "note": "Playground safety check. The July 2025 CPSC handbook is current federal guidance; do not assume that edition is automatically incorporated by Michigan law. Use-zone dimensions depend on equipment type, height, motion and permitted overlap. A universal 6-ft rule is not sufficient.",
+    "fed": "CPSC Public Playground Safety Handbook, Publication 325 (July 2025), §5.3 (equipment-specific use zones), including §5.3.10 where applicable; Michigan Playground Equipment Safety Act, MCL 408.684 and 408.686"
+   },
+   "play_safety.ps-trap": {
+    "note": "Playground safety check. The July 2025 CPSC handbook is current federal guidance; do not assume that edition is automatically incorporated by Michigan law. Evaluate head-entrapment hazards using the handbook criteria and applicable test procedures, rather than treating every opening as prohibited.",
+    "fed": "CPSC Public Playground Safety Handbook, Publication 325 (July 2025), §3.3.1 and Appendix B; Michigan Playground Equipment Safety Act, MCL 408.684 and 408.686"
+   },
+   "play_safety.ps-repair": {
+    "note": "Playground safety check. The July 2025 CPSC handbook is current federal guidance; do not assume that edition is automatically incorporated by Michigan law. Inspect and maintain equipment and surfacing; follow manufacturer instructions and address damaged or missing parts.",
+    "fed": "CPSC Public Playground Safety Handbook, Publication 325 (July 2025), §§4.1–4.3 and Appendix A; Michigan Playground Equipment Safety Act, MCL 408.684 and 408.686"
+   },
+   "play_safety.ps-insp": {
+    "note": "Playground safety check. The July 2025 CPSC handbook is current federal guidance; do not assume that edition is automatically incorporated by Michigan law. Keep dated inspection, maintenance and repair records; retain manufacturer instructions and inspection checklists.",
+    "fed": "CPSC Public Playground Safety Handbook, Publication 325 (July 2025), §4.4 and Appendix A; Michigan Playground Equipment Safety Act, MCL 408.684 and 408.686"
+   },
+   "surface.sf-firm": {
+    "note": "Added Oct 26, 2026."
+   },
+   "surface.sf-damage": {
+    "label": "Surface condition maintains required accessibility",
+    "note": "Evaluate potholes or broken pavement against the applicable surface, opening and level-change limits. Maintenance is separately addressed by 28 CFR §35.133 for public entities and §36.211 for public accommodations."
+   },
+   "surface.sf-level": {
+    "fed": "ADA 2010 §303.2, §303.3 and §303.4",
+    "mi": "ICC A117.1-2017 §303.2, §303.3 and §303.4"
+   }
+  };
+  RULES.elements.forEach(function (el) {
+    el.checks.forEach(function (c) {
+      var r = REVIEW_OCT28[el.id + '.' + c.id];
+      if (!r) return;
+      if (r.label) c.label = r.label;
+      if (r.note) c.note = r.note;
+      if (r.fed) { var s = c.ada || c.aba || c.bp; if (s) s.cite = r.fed; }
+      if (r.mi) { if (c.mi) c.mi.cite = r.mi; else c.mi = { cite: r.mi, expect: (c.ada || c.aba || {}).expect }; }
+    });
+  });
+  // Toilet paper outlet height under A117.1-2017 as corrected by ICC errata (Amy's review, Oct 28, 2026).
+  RULES.elements.forEach(function (el) {
+    el.checks.forEach(function (c) {
+      if (el.id === 'toilet' && c.id === 'wc-tp-ht') c.mi.min = 18;
+      // Every best-practice source is now checked except exterior lighting, which has none.
+      if (c.bp) c.bp.verify = /lighting|illumination/i.test(c.bp.cite);
+      if (c.mi) c.mi.verify = false;
+    });
+  });
   if (typeof module !== 'undefined' && module.exports) module.exports = RULES;
   else root.DNEM_RULES = RULES;
 })(this);
